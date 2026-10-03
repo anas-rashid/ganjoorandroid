@@ -54,4 +54,16 @@
     <string name="previous_poem">‹ %s</string>
     <string name="download_selected">Download %d poets</string>
     <string name="home">Home</string>
+    <string name="search">Search</string>
+    <string name="search_poems">Search poems</string>
+    <string name="search_poems_for">Search poems for “%s”</string>
+    <string name="all_poets">All poets</string>
+    <string name="choose_poets">Choose poets</string>
+    <string name="no_results">Nothing found.</string>
+    <string name="search_needs_connection">Search needs a connection. Turn off offline mode to use it.</string>
+    <string name="load_more">Load more</string>
+    <string name="done">Done</string>
+    <string name="theme_black">Black (OLED)</string>
+    <string name="about">About &amp; licences</string>
+    <string name="about_intro">Ganjoor for Android is free software. The poems, the fonts and every library it is built on are credited below; tap an entry to read its full licence.</string>
 </resources>

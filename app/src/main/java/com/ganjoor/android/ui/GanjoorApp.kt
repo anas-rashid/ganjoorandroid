@@ -31,10 +31,16 @@ data class CategoryRoute(val url: String)
 data class PoemRoute(val url: String, val fromBookmarks: Boolean = false)
 
 @Serializable
+data class SearchRoute(val term: String = "")
+
+@Serializable
 object BookmarksRoute
 
 @Serializable
 object DownloadsRoute
+
+@Serializable
+object AboutRoute
 
 /**
  * Opens a page with the poet list as the only thing beneath it.
@@ -63,7 +69,13 @@ fun GanjoorApp() {
     val nav = rememberNavController()
     var settingsOpen by rememberSaveable { mutableStateOf(false) }
 
-    CompositionLocalProvider(LocalOpenReadingSettings provides { settingsOpen = true }) {
+    CompositionLocalProvider(
+        LocalOpenReadingSettings provides { settingsOpen = true },
+        LocalOpenAbout provides {
+            settingsOpen = false
+            nav.navigate(AboutRoute)
+        },
+    ) {
         NavHost(
             navController = nav,
             startDestination = PoetsRoute,
@@ -77,6 +89,7 @@ fun GanjoorApp() {
             composable<PoetsRoute> {
                 PoetsScreen(
                     onPoet = { nav.open(CategoryRoute(it)) },
+                    onSearchPoems = { nav.navigate(SearchRoute(it)) },
                     onBookmarks = { nav.navigate(BookmarksRoute) },
                     onDownloads = { nav.navigate(DownloadsRoute) },
                 )
@@ -112,6 +125,15 @@ fun GanjoorApp() {
                     onCategory = { nav.open(CategoryRoute(it)) },
                 )
             }
+            composable<SearchRoute> { entry ->
+                SearchScreen(
+                    initialTerm = entry.toRoute<SearchRoute>().term,
+                    onUp = { nav.navigateUp() },
+                    onHome = { nav.goHome() },
+                    // Searching is a list, like the saved poems, so Back returns to the results.
+                    onPoem = { nav.navigate(PoemRoute(it, fromBookmarks = true)) },
+                )
+            }
             composable<BookmarksRoute> {
                 BookmarksScreen(
                     onUp = { nav.goHome() },
@@ -122,8 +144,12 @@ fun GanjoorApp() {
             composable<DownloadsRoute> {
                 DownloadsScreen(onUp = { nav.goHome() })
             }
+            composable<AboutRoute> {
+                AboutScreen(onUp = { nav.navigateUp() }, onHome = { nav.goHome() })
+            }
         }
-    }
 
-    if (settingsOpen) ReadingSettingsSheet(onDismiss = { settingsOpen = false })
+        // Inside the provider: the sheet reads LocalOpenAbout, so it has to be in scope.
+        if (settingsOpen) ReadingSettingsSheet(onDismiss = { settingsOpen = false })
+    }
 }

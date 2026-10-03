@@ -39,7 +39,8 @@ Licences are in [`licenses/`](licenses/).
 
 ## Themes, size, language
 
-Five themes, persisted: System, Light, Dark, Sepia and Sepia night. The two sepia schemes are
+Six themes, persisted: System, Light, Dark, Sepia, Sepia night, and Black for OLED panels,
+where an unlit pixel costs no power at all. The two sepia schemes are
 warm paper tones for long sessions; the dark one has no blue cast. Text size runs 14–40 sp with a
 live preview in the settings sheet.
 
@@ -135,15 +136,13 @@ server supports **AGP 9.4.1** — it is new, and that is the most likely thing t
 
 ## Licensing
 
-The app code is MIT (see [`LICENSE`](LICENSE)). What it builds on:
+The app code is MIT (see [`LICENSE`](LICENSE)). Every other component — the poems, the three
+bundled fonts, and each library — is credited with its terms in
+[`licenses/README.md`](licenses/README.md), and the full licence texts ship inside the APK,
+readable at **Reading settings → About & licences**.
 
-- **The poetry** is classical Persian verse, long out of copyright.
-- **The data set** ([`ganjoor/ganjoor-data`](https://github.com/ganjoor/ganjoor-data)) carries no
-  licence file at all. Worth asking upstream to add an explicit one.
-- **[GanjoorService](https://github.com/ganjoor/GanjoorService)**, Ganjoor's own backend and site,
-  is GPL-3.0. This app uses none of its code — only data over HTTPS — so it is not a derivative
-  work of it. Nothing in Ganjoor's repositories restricts AI-assisted use.
-- **The icon** is original: an eight-point shamsa, the star that tiles Persian architecture.
-  Ganjoor's own app icons are unlicensed and are their mark, so they are not used here.
+The two things worth knowing up front: the **data set** carries no licence file, and
+**GanjoorService** is GPL-3.0 but none of its code is used here — only data over HTTPS — so this
+app is not a derivative work of it.
 
 Not affiliated with or endorsed by Ganjoor.

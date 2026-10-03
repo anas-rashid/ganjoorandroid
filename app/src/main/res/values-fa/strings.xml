@@ -49,4 +49,16 @@
     <string name="copied">رونوشت شد</string>
     <string name="download_selected">دریافت %d شاعر</string>
     <string name="home">خانه</string>
+    <string name="search">جست‌وجو</string>
+    <string name="search_poems">جست‌وجوی شعرها</string>
+    <string name="search_poems_for">جست‌وجوی «%s» در شعرها</string>
+    <string name="all_poets">همهٔ شاعران</string>
+    <string name="choose_poets">انتخاب شاعران</string>
+    <string name="no_results">چیزی یافت نشد.</string>
+    <string name="search_needs_connection">جست‌وجو به اینترنت نیاز دارد. حالت برون‌خط را خاموش کنید.</string>
+    <string name="load_more">بیشتر</string>
+    <string name="done">تمام</string>
+    <string name="theme_black">سیاه (OLED)</string>
+    <string name="about">درباره و پروانه‌ها</string>
+    <string name="about_intro">گنجور برای اندروید نرم‌افزار آزاد است. شعرها، قلم‌ها و همهٔ کتابخانه‌هایی که این برنامه بر آن‌ها ساخته شده در زیر آمده‌اند؛ برای خواندن متن کامل پروانه روی هر مورد بزنید.</string>
 </resources>

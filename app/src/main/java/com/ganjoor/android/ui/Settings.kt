@@ -18,6 +18,9 @@ enum class ThemeMode(@StringRes val label: Int) {
     Dark(R.string.theme_dark),
     Sepia(R.string.theme_sepia),
     SepiaDark(R.string.theme_sepia_dark),
+
+    /** Pure black, so OLED panels can switch the pixels off entirely. */
+    Black(R.string.theme_black),
 }
 
 enum class ReadingFont(@StringRes val label: Int) {

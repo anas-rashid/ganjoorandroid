@@ -147,6 +147,21 @@ private data class LivePoem(val id: Int = 0, val excerpt: String? = null)
 
 private val liveJson = Json { ignoreUnknownKeys = true }
 
+@Serializable
+data class SearchHit(
+    val id: Int = 0,
+    val title: String = "",
+    val fullTitle: String = "",
+    val fullUrl: String = "",
+    val plainText: String? = null,
+)
+
+/** The line a search term actually appears on, rather than the opening line of the poem. */
+fun snippet(hit: SearchHit, term: String): String {
+    val lines = hit.plainText.orEmpty().lineSequence().map { it.trim() }.filter { it.isNotEmpty() }
+    return (lines.firstOrNull { it.contains(term) } ?: lines.firstOrNull()).orEmpty()
+}
+
 fun catPath(fullUrl: String) = "poets${fullUrl.trimEnd('/')}/_cat.json"
 
 fun poemPath(fullUrl: String) = "poets${fullUrl.trimEnd('/')}.json"
@@ -271,6 +286,42 @@ object Ganjoor {
         }.onSuccess {
             if (it.isNotEmpty()) Offline.write(path, liveJson.encodeToString(it))
         }.getOrDefault(emptyMap())
+    }
+
+    /**
+     * Full-text search across the poems.
+     *
+     * The static data set carries no index, so this is ganjoor.net's own search. An empty
+     * [poetIds] searches every poet; otherwise one query runs per poet and the results merge,
+     * since the endpoint scopes to a single poet at a time.
+     *
+     * ponytail: online only. Searching offline would mean scanning the downloaded tree file by
+     * file, which is fine for one poet and hopeless for all of them.
+     */
+    suspend fun search(
+        term: String,
+        poetIds: List<Int>,
+        page: Int,
+        pageSize: Int = 20,
+    ): List<SearchHit> = withContext(Dispatchers.IO) {
+        if (term.isBlank() || offline) return@withContext emptyList()
+        val scopes: List<Int?> = poetIds.ifEmpty { listOf(null) }
+        coroutineScope {
+            scopes.map { poetId ->
+                async {
+                    val url = liveBase.newBuilder()
+                        .addPathSegments("api/ganjoor/poems/search")
+                        .addQueryParameter("term", term)
+                        .addQueryParameter("PageNumber", page.toString())
+                        .addQueryParameter("PageSize", pageSize.toString())
+                        .also { if (poetId != null) it.addQueryParameter("poetId", poetId.toString()) }
+                        .build()
+                    runCatching {
+                        liveJson.decodeFromString<List<SearchHit>>(fetch(url))
+                    }.getOrDefault(emptyList())
+                }
+            }.awaitAll().flatten()
+        }
     }
 
     /**

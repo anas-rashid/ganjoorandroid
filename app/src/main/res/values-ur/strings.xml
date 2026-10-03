@@ -49,4 +49,16 @@
     <string name="copied">نقل ہو گیا</string>
     <string name="download_selected">%d شعرا ڈاؤن لوڈ کریں</string>
     <string name="home">ہوم</string>
+    <string name="search">تلاش</string>
+    <string name="search_poems">کلام میں تلاش</string>
+    <string name="search_poems_for">کلام میں «%s» تلاش کریں</string>
+    <string name="all_poets">تمام شعرا</string>
+    <string name="choose_poets">شعرا منتخب کریں</string>
+    <string name="no_results">کچھ نہیں ملا۔</string>
+    <string name="search_needs_connection">تلاش کے لیے انٹرنیٹ درکار ہے۔ آف لائن موڈ بند کریں۔</string>
+    <string name="load_more">مزید</string>
+    <string name="done">مکمل</string>
+    <string name="theme_black">سیاہ (OLED)</string>
+    <string name="about">تعارف اور لائسنس</string>
+    <string name="about_intro">گنجور فار اینڈرائیڈ آزاد سافٹ ویئر ہے۔ کلام، فونٹس اور تمام لائبریریاں ذیل میں درج ہیں؛ مکمل لائسنس پڑھنے کے لیے کسی اندراج پر ٹیپ کریں۔</string>
 </resources>

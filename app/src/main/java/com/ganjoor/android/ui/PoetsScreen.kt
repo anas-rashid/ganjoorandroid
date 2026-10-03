@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -24,9 +26,11 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -52,7 +56,15 @@ import com.ganjoor.android.data.PoetRef
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PoetsScreen(onPoet: (String) -> Unit, onBookmarks: () -> Unit, onDownloads: () -> Unit) {
+fun PoetsScreen(
+    onPoet: (String) -> Unit,
+    onSearchPoems: (String) -> Unit,
+    onBookmarks: () -> Unit,
+    onDownloads: () -> Unit,
+) {
+    // Hoisted so the search box can live in the bottom bar, within thumb reach.
+    var query by remember { mutableStateOf("") }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -68,12 +80,18 @@ fun PoetsScreen(onPoet: (String) -> Unit, onBookmarks: () -> Unit, onDownloads: 
                     ReadingSettingsAction()
                 },
             )
-        }
+        },
+        bottomBar = {
+            SearchBar(
+                query = query,
+                onQueryChange = { query = it },
+                onSearchPoems = { onSearchPoems(query.trim()) },
+            )
+        },
     ) { insets ->
         Load(key = Unit, block = { Ganjoor.manifest() }) { manifest ->
             val settings = LocalSettings.current
             val sort = settings.value.poetSort
-            var query by remember { mutableStateOf("") }
             val poets = remember(query, manifest, sort) {
                 val matches =
                     if (query.isBlank()) manifest.poets
@@ -116,20 +134,44 @@ fun PoetsScreen(onPoet: (String) -> Unit, onBookmarks: () -> Unit, onDownloads: 
                         }
                     }
                 }
-                item(span = { GridItemSpan(maxLineSpan) }) {
-                    OutlinedTextField(
-                        value = query,
-                        onValueChange = { query = it },
-                        label = { Text(stringResource(R.string.search_poets)) },
-                        leadingIcon = { Icon(Icons.Default.Search, null) },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp),
-                    )
-                }
                 items(poets, key = { it.id }) { poet ->
                     PoetCard(poet) { onPoet(poet.fullUrl) }
                 }
             }
+        }
+    }
+}
+
+/**
+ * Filters the poets as you type, and offers the same words to the poem search one tap further.
+ * It sits at the bottom of the screen: a phone held one-handed reaches here, not the top.
+ */
+@Composable
+private fun SearchBar(query: String, onQueryChange: (String) -> Unit, onSearchPoems: () -> Unit) {
+    Surface(tonalElevation = 3.dp) {
+        Column(
+            modifier = Modifier
+                .navigationBarsPadding()
+                .imePadding()
+                .padding(horizontal = 12.dp, vertical = 8.dp),
+        ) {
+            if (query.isNotBlank()) {
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.search_poems_for, query.trim())) },
+                    leadingContent = {
+                        Icon(Icons.Default.Search, null, tint = MaterialTheme.colorScheme.primary)
+                    },
+                    modifier = Modifier.clickable(onClick = onSearchPoems),
+                )
+            }
+            OutlinedTextField(
+                value = query,
+                onValueChange = onQueryChange,
+                label = { Text(stringResource(R.string.search_poets)) },
+                leadingIcon = { Icon(Icons.Default.Search, null) },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+            )
         }
     }
 }

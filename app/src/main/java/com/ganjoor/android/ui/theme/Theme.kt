@@ -64,6 +64,36 @@ private val DarkScheme = darkColorScheme(
     outline = Color(0xFF899393),
 )
 
+/**
+ * True black, for OLED panels: a black pixel is an unlit pixel, so a night-time reading session
+ * costs noticeably less battery than the regular dark theme's dark grey. Surfaces step up in
+ * near-black greys so cards and sheets stay distinguishable without lighting the whole screen.
+ */
+private val BlackScheme = darkColorScheme(
+    primary = Color(0xFF80D4DA),
+    onPrimary = Color(0xFF00363A),
+    primaryContainer = Color(0xFF004F53),
+    onPrimaryContainer = Color(0xFF9CF1F6),
+    secondary = Color(0xFFFFB873),
+    onSecondary = Color(0xFF4A2800),
+    secondaryContainer = Color(0xFF693C00),
+    onSecondaryContainer = Color(0xFFFFDCBE),
+    background = Color(0xFF000000),
+    onBackground = Color(0xFFE3E3E3),
+    surface = Color(0xFF000000),
+    onSurface = Color(0xFFE3E3E3),
+    surfaceVariant = Color(0xFF1C1C1C),
+    onSurfaceVariant = Color(0xFFBDBDBD),
+    outline = Color(0xFF6E6E6E),
+    surfaceBright = Color(0xFF262626),
+    surfaceDim = Color(0xFF000000),
+    surfaceContainerLowest = Color(0xFF000000),
+    surfaceContainerLow = Color(0xFF0A0A0A),
+    surfaceContainer = Color(0xFF101010),
+    surfaceContainerHigh = Color(0xFF1A1A1A),
+    surfaceContainerHighest = Color(0xFF242424),
+)
+
 // Aged paper, for long reading sessions.
 private val SepiaScheme = lightColorScheme(
     primary = Color(0xFF7A4E24),
@@ -121,11 +151,12 @@ fun GanjoorTheme(mode: ThemeMode, language: Language, content: @Composable () ->
     val dark = when (mode) {
         ThemeMode.System -> isSystemInDarkTheme()
         ThemeMode.Light, ThemeMode.Sepia -> false
-        ThemeMode.Dark, ThemeMode.SepiaDark -> true
+        ThemeMode.Dark, ThemeMode.SepiaDark, ThemeMode.Black -> true
     }
     val scheme = when (mode) {
         ThemeMode.Sepia -> SepiaScheme
         ThemeMode.SepiaDark -> SepiaDarkScheme
+        ThemeMode.Black -> BlackScheme
         else -> if (dark) DarkScheme else LightScheme
     }
 

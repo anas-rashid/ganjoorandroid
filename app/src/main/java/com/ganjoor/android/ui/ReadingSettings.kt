@@ -20,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.staticCompositionLocalOf
@@ -40,6 +41,9 @@ import com.ganjoor.android.ui.theme.readingStyle
 val LocalOpenReadingSettings = staticCompositionLocalOf<() -> Unit> {
     error("No reading settings host")
 }
+
+/** Opens the About and licences screen; the sheet is the only place that needs it. */
+val LocalOpenAbout = staticCompositionLocalOf<() -> Unit> { error("No about host") }
 
 /** Top-bar button that opens the reading settings sheet. */
 @Composable
@@ -122,6 +126,14 @@ fun ReadingSettingsSheet(onDismiss: () -> Unit) {
                 checked = prefs.showSummaries,
             ) { on ->
                 settings.update { it.copy(showSummaries = on) }
+            }
+
+            val openAbout = LocalOpenAbout.current
+            TextButton(
+                onClick = openAbout,
+                modifier = Modifier.padding(top = 16.dp),
+            ) {
+                Text(stringResource(R.string.about))
             }
         }
     }
