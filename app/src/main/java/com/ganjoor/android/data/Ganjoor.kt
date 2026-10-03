@@ -2,6 +2,9 @@ package com.ganjoor.android.data
 
 import android.content.Context
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
@@ -9,6 +12,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonNamingStrategy
 import okhttp3.Cache
 import okhttp3.CacheControl
+import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -131,23 +135,45 @@ fun List<Verse>.couplets(): List<List<Verse>> {
     return out
 }
 
+/** First lines come from ganjoor.net's live API, which uses camelCase. */
+@Serializable
+private data class LiveCatPage(val cat: LiveCat? = null)
+
+@Serializable
+private data class LiveCat(val poems: List<LivePoem> = emptyList())
+
+@Serializable
+private data class LivePoem(val id: Int = 0, val excerpt: String? = null)
+
+private val liveJson = Json { ignoreUnknownKeys = true }
+
+fun catPath(fullUrl: String) = "poets${fullUrl.trimEnd('/')}/_cat.json"
+
+fun poemPath(fullUrl: String) = "poets${fullUrl.trimEnd('/')}.json"
+
 object Ganjoor {
-    private val base = DATA_BASE.toHttpUrl()
+    private val dataBase = DATA_BASE.toHttpUrl()
+    private val liveBase = "https://api.ganjoor.net/".toHttpUrl()
     private lateinit var http: OkHttpClient
 
+    /** When set, nothing leaves the device: only downloaded pages open. */
+    @Volatile
+    var offline = false
+
     fun init(context: Context) {
+        Offline.init(context)
         if (::http.isInitialized) return
-        // jsDelivr serves these with a long max-age, so this disk cache is what makes already
-        // visited poems readable offline. ponytail: no Room mirror until "download a poet" exists.
+        // jsDelivr serves these with a long max-age, so this cache covers casual re-reading.
+        // Anything that has to survive for certain goes through Offline instead.
         http = OkHttpClient.Builder()
             .cache(Cache(File(context.cacheDir, "ganjoor-data"), 64L * 1024 * 1024))
             .build()
     }
 
-    private suspend inline fun <reified T> get(path: String): T = withContext(Dispatchers.IO) {
-        val request = Request.Builder()
-            .url(base.newBuilder().addPathSegments(path).build())
-            .build()
+    private fun dataUrl(path: String) = dataBase.newBuilder().addPathSegments(path).build()
+
+    private fun fetch(url: HttpUrl): String {
+        val request = Request.Builder().url(url).build()
         val response = try {
             http.newCall(request).execute()
         } catch (offline: IOException) {
@@ -155,19 +181,102 @@ object Ganjoor {
             http.newCall(request.newBuilder().cacheControl(CacheControl.FORCE_CACHE).build())
                 .execute()
         }
-        response.use {
-            if (!it.isSuccessful) throw IOException("HTTP ${it.code} for $path")
-            json.decodeFromString<T>(it.body!!.string())
+        return response.use {
+            if (!it.isSuccessful) throw IOException("HTTP ${it.code} for $url")
+            it.body!!.string()
         }
     }
 
-    suspend fun manifest(): Manifest = get("manifest.json")
+    /** Downloaded copy first, then the network — unless offline mode rules the network out. */
+    private suspend inline fun <reified T> load(path: String): T = withContext(Dispatchers.IO) {
+        Offline.read(path)?.let { return@withContext json.decodeFromString<T>(it) }
+        if (offline) throw NotDownloaded(path)
+        json.decodeFromString<T>(fetch(dataUrl(path)))
+    }
 
-    suspend fun poet(slug: String): Poet = get("poets/$slug/poet.json")
+    /** Like [load], but keeps the body on disk. Already-saved paths cost nothing. */
+    private suspend fun grab(path: String): String = withContext(Dispatchers.IO) {
+        Offline.read(path) ?: fetch(dataUrl(path)).also { Offline.write(path, it) }
+    }
+
+    // Kept on disk from the first fetch: without the poet list, offline mode has no way in.
+    suspend fun manifest(): Manifest = json.decodeFromString(grab("manifest.json"))
+
+    suspend fun poet(slug: String): Poet = load("poets/$slug/poet.json")
 
     /** @param fullUrl a Ganjoor category URL, e.g. `/hafez/ghazal` (or `/hafez` for a poet's root). */
-    suspend fun category(fullUrl: String): Category = get("poets${fullUrl.trimEnd('/')}/_cat.json")
+    suspend fun category(fullUrl: String): Category = load(catPath(fullUrl))
 
     /** @param fullUrl a Ganjoor poem URL, e.g. `/hafez/ghazal/sh1`. */
-    suspend fun poem(fullUrl: String): Poem = get("poets${fullUrl.trimEnd('/')}.json")
+    suspend fun poem(fullUrl: String): Poem = load(poemPath(fullUrl))
+
+    /**
+     * Poem id -> opening line, for a category listing.
+     *
+     * The data set's `_cat.json` carries only id, title and url, so this is a best-effort call
+     * to ganjoor.net's live API; the list renders without it and fills in when it lands. The
+     * result is kept on disk so downloaded poets still show their first lines offline.
+     *
+     * ponytail: delete this the day ganjoor-data's `_cat.json` gains an Excerpt field.
+     */
+    suspend fun excerpts(catId: Int): Map<Int, String> = withContext(Dispatchers.IO) {
+        val path = "excerpts/$catId.json"
+        Offline.read(path)?.let {
+            return@withContext runCatching {
+                liveJson.decodeFromString<Map<Int, String>>(it)
+            }.getOrDefault(emptyMap())
+        }
+        if (offline) return@withContext emptyMap()
+
+        val url = liveBase.newBuilder()
+            .addPathSegments("api/ganjoor/cat/$catId")
+            .addQueryParameter("poems", "true")
+            .build()
+        runCatching {
+            liveJson.decodeFromString<LiveCatPage>(fetch(url)).cat?.poems.orEmpty()
+                .mapNotNull { poem -> poem.excerpt?.takeIf { it.isNotBlank() }?.let { poem.id to it } }
+                .toMap()
+        }.onSuccess {
+            if (it.isNotEmpty()) Offline.write(path, liveJson.encodeToString(it))
+        }.getOrDefault(emptyMap())
+    }
+
+    /**
+     * Saves a poet's whole tree — biography, every category and every poem — for offline reading.
+     * Re-running it is cheap: anything already on disk is skipped, which is also how a download
+     * interrupted by the process dying gets finished.
+     */
+    suspend fun downloadPoet(slug: String, onProgress: (done: Int, total: Int) -> Unit) {
+        val wasOffline = offline
+        offline = false
+        try {
+            runCatching { grab("poets/$slug/poet.json") }
+
+            val poemPaths = mutableListOf<String>()
+            val catIds = mutableListOf<Int>()
+
+            suspend fun walk(fullUrl: String) {
+                val cat = json.decodeFromString<Category>(grab(catPath(fullUrl)))
+                catIds += cat.id
+                cat.poems.forEach { poemPaths += poemPath(it.fullUrl) }
+                cat.childCats.forEach { walk(it.fullUrl) }
+            }
+            walk("/$slug")
+
+            onProgress(0, poemPaths.size)
+            var done = 0
+            // Six at a time: enough to keep the CDN busy without opening a connection per poem.
+            poemPaths.chunked(6).forEach { chunk ->
+                coroutineScope {
+                    chunk.map { path -> async { runCatching { grab(path) } } }.awaitAll()
+                }
+                done += chunk.size
+                onProgress(done, poemPaths.size)
+            }
+
+            catIds.forEach { runCatching { excerpts(it) } }
+        } finally {
+            offline = wasOffline
+        }
+    }
 }

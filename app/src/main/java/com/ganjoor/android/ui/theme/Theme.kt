@@ -10,6 +10,7 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
+import com.ganjoor.android.ui.Language
 import com.ganjoor.android.ui.ThemeMode
 
 // Persian tilework: turquoise with saffron accents.
@@ -116,7 +117,7 @@ private val SepiaDarkScheme = darkColorScheme(
 )
 
 @Composable
-fun GanjoorTheme(mode: ThemeMode, content: @Composable () -> Unit) {
+fun GanjoorTheme(mode: ThemeMode, language: Language, content: @Composable () -> Unit) {
     val dark = when (mode) {
         ThemeMode.System -> isSystemInDarkTheme()
         ThemeMode.Light, ThemeMode.Sepia -> false
@@ -139,5 +140,10 @@ fun GanjoorTheme(mode: ThemeMode, content: @Composable () -> Unit) {
         }
     }
 
-    MaterialTheme(colorScheme = scheme, typography = GanjoorTypography, content = content)
+    MaterialTheme(
+        colorScheme = scheme,
+        // Latin interface text gets a Latin reading serif; the RTL interfaces stay on naskh.
+        typography = if (language == Language.En) LibronTypography else NaskhTypography,
+        content = content,
+    )
 }

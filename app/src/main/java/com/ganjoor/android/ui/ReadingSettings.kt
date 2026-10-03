@@ -1,11 +1,12 @@
 package com.ganjoor.android.ui
 
+import android.app.Activity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -24,9 +25,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.ganjoor.android.R
+import com.ganjoor.android.data.Ganjoor
 import com.ganjoor.android.ui.theme.readingStyle
 
 /**
@@ -52,6 +55,7 @@ fun ReadingSettingsAction() {
 fun ReadingSettingsSheet(onDismiss: () -> Unit) {
     val settings = LocalSettings.current
     val prefs = settings.value
+    val context = LocalContext.current
 
     ModalBottomSheet(onDismissRequest = onDismiss) {
         Column(
@@ -66,25 +70,18 @@ fun ReadingSettingsSheet(onDismiss: () -> Unit) {
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Label(R.string.theme)
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                ThemeMode.entries.forEach { mode ->
-                    FilterChip(
-                        selected = prefs.theme == mode,
-                        onClick = { settings.update { it.copy(theme = mode) } },
-                        label = { Text(stringResource(mode.label)) },
-                    )
-                }
+            Chips(ThemeMode.entries, prefs.theme, { stringResource(it.label) }) { mode ->
+                settings.update { it.copy(theme = mode) }
             }
 
             Label(R.string.font)
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                ReadingFont.entries.forEach { font ->
-                    FilterChip(
-                        selected = prefs.font == font,
-                        onClick = { settings.update { it.copy(font = font) } },
-                        label = { Text(stringResource(font.label)) },
-                    )
-                }
+            Chips(ReadingFont.entries, prefs.font, { stringResource(it.label) }) { font ->
+                settings.update { it.copy(font = font) }
+            }
+
+            Label(R.string.weight)
+            Chips(ReadingWeight.entries, prefs.fontWeight, { stringResource(it.label) }) { weight ->
+                settings.update { it.copy(fontWeight = weight) }
             }
 
             Label(R.string.text_size)
@@ -94,31 +91,75 @@ fun ReadingSettingsSheet(onDismiss: () -> Unit) {
                 valueRange = 14f..40f,
                 steps = 12,
             )
-            // Live preview, so the size and font choice can be judged before closing the sheet.
+            // Live preview, so size, weight and font can be judged before closing the sheet.
             Text(
                 text = stringResource(R.string.font_preview),
-                style = readingStyle(prefs.font, prefs.fontSize),
+                style = readingStyle(prefs.font, prefs.fontSize, prefs.fontWeight.weight),
                 modifier = Modifier.fillMaxWidth(),
             )
 
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Column(Modifier.weight(1f)) {
-                    Text(stringResource(R.string.show_summaries))
-                    Text(
-                        text = stringResource(R.string.summary_ai_note),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
+            Label(R.string.language)
+            Chips(Language.entries, prefs.language, { it.label }) { language ->
+                if (language != prefs.language) {
+                    settings.update { it.copy(language = language) }
+                    // Resources are picked in attachBaseContext, so the activity has to restart.
+                    (context as? Activity)?.recreate()
                 }
-                Switch(
-                    checked = prefs.showSummaries,
-                    onCheckedChange = { on -> settings.update { it.copy(showSummaries = on) } },
-                )
+            }
+
+            Toggle(
+                title = R.string.offline_mode,
+                note = R.string.offline_mode_note,
+                checked = prefs.offline,
+            ) { on ->
+                settings.update { it.copy(offline = on) }
+                Ganjoor.offline = on
+            }
+
+            Toggle(
+                title = R.string.show_summaries,
+                note = R.string.summary_ai_note,
+                checked = prefs.showSummaries,
+            ) { on ->
+                settings.update { it.copy(showSummaries = on) }
             }
         }
+    }
+}
+
+@Composable
+private fun <T> Chips(
+    options: List<T>,
+    selected: T,
+    label: @Composable (T) -> String,
+    onSelect: (T) -> Unit,
+) {
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        options.forEach { option ->
+            FilterChip(
+                selected = option == selected,
+                onClick = { onSelect(option) },
+                label = { Text(label(option)) },
+            )
+        }
+    }
+}
+
+@Composable
+private fun Toggle(title: Int, note: Int, checked: Boolean, onChange: (Boolean) -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(Modifier.weight(1f)) {
+            Text(stringResource(title))
+            Text(
+                text = stringResource(note),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        Switch(checked = checked, onCheckedChange = onChange)
     }
 }
 

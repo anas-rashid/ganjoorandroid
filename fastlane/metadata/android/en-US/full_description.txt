@@ -1,0 +1,17 @@
+A reader for Ganjoor, the open archive of Persian poetry — 240 poets and around 135,000 poems,
+from Rudaki and Ferdowsi through Hafez, Saadi and Rumi to Parvin Etesami.
+
+Built for reading rather than browsing:
+
+* Poems are set as couplets, the way they are meant to be read, with prose sections laid out as prose.
+* Two bundled fonts, Noto Naskh Arabic and Noto Nastaliq Urdu, switchable mid-poem, with four weights so the text can be thickened for a lit screen.
+* Five themes: system, light, dark, sepia and sepia night.
+* Adjustable text size.
+* The whole interface reads and navigates right to left, in Persian, Urdu or English.
+* Bookmark anything, kept on the device.
+* Download a poet, or every poet, and read with no connection at all.
+
+The poems come from a static, git-tracked export of Ganjoor's content served over a CDN. There is
+no account, no tracking and no server of the app's own.
+
+Not affiliated with or endorsed by Ganjoor.

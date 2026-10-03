@@ -8,3 +8,11 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Local release signing — never committed; F-Droid signs with its own key.
+keystore.properties
+*.jks
+*.keystore
+
+# Built APKs copied out for testing
+/*.apk

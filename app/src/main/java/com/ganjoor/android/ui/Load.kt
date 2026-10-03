@@ -21,12 +21,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.ganjoor.android.R
+import com.ganjoor.android.data.NotDownloaded
 
 /**
  * Fetches [block] whenever [key] changes and renders loading / error / content.
  *
- * ponytail: no ViewModel, so going back re-fetches — which the OkHttp disk cache makes nearly
- * free. Promote to a ViewModel when a screen gains state worth surviving rotation.
+ * ponytail: no ViewModel, so going back re-fetches — which the disk cache makes nearly free.
+ * Promote to a ViewModel when a screen gains state worth surviving rotation.
  */
 @Composable
 fun <T> Load(key: Any?, block: suspend () -> T, content: @Composable (T) -> Unit) {
@@ -45,7 +46,12 @@ fun <T> Load(key: Any?, block: suspend () -> T, content: @Composable (T) -> Unit
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
-                    text = stringResource(R.string.load_failed),
+                    text = stringResource(
+                        // Offline mode failing on a page nobody downloaded isn't a network error,
+                        // and telling someone to check their connection would be a dead end.
+                        if (outcome.exceptionOrNull() is NotDownloaded) R.string.load_failed_offline
+                        else R.string.load_failed
+                    ),
                     style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center,
                 )

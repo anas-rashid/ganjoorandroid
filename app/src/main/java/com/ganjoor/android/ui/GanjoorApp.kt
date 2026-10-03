@@ -1,5 +1,6 @@
 package com.ganjoor.android.ui
 
+import androidx.compose.animation.AnimatedContentTransitionScope.SlideDirection
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -23,15 +24,34 @@ data class CategoryRoute(val url: String)
 @Serializable
 data class PoemRoute(val url: String)
 
+@Serializable
+object BookmarksRoute
+
+@Serializable
+object DownloadsRoute
+
 @Composable
 fun GanjoorApp() {
     val nav = rememberNavController()
     var settingsOpen by rememberSaveable { mutableStateOf(false) }
 
     CompositionLocalProvider(LocalOpenReadingSettings provides { settingsOpen = true }) {
-        NavHost(navController = nav, startDestination = PoetsRoute) {
+        NavHost(
+            navController = nav,
+            startDestination = PoetsRoute,
+            // Start/End rather than Left/Right, so going deeper always moves against the reading
+            // direction — leftwards here, since the app lays out right-to-left.
+            enterTransition = { slideIntoContainer(SlideDirection.Start) },
+            exitTransition = { slideOutOfContainer(SlideDirection.Start) },
+            popEnterTransition = { slideIntoContainer(SlideDirection.End) },
+            popExitTransition = { slideOutOfContainer(SlideDirection.End) },
+        ) {
             composable<PoetsRoute> {
-                PoetsScreen(onPoet = { nav.navigate(CategoryRoute(it)) })
+                PoetsScreen(
+                    onPoet = { nav.navigate(CategoryRoute(it)) },
+                    onBookmarks = { nav.navigate(BookmarksRoute) },
+                    onDownloads = { nav.navigate(DownloadsRoute) },
+                )
             }
             composable<CategoryRoute> { entry ->
                 CategoryScreen(
@@ -53,6 +73,15 @@ fun GanjoorApp() {
                         }
                     },
                 )
+            }
+            composable<BookmarksRoute> {
+                BookmarksScreen(
+                    onBack = { nav.navigateUp() },
+                    onPoem = { nav.navigate(PoemRoute(it)) },
+                )
+            }
+            composable<DownloadsRoute> {
+                DownloadsScreen(onBack = { nav.navigateUp() })
             }
         }
     }

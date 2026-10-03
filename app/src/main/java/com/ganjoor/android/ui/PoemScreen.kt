@@ -1,5 +1,6 @@
 package com.ganjoor.android.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -9,12 +10,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -27,12 +32,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ganjoor.android.R
+import com.ganjoor.android.data.Bookmark
 import com.ganjoor.android.data.Ganjoor
+import com.ganjoor.android.data.LocalBookmarks
 import com.ganjoor.android.data.PoemRef
 import com.ganjoor.android.data.Verse
 import com.ganjoor.android.data.couplets
@@ -43,7 +52,7 @@ import com.ganjoor.android.ui.theme.readingStyle
 fun PoemScreen(fullUrl: String, onBack: () -> Unit, onPoem: (String) -> Unit) {
     Load(key = fullUrl, block = { Ganjoor.poem(fullUrl) }) { poem ->
         val prefs = LocalSettings.current.value
-        val style = readingStyle(prefs.font, prefs.fontSize)
+        val style = readingStyle(prefs.font, prefs.fontSize, prefs.fontWeight.weight)
         val couplets = remember(poem) { poem.verses.couplets() }
 
         // Siblings come from the parent category, which is a much bigger file than the poem, so
@@ -65,10 +74,20 @@ fun PoemScreen(fullUrl: String, onBack: () -> Unit, onPoem: (String) -> Unit) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.back))
                         }
                     },
-                    actions = { ReadingSettingsAction() },
+                    actions = {
+                        BookmarkAction(
+                            url = fullUrl,
+                            title = poem.title,
+                            subtitle = poem.fullTitle,
+                        )
+                        ReadingSettingsAction()
+                    },
                 )
             }
         ) { insets ->
+            // Free-form selection for copying any span; the per-couplet actions below are for
+            // saving a passage with the reference attached, which a raw copy would lose.
+            SelectionContainer {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(
@@ -94,7 +113,14 @@ fun PoemScreen(fullUrl: String, onBack: () -> Unit, onPoem: (String) -> Unit) {
                     }
                 }
 
-                items(couplets) { couplet -> Couplet(couplet, style, prefs.showSummaries) }
+                items(couplets) { couplet ->
+                    Couplet(
+                        couplet = couplet,
+                        style = style,
+                        showSummaries = prefs.showSummaries,
+                        source = Bookmark(fullUrl, poem.title, poem.fullTitle),
+                    )
+                }
 
                 if (prefs.showSummaries) {
                     poem.poemSummary?.takeIf { it.isNotBlank() }?.let { summary ->
@@ -121,7 +147,23 @@ fun PoemScreen(fullUrl: String, onBack: () -> Unit, onPoem: (String) -> Unit) {
                     }
                 }
             }
+            }
         }
+    }
+}
+
+@Composable
+private fun BookmarkAction(url: String, title: String, subtitle: String) {
+    val bookmarks = LocalBookmarks.current
+    val saved = bookmarks.contains(url)
+    IconButton(onClick = { bookmarks.toggle(Bookmark(url, title, subtitle)) }) {
+        Icon(
+            imageVector = if (saved) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+            contentDescription = stringResource(
+                if (saved) R.string.bookmark_remove else R.string.bookmark_add
+            ),
+            tint = if (saved) MaterialTheme.colorScheme.primary else LocalContentColor.current,
+        )
     }
 }
 
@@ -134,8 +176,17 @@ private fun Couplet(
     couplet: List<Verse>,
     style: androidx.compose.ui.text.TextStyle,
     showSummaries: Boolean,
+    source: Bookmark,
 ) {
-    Column(Modifier.fillMaxWidth().padding(vertical = 6.dp)) {
+    // Tap, not long-press: long-press belongs to the text selection this sits inside.
+    var actionsOpen by remember(couplet) { mutableStateOf(false) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { actionsOpen = !actionsOpen }
+            .padding(vertical = 6.dp)
+    ) {
         couplet.forEach { verse ->
             Text(
                 text = verse.text,
@@ -161,6 +212,34 @@ private fun Couplet(
                         modifier = Modifier.padding(top = 4.dp, bottom = 8.dp),
                     )
                 }
+        }
+        if (actionsOpen) {
+            PassageActions(source.copy(excerpt = couplet.joinToString("\n") { it.text }))
+        }
+    }
+}
+
+/** Save this passage, or copy it. Saving keeps the link back to the poem; copying doesn't. */
+@Composable
+private fun PassageActions(passage: Bookmark) {
+    val bookmarks = LocalBookmarks.current
+    val clipboard = LocalClipboardManager.current
+    val saved = bookmarks.contains(passage)
+
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        TextButton(onClick = { bookmarks.toggle(passage) }) {
+            Text(
+                text = stringResource(
+                    if (saved) R.string.saved_passage else R.string.save_passage
+                ),
+                color = if (saved) MaterialTheme.colorScheme.primary
+                else LocalContentColor.current,
+            )
+        }
+        TextButton(onClick = {
+            clipboard.setText(AnnotatedString(passage.excerpt.orEmpty()))
+        }) {
+            Text(stringResource(R.string.copy))
         }
     }
 }
