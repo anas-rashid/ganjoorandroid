@@ -10,6 +10,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.core.graphics.drawable.toDrawable
 import com.ganjoor.android.data.Bookmarks
 import com.ganjoor.android.data.Ganjoor
 import com.ganjoor.android.data.LocalBookmarks
@@ -17,6 +18,7 @@ import com.ganjoor.android.ui.GanjoorApp
 import com.ganjoor.android.ui.LocalSettings
 import com.ganjoor.android.ui.Settings
 import com.ganjoor.android.ui.theme.GanjoorTheme
+import com.ganjoor.android.ui.theme.windowBackground
 import java.util.Locale
 
 class MainActivity : ComponentActivity() {
@@ -35,9 +37,19 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Ganjoor.init(applicationContext)
+
+        // Before the first frame: otherwise the window keeps the platform's white through
+        // startup and every screen transition, whatever theme is chosen.
+        val settings = Settings(applicationContext)
+        val systemInDark = resources.configuration.uiMode and
+            Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+        window.setBackgroundDrawable(
+            windowBackground(settings.value.theme, systemInDark).toDrawable()
+        )
+
         enableEdgeToEdge()
         setContent {
-            val settings = remember { Settings(applicationContext) }
+            val settings = remember { settings }
             val bookmarks = remember { Bookmarks(applicationContext) }
             // The client reads this flag on every request, so keep it in step with the setting.
             Ganjoor.offline = settings.value.offline

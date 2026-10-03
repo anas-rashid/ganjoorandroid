@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--
+      Android 12+ draws its own splash from these attributes, before any of our code runs, so it
+      can only follow the system's light/dark setting — not the theme chosen inside the app.
+      Picking sepia or OLED on a light-mode phone still shows a light splash for one frame.
+    -->
+    <style name="Theme.Ganjoorappandroid" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/window_background</item>
+        <item name="android:windowSplashScreenBackground">@color/window_background</item>
+    </style>
+</resources>

@@ -8,7 +8,9 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
+import androidx.core.graphics.drawable.toDrawable
 import androidx.core.view.WindowCompat
 import com.ganjoor.android.ui.Language
 import com.ganjoor.android.ui.ThemeMode
@@ -146,6 +148,20 @@ private val SepiaDarkScheme = darkColorScheme(
     outline = Color(0xFF968A72),
 )
 
+/**
+ * The window's own background colour for a theme. The activity paints this before Compose runs,
+ * so the gap between the window appearing and the first frame matches the theme instead of
+ * flashing the platform's white. A static XML theme can't express sepia or OLED, hence this.
+ */
+fun windowBackground(mode: ThemeMode, systemInDark: Boolean): Int = when (mode) {
+    ThemeMode.Light -> LightScheme
+    ThemeMode.Dark -> DarkScheme
+    ThemeMode.Sepia -> SepiaScheme
+    ThemeMode.SepiaDark -> SepiaDarkScheme
+    ThemeMode.Black -> BlackScheme
+    ThemeMode.System -> if (systemInDark) DarkScheme else LightScheme
+}.background.toArgb()
+
 @Composable
 fun GanjoorTheme(mode: ThemeMode, language: Language, content: @Composable () -> Unit) {
     val dark = when (mode) {
@@ -164,6 +180,9 @@ fun GanjoorTheme(mode: ThemeMode, language: Language, content: @Composable () ->
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
+            // Keep the window in step when the theme changes, so switching themes doesn't leave
+            // a stale colour behind transitions.
+            window.setBackgroundDrawable(scheme.background.toArgb().toDrawable())
             WindowCompat.getInsetsController(window, view).apply {
                 isAppearanceLightStatusBars = !dark
                 isAppearanceLightNavigationBars = !dark

@@ -1,5 +1,6 @@
 package com.ganjoor.android.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,12 +37,23 @@ fun <T> Load(key: Any?, block: suspend () -> T, content: @Composable (T) -> Unit
 
     result.let { outcome ->
         when {
-            outcome == null -> Box(Modifier.fillMaxSize(), Alignment.Center) {
+            // Painted explicitly: on the category and poem screens Load sits outside the
+            // Scaffold, so while loading nothing else fills the window and the bare window
+            // background would show through.
+            outcome == null -> Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background),
+                contentAlignment = Alignment.Center,
+            ) {
                 CircularProgressIndicator()
             }
 
             outcome.isFailure -> Column(
-                modifier = Modifier.fillMaxSize().padding(24.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(24.dp),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
