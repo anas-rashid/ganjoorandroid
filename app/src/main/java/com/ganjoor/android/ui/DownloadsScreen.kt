@@ -54,7 +54,7 @@ import com.ganjoor.android.data.PoetRef
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DownloadsScreen(onBack: () -> Unit) {
+fun DownloadsScreen(onUp: () -> Unit) {
     Load(key = Unit, block = { Ganjoor.manifest() }) { manifest ->
         val context = LocalContext.current
         // Re-read the disk whenever a download finishes or a poet is removed.
@@ -76,7 +76,7 @@ fun DownloadsScreen(onBack: () -> Unit) {
                 TopAppBar(
                     title = { Text(stringResource(R.string.downloads)) },
                     navigationIcon = {
-                        IconButton(onClick = onBack) {
+                        IconButton(onClick = onUp) {
                             Icon(
                                 Icons.AutoMirrored.Filled.ArrowBack,
                                 stringResource(R.string.back),

@@ -53,4 +53,5 @@
     <string name="next_poem">%s ›</string>
     <string name="previous_poem">‹ %s</string>
     <string name="download_selected">Download %d poets</string>
+    <string name="home">Home</string>
 </resources>

@@ -1,6 +1,9 @@
 package com.ganjoor.android
 
+import com.ganjoor.android.data.Crumb
 import com.ganjoor.android.data.Verse
+import com.ganjoor.android.data.breadcrumbs
+import com.ganjoor.android.data.parentUrl
 import com.ganjoor.android.data.couplets
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -64,5 +67,61 @@ class CoupletsTest {
         ).couplets()
 
         assertEquals(listOf(2, 1, 1), grouped.map { it.size })
+    }
+}
+
+class BreadcrumbsTest {
+    @Test
+    fun `every ancestor is linked and the poem itself is not`() {
+        val crumbs = breadcrumbs("حافظ » غزلیات » غزل شمارهٔ ۱", "/hafez/ghazal/sh1")
+
+        assertEquals(listOf("حافظ", "غزلیات", "غزل شمارهٔ ۱"), crumbs.map { it.label })
+        assertEquals(listOf("/hafez", "/hafez/ghazal", null), crumbs.map { it.url })
+    }
+
+    @Test
+    fun `deeply nested books keep the whole trail`() {
+        val crumbs = breadcrumbs(
+            "مولانا » مثنوی معنوی » دفتر اول » بخش ۱",
+            "/moulavi/masnavi/daftar1/sh1",
+        )
+
+        assertEquals(4, crumbs.size)
+        assertEquals("/moulavi/masnavi/daftar1", crumbs[2].url)
+        assertEquals(null, crumbs.last().url)
+    }
+
+    @Test
+    fun `a title and url that disagree produce nothing, so the caller falls back`() {
+        assertEquals(emptyList<Crumb>(), breadcrumbs("حافظ » غزل ۱", "/hafez/ghazal/sh1"))
+        assertEquals(emptyList<Crumb>(), breadcrumbs("", "/hafez/ghazal/sh1"))
+    }
+
+    @Test
+    fun `a poem directly under a poet still links the poet`() {
+        val crumbs = breadcrumbs("حافظ » ساقی‌نامه", "/hafez/saghinameh")
+
+        assertEquals(listOf("/hafez", null), crumbs.map { it.url })
+    }
+}
+
+class ParentUrlTest {
+    @Test
+    fun `each level climbs to the one above it`() {
+        assertEquals("/hafez/ghazal", parentUrl("/hafez/ghazal/sh1"))
+        assertEquals("/hafez", parentUrl("/hafez/ghazal"))
+        assertEquals("/moulavi/masnavi", parentUrl("/moulavi/masnavi/daftar1"))
+    }
+
+    @Test
+    fun `a poet root has no parent, so the caller sends you home`() {
+        assertEquals(null, parentUrl("/hafez"))
+        assertEquals(null, parentUrl("hafez"))
+        assertEquals(null, parentUrl(""))
+    }
+
+    @Test
+    fun `trailing slashes don't invent a level`() {
+        assertEquals("/hafez", parentUrl("/hafez/ghazal/"))
     }
 }

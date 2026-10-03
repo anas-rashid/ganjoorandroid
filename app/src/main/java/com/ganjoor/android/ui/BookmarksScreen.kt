@@ -29,7 +29,7 @@ import com.ganjoor.android.data.LocalBookmarks
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BookmarksScreen(onBack: () -> Unit, onPoem: (String) -> Unit) {
+fun BookmarksScreen(onUp: () -> Unit, onPoem: (String) -> Unit) {
     val bookmarks = LocalBookmarks.current
 
     Scaffold(
@@ -37,7 +37,7 @@ fun BookmarksScreen(onBack: () -> Unit, onPoem: (String) -> Unit) {
             TopAppBar(
                 title = { Text(stringResource(R.string.bookmarks)) },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
+                    IconButton(onClick = onUp) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.back))
                     }
                 },

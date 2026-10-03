@@ -1,7 +1,9 @@
 package com.ganjoor.android.ui
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -40,6 +42,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ganjoor.android.R
 import com.ganjoor.android.data.Bookmark
+import com.ganjoor.android.data.breadcrumbs
 import com.ganjoor.android.data.Ganjoor
 import com.ganjoor.android.data.LocalBookmarks
 import com.ganjoor.android.data.PoemRef
@@ -49,7 +52,15 @@ import com.ganjoor.android.ui.theme.readingStyle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PoemScreen(fullUrl: String, onBack: () -> Unit, onPoem: (String) -> Unit) {
+fun PoemScreen(
+    fullUrl: String,
+    onUp: () -> Unit,
+    onHome: () -> Unit,
+    onPoem: (String) -> Unit,
+    onCategory: (String) -> Unit,
+) {
+    BackHandler(onBack = onUp)
+
     Load(key = fullUrl, block = { Ganjoor.poem(fullUrl) }) { poem ->
         val prefs = LocalSettings.current.value
         val style = readingStyle(prefs.font, prefs.fontSize, prefs.fontWeight.weight)
@@ -70,11 +81,12 @@ fun PoemScreen(fullUrl: String, onBack: () -> Unit, onPoem: (String) -> Unit) {
                 TopAppBar(
                     title = { Text(poem.title, maxLines = 1, overflow = TextOverflow.Ellipsis) },
                     navigationIcon = {
-                        IconButton(onClick = onBack) {
+                        IconButton(onClick = onUp) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.back))
                         }
                     },
                     actions = {
+                        HomeAction(onHome)
                         BookmarkAction(
                             url = fullUrl,
                             title = poem.title,
@@ -99,10 +111,7 @@ fun PoemScreen(fullUrl: String, onBack: () -> Unit, onPoem: (String) -> Unit) {
             ) {
                 item {
                     Column(Modifier.padding(bottom = 12.dp)) {
-                        Text(
-                            text = poem.fullTitle,
-                            style = MaterialTheme.typography.titleMedium,
-                        )
+                        Breadcrumbs(poem.fullTitle, poem.fullUrl.ifBlank { fullUrl }, onCategory)
                         poem.metre?.rhythm?.let { rhythm ->
                             Text(
                                 text = rhythm,
@@ -148,6 +157,36 @@ fun PoemScreen(fullUrl: String, onBack: () -> Unit, onPoem: (String) -> Unit) {
                 }
             }
             }
+        }
+    }
+}
+
+/** The poem's path, with every ancestor tappable: poet » book » section » this poem. */
+@Composable
+private fun Breadcrumbs(fullTitle: String, fullUrl: String, onCategory: (String) -> Unit) {
+    val crumbs = remember(fullTitle, fullUrl) { breadcrumbs(fullTitle, fullUrl) }
+    if (crumbs.isEmpty()) {
+        Text(fullTitle, style = MaterialTheme.typography.titleMedium)
+        return
+    }
+
+    FlowRow(verticalArrangement = Arrangement.Center) {
+        crumbs.forEachIndexed { index, crumb ->
+            if (index > 0) {
+                Text(
+                    text = " » ",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            Text(
+                text = crumb.label,
+                style = MaterialTheme.typography.titleMedium,
+                color = if (crumb.url == null) MaterialTheme.colorScheme.onSurface
+                else MaterialTheme.colorScheme.primary,
+                modifier = if (crumb.url == null) Modifier
+                else Modifier.clickable { onCategory(crumb.url) },
+            )
         }
     }
 }

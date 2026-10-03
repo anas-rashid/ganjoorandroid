@@ -151,6 +151,38 @@ fun catPath(fullUrl: String) = "poets${fullUrl.trimEnd('/')}/_cat.json"
 
 fun poemPath(fullUrl: String) = "poets${fullUrl.trimEnd('/')}.json"
 
+/** One step of a poem's path. [url] is null for the poem itself, which is already open. */
+data class Crumb(val label: String, val url: String?)
+
+/**
+ * Splits a poem's path into tappable ancestors, pairing the titles in `fullTitle`
+ * ("حافظ » غزلیات » غزل شمارهٔ ۱") with the segments of `fullUrl` ("/hafez/ghazal/sh1").
+ *
+ * Derived from the poem itself rather than the back stack, so the trail is the same whether the
+ * poem was opened by browsing, from a bookmark, or by reading on from the previous poem.
+ * Returns empty if the two don't line up, in which case the caller shows the plain title.
+ */
+fun breadcrumbs(fullTitle: String, fullUrl: String): List<Crumb> {
+    val labels = fullTitle.split('»').map { it.trim() }.filter { it.isNotEmpty() }
+    val segments = fullUrl.trim('/').split('/').filter { it.isNotEmpty() }
+    if (labels.isEmpty() || labels.size != segments.size) return emptyList()
+    return labels.mapIndexed { i, label ->
+        Crumb(
+            label = label,
+            url = if (i == labels.lastIndex) null else "/" + segments.take(i + 1).joinToString("/"),
+        )
+    }
+}
+
+/**
+ * The page one level up: a poem's section, a section's book, a book's poet. Null at a poet's
+ * root, whose parent is the poet list.
+ */
+fun parentUrl(fullUrl: String): String? {
+    val segments = fullUrl.trim('/').split('/').filter { it.isNotEmpty() }
+    return if (segments.size <= 1) null else "/" + segments.dropLast(1).joinToString("/")
+}
+
 object Ganjoor {
     private val dataBase = DATA_BASE.toHttpUrl()
     private val liveBase = "https://api.ganjoor.net/".toHttpUrl()

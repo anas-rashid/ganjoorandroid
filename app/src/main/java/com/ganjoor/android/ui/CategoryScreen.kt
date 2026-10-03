@@ -1,5 +1,6 @@
 package com.ganjoor.android.ui
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -45,10 +46,14 @@ import com.ganjoor.android.data.Offline
 @Composable
 fun CategoryScreen(
     fullUrl: String,
-    onBack: () -> Unit,
+    onUp: () -> Unit,
+    onHome: () -> Unit,
     onCategory: (String) -> Unit,
     onPoem: (String) -> Unit,
 ) {
+    // System Back climbs the tree too, not the visit history.
+    BackHandler(onBack = onUp)
+
     Load(key = fullUrl, block = { Ganjoor.category(fullUrl) }) { cat ->
         // First lines are a separate, optional call; the list shows up without waiting for it.
         var excerpts by remember(cat.id) { mutableStateOf(emptyMap<Int, String>()) }
@@ -65,11 +70,12 @@ fun CategoryScreen(
                         Text(cat.title, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     },
                     navigationIcon = {
-                        IconButton(onClick = onBack) {
+                        IconButton(onClick = onUp) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.back))
                         }
                     },
                     actions = {
+                        HomeAction(onHome)
                         // A whole poet can be saved for offline reading; a sub-collection can't,
                         // because the saved tree is keyed by poet.
                         poetSlug(fullUrl)?.let { PoetDownloadAction(it) }

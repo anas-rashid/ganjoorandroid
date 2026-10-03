@@ -48,4 +48,5 @@
     <string name="copy">رونوشت</string>
     <string name="copied">رونوشت شد</string>
     <string name="download_selected">دریافت %d شاعر</string>
+    <string name="home">خانه</string>
 </resources>
