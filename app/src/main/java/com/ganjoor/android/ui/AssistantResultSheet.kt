@@ -26,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.ganjoor.android.R
@@ -67,6 +68,11 @@ fun AssistantAction(prompt: String, text: String, label: Int, instruction: Int) 
     TextButton(onClick = {
         if (assistant.serverReady) open = true else context.shareText("$ask\n\n$text")
     }) {
+        Icon(
+            painter = painterResource(R.drawable.ic_ask),
+            contentDescription = null,
+            modifier = Modifier.size(18.dp).padding(end = 4.dp),
+        )
         Text(stringResource(label))
     }
     if (open) AssistantResultSheet(prompt = prompt, text = text, onDismiss = { open = false })

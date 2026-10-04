@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -30,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -165,7 +165,7 @@ private fun SelectionScreen(selected: String, action: SelectionAction, onClose: 
                 actions = {
                     // The dictionary knows single words; a whole line is better asked about.
                     IconButton(onClick = { context.shareText("$prompt\n\n$selected") }) {
-                        Icon(Icons.AutoMirrored.Filled.Send, stringResource(R.string.assistant_ask))
+                        Icon(painterResource(R.drawable.ic_ask), stringResource(R.string.assistant_ask))
                     }
                     IconButton(onClick = { context.shareText(selected) }) {
                         Icon(Icons.Default.Share, stringResource(R.string.share))
