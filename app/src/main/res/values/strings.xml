@@ -67,7 +67,7 @@
     <string name="about">About &amp; licences</string>
     <string name="about_intro">Ganjoor for Android is free software. The poems, the fonts and every library it is built on are credited below; tap an entry to read its full licence.</string>
     <string name="no_definition">No entry for this word.</string>
-    <string name="source_wiktionary">Wiktionary (CC BY-SA 3.0)</string>
-    <string name="source_daneshjoo">Daneshjoo Dictionary</string>
+    <string name="source_wiktionary">Wiktionary — Persian to English (CC BY-SA 3.0)</string>
+    <string name="source_daneshjoo">Daneshjoo — Persian to English</string>
     <string name="dictionary">Dictionary</string>
 </resources>

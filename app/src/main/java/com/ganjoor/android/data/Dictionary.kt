@@ -69,6 +69,18 @@ object Dictionary {
                     .firstNotNullOfOrNull { direct(database, normalise(it)).ifEmpty { null } }
                     .orEmpty()
             }
+            // A selection is usually a phrase rather than a word; fall back to its words.
+            .ifEmpty {
+                raw.split(' ', '\n', '\r')
+                    .map { normalise(it) }
+                    .filter { it.length > 1 && it != word }
+                    .firstNotNullOfOrNull { part ->
+                        direct(database, part).ifEmpty {
+                            lemmas(database, part).flatMap { direct(database, it) }.ifEmpty { null }
+                        }
+                    }
+                    .orEmpty()
+            }
     }
 
     private fun direct(database: SQLiteDatabase, word: String): List<Definition> =
@@ -94,14 +106,29 @@ object Dictionary {
 
 private const val ZWNJ = '‌'
 
-private val SUFFIXES = listOf("ها", "اش", "ش", "م", "ت", "را", "ی", "ان")
-// "ال" is the Arabic definite article: poems quote Arabic, so السّاقی has to reach ساقی.
-private val PREFIXES = listOf("ال", "می", "بر", "ب")
+/**
+ * Longest first, so تربتش strips شـ rather than matching nothing. These are the endings that
+ * actually turn up in classical verse: plurals, the object marker, and the enclitic pronouns
+ * that Persian glues onto a verb or noun — آیدت is آید + ت, باشدش is باشد + ش.
+ */
+private val SUFFIXES = listOf(
+    "شان", "تان", "مان", "ها", "اش", "ست", "یم", "ید", "ند", "را", "ش", "م", "ت", "ی", "ان", "ه",
+)
 
-/** Candidate stems after stripping one common affix. Order matters: longest affix first. */
-internal fun affixes(word: String): List<String> = buildList {
-    SUFFIXES.forEach { if (word.endsWith(it) && word.length > it.length + 1) add(word.dropLast(it.length)) }
-    PREFIXES.forEach { if (word.startsWith(it) && word.length > it.length + 1) add(word.drop(it.length)) }
+/** "ال" is the Arabic definite article, "ن"/"نمی" negation, "بی" privative. */
+private val PREFIXES = listOf("نمی", "ال", "می", "بی", "بر", "ن", "ب")
+
+/**
+ * Candidate stems, one affix deep and then two — برنیاید is بر + ن + یاید, and a single pass
+ * would never reach the verb. Ordered so the least mangled candidate is tried first.
+ */
+internal fun affixes(word: String): List<String> {
+    fun oneStep(w: String) = buildList {
+        SUFFIXES.forEach { if (w.endsWith(it) && w.length > it.length + 1) add(w.dropLast(it.length)) }
+        PREFIXES.forEach { if (w.startsWith(it) && w.length > it.length + 1) add(w.drop(it.length)) }
+    }
+    val first = oneStep(word)
+    return (first + first.flatMap(::oneStep)).distinct()
 }
 
 private val HARAKAT = (0x064B..0x0652) + listOf(0x0670, 0x0640) + (0x0610..0x0615)

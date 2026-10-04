@@ -105,8 +105,14 @@ fun PoemScreen(
                 )
             }
         ) { insets ->
-            // Free-form selection for copying any span; the per-couplet actions below are for
-            // saving a passage with the reference attached, which a raw copy would lose.
+            // Free-form selection for copying any span; tapping a word looks it up, and the
+            // per-couplet actions save a passage with the reference attached, which a raw copy
+            // would lose.
+            //
+            // ponytail: no dictionary entry in the selection toolbar. Compose 1.10 stopped
+            // routing SelectionContainer through LocalTextToolbar — a custom TextToolbar is
+            // simply never asked to show — and the replacement, foundation's contextmenu
+            // package, is internal. Revisit when that becomes public API.
             SelectionContainer {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),

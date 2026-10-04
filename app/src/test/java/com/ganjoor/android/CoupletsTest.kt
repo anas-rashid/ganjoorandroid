@@ -1,6 +1,10 @@
 package com.ganjoor.android
 
+import com.ganjoor.android.data.CatEntry
+import com.ganjoor.android.data.Category
 import com.ganjoor.android.data.Crumb
+import com.ganjoor.android.data.PoemRef
+import com.ganjoor.android.data.orderedEntries
 import com.ganjoor.android.data.Verse
 import com.ganjoor.android.data.breadcrumbs
 import com.ganjoor.android.data.parentUrl
@@ -123,5 +127,56 @@ class ParentUrlTest {
     @Test
     fun `trailing slashes don't invent a level`() {
         assertEquals("/hafez", parentUrl("/hafez/ghazal/"))
+    }
+}
+
+class CategoryOrderTest {
+    private fun cat(chapters: List<String>, poems: List<String>) = Category(
+        id = 1,
+        title = "book",
+        childCats = chapters.mapIndexed { i, t -> Category(id = 100 + i, title = t) },
+        poems = poems.mapIndexed { i, t -> PoemRef(id = 200 + i, title = t) },
+    )
+
+    private fun titles(category: Category) = orderedEntries(category).map {
+        when (it) {
+            is CatEntry.Chapter -> it.category.title
+            is CatEntry.Poem -> it.poem.title
+        }
+    }
+
+    @Test
+    fun `a preface comes before the chapters, as on ganjoor net`() {
+        // Golestan: دیباچه then the eight باب
+        val golestan = cat(listOf("باب اول", "باب دوم"), listOf("دیباچه"))
+
+        assertEquals(listOf("دیباچه", "باب اول", "باب دوم"), titles(golestan))
+    }
+
+    @Test
+    fun `other poems stay after the chapters`() {
+        // Hafez: مقدّمه, then the collections, then مثنوی and ساقی‌نامه
+        val hafez = cat(
+            chapters = listOf("غزلیات", "قطعات"),
+            poems = listOf("مثنوی (الا ای آهوی وحشی)", "ساقی‌نامه", "مقدّمهٔ جمع‌آورندهٔ دیوان حافظ"),
+        )
+
+        assertEquals(
+            listOf("مقدّمهٔ جمع‌آورندهٔ دیوان حافظ", "غزلیات", "قطعات", "مثنوی (الا ای آهوی وحشی)", "ساقی‌نامه"),
+            titles(hafez),
+        )
+    }
+
+    @Test
+    fun `diacritics in a preface title don't hide it`() {
+        // مقدّمه carries a shadda the plain spelling doesn't
+        assertEquals(listOf("مقدّمه", "باب اول"), titles(cat(listOf("باب اول"), listOf("مقدّمه"))))
+    }
+
+    @Test
+    fun `a category with no poems is left exactly as it is`() {
+        val masnavi = cat(listOf("دفتر اول", "دفتر دوم", "دفتر سوم"), emptyList())
+
+        assertEquals(listOf("دفتر اول", "دفتر دوم", "دفتر سوم"), titles(masnavi))
     }
 }

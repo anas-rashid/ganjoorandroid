@@ -62,7 +62,7 @@
     <string name="about">تعارف اور لائسنس</string>
     <string name="about_intro">گنجور فار اینڈرائیڈ آزاد سافٹ ویئر ہے۔ کلام، فونٹس اور تمام لائبریریاں ذیل میں درج ہیں؛ مکمل لائسنس پڑھنے کے لیے کسی اندراج پر ٹیپ کریں۔</string>
     <string name="no_definition">اس لفظ کا کوئی اندراج نہیں ملا۔</string>
-    <string name="source_wiktionary">ویکی لغت (CC BY-SA 3.0)</string>
-    <string name="source_daneshjoo">دانشجو لغت</string>
+    <string name="source_wiktionary">ویکی لغت — فارسی سے انگریزی (CC BY-SA 3.0)</string>
+    <string name="source_daneshjoo">دانشجو لغت — فارسی سے انگریزی</string>
     <string name="dictionary">لغت نامہ</string>
 </resources>

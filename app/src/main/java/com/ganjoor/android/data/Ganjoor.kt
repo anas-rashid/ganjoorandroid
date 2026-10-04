@@ -166,6 +166,37 @@ fun catPath(fullUrl: String) = "poets${fullUrl.trimEnd('/')}/_cat.json"
 
 fun poemPath(fullUrl: String) = "poets${fullUrl.trimEnd('/')}.json"
 
+/** A row in a category listing: either a chapter to open, or a poem to read. */
+sealed interface CatEntry {
+    data class Chapter(val category: Category) : CatEntry
+    data class Poem(val poem: PoemRef) : CatEntry
+}
+
+private val PREFACE_TITLES = listOf("دیباچه", "مقدمه", "سرآغاز", "پیشگفتار", "آغاز")
+
+/**
+ * Orders a category the way ganjoor.net does: a book's own preface first, then its chapters,
+ * then whatever other poems sit directly under it. Golestan's دیباچه belongs above the eight
+ * باب, not below them; Hafez's مقدّمه above his five collections, with مثنوی and ساقی‌نامه after.
+ *
+ * Ganjoor decides this with each poem's MixedModeOrder — 1 sorts a poem above the chapters, 0
+ * below — but that field isn't in the exported `_cat.json`, only on the live API's per-poem
+ * record, which would be one request per poem.
+ *
+ * ponytail: so prefaces are recognised by title instead. Adding MixedModeOrder to the Poems
+ * entries in ganjoor-data would make this exact; until then a book whose preface is named
+ * something unusual still lands after its chapters.
+ */
+fun orderedEntries(category: Category): List<CatEntry> {
+    val (prefaces, rest) = category.poems.partition { poem ->
+        val title = normalise(poem.title).trimStart()
+        PREFACE_TITLES.any { title.startsWith(it) }
+    }
+    return prefaces.map(CatEntry::Poem) +
+        category.childCats.map(CatEntry::Chapter) +
+        rest.map(CatEntry::Poem)
+}
+
 /** One step of a poem's path. [url] is null for the poem itself, which is already open. */
 data class Crumb(val label: String, val url: String?)
 

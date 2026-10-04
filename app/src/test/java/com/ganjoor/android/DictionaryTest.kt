@@ -79,3 +79,30 @@ class ArabicArticleTest {
         assertTrue(affixes("الناس").contains("ناس"))
     }
 }
+
+class PersianMorphologyTest {
+    @Test
+    fun `enclitic pronouns glued onto a verb are stripped`() {
+        assertTrue(affixes("آیدت").contains("آید"))
+        assertTrue(affixes("باشدش").contains("باشد"))
+        assertTrue(affixes("تربتش").contains("تربت"))
+    }
+
+    @Test
+    fun `a prefix and a negation together still reach the verb`() {
+        // برنیاید = بر + ن + یاید; one pass would stop at نیاید
+        assertTrue(affixes("برنیاید").contains("یاید"))
+    }
+
+    @Test
+    fun `plural and object markers still work`() {
+        assertTrue(affixes("دلها").contains("دل"))
+        assertTrue(affixes("مارا").contains("ما"))
+    }
+
+    @Test
+    fun `stripping never produces a single letter`() {
+        assertTrue(affixes("شان").none { it.length < 2 })
+        assertTrue(affixes("بها").none { it.length < 2 })
+    }
+}
