@@ -69,6 +69,25 @@ for line in open('ur.jsonl', encoding='utf-8'):
             forms.add((normalise(t), normalise(word)))
 print(f"wiktionary-ur: {len(entries) - n_fa} entries, {len(forms)} forms total")
 
+# Arabic, for the lines classical Persian quotes outright — Hafez opens with one.
+if os.path.exists('ar.jsonl'):
+    n_ar, f_ar = len(entries), len(forms)
+    for line in open('ar.jsonl', encoding='utf-8'):
+        try: e = json.loads(line)
+        except Exception: continue
+        word = e.get('word')
+        if not word: continue
+        gs = [g.strip() for s in e.get('senses', []) for g in (s.get('glosses') or []) if g.strip()]
+        if gs:
+            pos = e.get('pos') or ''
+            gloss = '; '.join(dict.fromkeys(gs))[:600]
+            entries.append((normalise(word), word, f"({pos}) {gloss}" if pos else gloss, 'wiktionary-ar'))
+        for f in e.get('forms', []):
+            t = f.get('form')
+            if t and t != word and not t.startswith('-') and len(t) > 1:
+                forms.add((normalise(t), normalise(word)))
+    print(f"wiktionary-ar: {len(entries) - n_ar} entries, {len(forms) - f_ar} new forms")
+
 tag = re.compile(r'<[^>]+>')
 n0 = len(entries)
 for k, v in MDX('daneshjoo.mdx').items():

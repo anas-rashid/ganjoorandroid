@@ -55,6 +55,7 @@ private fun sourceLabel(source: String) = when (source) {
     "wiktionary-fa" -> R.string.source_wiktionary
     "wiktionary-ur" -> R.string.source_wiktionary_ur
     "urwiktionary" -> R.string.source_urwiktionary
+    "wiktionary-ar" -> R.string.source_wiktionary_ar
     else -> R.string.source_daneshjoo
 }
 

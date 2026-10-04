@@ -17,7 +17,7 @@ data class Definition(val word: String, val gloss: String, val source: String)
  */
 object Dictionary {
     /** Guards against a copy interrupted half-way leaving an unopenable file behind. */
-    private const val ASSET_BYTES = 27742208L
+    private const val ASSET_BYTES = 86663168L
 
     // Not a .gz: the build packager silently gunzips those and drops the extension, which left
     // the asset under a different name than the code was opening.
@@ -83,9 +83,28 @@ object Dictionary {
             }
     }
 
+    /**
+     * Ordered the way a reader of this app wants to be answered: a definition written in Urdu
+     * first, because it needs no translating at all, then the Persian sources, then the ones
+     * keyed on another language. English is what the rest fall back to, so it comes last by
+     * coming from the sources that sit last.
+     *
+     * Arabic is last outright: its forms index is larger than every other source combined,
+     * which makes it the likeliest to match something by coincidence.
+     */
     private fun direct(database: SQLiteDatabase, word: String): List<Definition> =
         database.rawQuery(
-            "SELECT display, gloss, source FROM entry WHERE word = ? LIMIT 12",
+            """
+            SELECT display, gloss, source FROM entry WHERE word = ?
+            ORDER BY CASE source
+                WHEN 'urwiktionary' THEN 0
+                WHEN 'wiktionary-fa' THEN 1
+                WHEN 'daneshjoo' THEN 2
+                WHEN 'wiktionary-ur' THEN 3
+                ELSE 4
+            END
+            LIMIT 12
+            """,
             arrayOf(word),
         ).use { cursor ->
             buildList {
