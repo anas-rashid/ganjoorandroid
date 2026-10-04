@@ -138,6 +138,14 @@ private val CREDITS = listOf(
         "https://google.github.io/accompanist/",
     ),
     Credit(
+        "Material Symbols",
+        "The Android Open Source Project — the share, lookup and assistant glyphs, drawn from " +
+            "their path data rather than pulled in as a library",
+        "Apache License 2.0",
+        "apache-2.0.txt",
+        "https://fonts.google.com/icons",
+    ),
+    Credit(
         "Ganjoor for Android",
         "This app",
         "MIT License",

@@ -1,0 +1,2 @@
+Credits the Material Symbols glyphs the app draws its share, lookup and
+assistant icons from, and states the terms around the optional AI assistant.

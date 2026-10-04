@@ -19,6 +19,22 @@ bundled rather than merely linked.
 
 Nothing in Ganjoor's repositories restricts AI-assisted use.
 
+## The AI assistant
+
+Optional, off by default, and the app ships no vendor SDK, no API key and no default endpoint.
+Nothing is sent anywhere until a reader configures a server themselves.
+
+| What | Terms |
+| --- | --- |
+| The client | Ours, MIT. It speaks the OpenAI chat-completions shape, which is a request format, not anyone's code, plus Anthropic's `/v1/messages` shape for Claude |
+| A self-hosted server (Ollama, LM Studio, llama.cpp, LocalAI) | Each is separately installed free software; this app only makes HTTP requests to it |
+| A hosted service (OpenAI, DeepSeek, Gemini, Claude) | Whatever the reader agreed with that service. Their terms and privacy policy govern what they do with the text sent |
+| What a model writes back | Generated text, not Ganjoor's and not ours. Shown as an aid, never stored next to the poem |
+
+For F-Droid: nothing here is a non-free dependency, since no such code ships. A reader *may*
+point it at a non-free network service, which is why the setting is off by default and the
+privacy note sits on its own settings page.
+
 ## Dictionary
 
 Five sources, each row in the database tagged with the one it came from so the app can name it
@@ -66,6 +82,15 @@ Every dependency is Apache-2.0. The full text is in
 
 No Google Play Services, Firebase, analytics or tracking of any kind. The only Android
 permission requested is `INTERNET`.
+
+## Icons
+
+The share, lookup and assistant glyphs in `app/src/main/res/drawable/` are drawn from
+[Material Symbols](https://fonts.google.com/icons) path data, copied into our own vector files
+rather than pulled in as a dependency. Apache 2.0, the same terms as the Material icons listed
+under Libraries. The assistant glyph is Material's `auto_awesome`; the sparkle that has come to
+mean "ask a model" is used by Gemini and others, but their marks are trademarks and none is used
+here.
 
 ## Artwork
 
