@@ -1,0 +1,8 @@
+Share a poem, a couplet, or any selected text, with a link back to ganjoor.net.
+
+Look up a word from the text-selection menu, in this app or any other.
+
+An optional AI assistant, off by default: connect your own Ollama, LM Studio,
+llama.cpp or LocalAI server, or a service such as OpenAI, DeepSeek, Gemini or
+Claude, to translate Ganjoor's summaries and explain a couplet. Nothing is sent
+anywhere until you set one up, and no key ships with the app.

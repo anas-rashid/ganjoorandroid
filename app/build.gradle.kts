@@ -14,6 +14,11 @@ val keystoreProperties = Properties().apply {
     if (file.exists()) file.inputStream().use { load(it) }
 }
 
+// A delivered file should say what it is without being opened.
+base {
+    archivesName = "ganjoor-0.2.0"
+}
+
 android {
     namespace = "com.ganjoor.android"
     compileSdk {
@@ -24,8 +29,11 @@ android {
         applicationId = "com.ganjoor.android"
         minSdk = 24
         targetSdk = 37
-        versionCode = 1
-        versionName = "0.1.0"
+        // Pre-1.0 while the app is still being shaped. versionCode only ever climbs: F-Droid
+        // refuses an update that does not, and one changelog file per code lives in
+        // fastlane/metadata/android/*/changelogs/.
+        versionCode = 2
+        versionName = "0.2.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
