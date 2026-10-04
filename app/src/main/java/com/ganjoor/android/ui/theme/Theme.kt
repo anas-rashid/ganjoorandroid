@@ -2,12 +2,14 @@ package com.ganjoor.android.ui.theme
 
 import android.app.Activity
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.core.graphics.drawable.toDrawable
@@ -64,36 +66,6 @@ private val DarkScheme = darkColorScheme(
     surfaceContainerHigh = Color(0xFF2F3333),
     surfaceContainerHighest = Color(0xFF3A3E3E),
     outline = Color(0xFF899393),
-)
-
-/**
- * True black, for OLED panels: a black pixel is an unlit pixel, so a night-time reading session
- * costs noticeably less battery than the regular dark theme's dark grey. Surfaces step up in
- * near-black greys so cards and sheets stay distinguishable without lighting the whole screen.
- */
-private val BlackScheme = darkColorScheme(
-    primary = Color(0xFF80D4DA),
-    onPrimary = Color(0xFF00363A),
-    primaryContainer = Color(0xFF004F53),
-    onPrimaryContainer = Color(0xFF9CF1F6),
-    secondary = Color(0xFFFFB873),
-    onSecondary = Color(0xFF4A2800),
-    secondaryContainer = Color(0xFF693C00),
-    onSecondaryContainer = Color(0xFFFFDCBE),
-    background = Color(0xFF000000),
-    onBackground = Color(0xFFE3E3E3),
-    surface = Color(0xFF000000),
-    onSurface = Color(0xFFE3E3E3),
-    surfaceVariant = Color(0xFF1C1C1C),
-    onSurfaceVariant = Color(0xFFBDBDBD),
-    outline = Color(0xFF6E6E6E),
-    surfaceBright = Color(0xFF262626),
-    surfaceDim = Color(0xFF000000),
-    surfaceContainerLowest = Color(0xFF000000),
-    surfaceContainerLow = Color(0xFF0A0A0A),
-    surfaceContainer = Color(0xFF101010),
-    surfaceContainerHigh = Color(0xFF1A1A1A),
-    surfaceContainerHighest = Color(0xFF242424),
 )
 
 // Aged paper, for long reading sessions.
@@ -153,28 +125,61 @@ private val SepiaDarkScheme = darkColorScheme(
  * so the gap between the window appearing and the first frame matches the theme instead of
  * flashing the platform's white. A static XML theme can't express sepia or OLED, hence this.
  */
-fun windowBackground(mode: ThemeMode, systemInDark: Boolean): Int = when (mode) {
-    ThemeMode.Light -> LightScheme
-    ThemeMode.Dark -> DarkScheme
-    ThemeMode.Sepia -> SepiaScheme
-    ThemeMode.SepiaDark -> SepiaDarkScheme
-    ThemeMode.Black -> BlackScheme
-    ThemeMode.System -> if (systemInDark) DarkScheme else LightScheme
-}.background.toArgb()
+fun windowBackground(mode: ThemeMode, systemInDark: Boolean, oled: Boolean): Int {
+    val dark = when (mode) {
+        ThemeMode.System -> systemInDark
+        ThemeMode.Light, ThemeMode.Sepia -> false
+        ThemeMode.Dark, ThemeMode.SepiaDark -> true
+    }
+    if (oled && dark) return Color.Black.toArgb()
+    return when (mode) {
+        ThemeMode.Light -> LightScheme
+        ThemeMode.Dark -> DarkScheme
+        ThemeMode.Sepia -> SepiaScheme
+        ThemeMode.SepiaDark -> SepiaDarkScheme
+        ThemeMode.System -> if (systemInDark) DarkScheme else LightScheme
+    }.background.toArgb()
+}
+
+/**
+ * Pushes a dark scheme to true black for OLED panels, where an unlit pixel costs no power.
+ *
+ * Only the surfaces move, and they move towards black rather than being replaced by it, so sepia
+ * night keeps its warmth instead of turning into the grey dark theme. Text and accents are left
+ * exactly as they were.
+ */
+private fun ColorScheme.asOled(): ColorScheme = copy(
+    background = Color.Black,
+    surface = Color.Black,
+    surfaceDim = Color.Black,
+    surfaceContainerLowest = Color.Black,
+    surfaceContainerLow = lerp(surfaceContainerLow, Color.Black, 0.80f),
+    surfaceContainer = lerp(surfaceContainer, Color.Black, 0.74f),
+    surfaceContainerHigh = lerp(surfaceContainerHigh, Color.Black, 0.64f),
+    surfaceContainerHighest = lerp(surfaceContainerHighest, Color.Black, 0.54f),
+    surfaceBright = lerp(surfaceBright, Color.Black, 0.46f),
+    surfaceVariant = lerp(surfaceVariant, Color.Black, 0.52f),
+)
 
 @Composable
-fun GanjoorTheme(mode: ThemeMode, language: Language, content: @Composable () -> Unit) {
+fun GanjoorTheme(
+    mode: ThemeMode,
+    language: Language,
+    oled: Boolean,
+    content: @Composable () -> Unit,
+) {
     val dark = when (mode) {
         ThemeMode.System -> isSystemInDarkTheme()
         ThemeMode.Light, ThemeMode.Sepia -> false
-        ThemeMode.Dark, ThemeMode.SepiaDark, ThemeMode.Black -> true
+        ThemeMode.Dark, ThemeMode.SepiaDark -> true
     }
-    val scheme = when (mode) {
+    val chosen = when (mode) {
         ThemeMode.Sepia -> SepiaScheme
         ThemeMode.SepiaDark -> SepiaDarkScheme
-        ThemeMode.Black -> BlackScheme
         else -> if (dark) DarkScheme else LightScheme
     }
+    // Only dark schemes have anything to gain from it.
+    val scheme = if (oled && dark) chosen.asOled() else chosen
 
     val view = LocalView.current
     if (!view.isInEditMode) {

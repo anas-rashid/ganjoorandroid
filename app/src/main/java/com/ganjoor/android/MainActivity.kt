@@ -46,7 +46,7 @@ class MainActivity : ComponentActivity() {
         val systemInDark = resources.configuration.uiMode and
             Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
         window.setBackgroundDrawable(
-            windowBackground(settings.value.theme, systemInDark).toDrawable()
+            windowBackground(settings.value.theme, systemInDark, settings.value.oled).toDrawable()
         )
 
         enableEdgeToEdge()
@@ -62,7 +62,7 @@ class MainActivity : ComponentActivity() {
                 // navigates right-to-left whichever UI language is selected.
                 LocalLayoutDirection provides LayoutDirection.Rtl,
             ) {
-                GanjoorTheme(settings.value.theme, settings.value.language) {
+                GanjoorTheme(settings.value.theme, settings.value.language, settings.value.oled) {
                     GanjoorApp()
                 }
             }

@@ -77,6 +77,15 @@ then with an affix stripped, then the parts of a ZWNJ compound. The lemma step i
 classical verse readable — `افتاد` is only findable as `افتادن`, and Wiktionary ships 149,589
 form→lemma pairs that make that possible.
 
+Each entry carries its pronunciation where Wiktionary has one — 101,306 of them, tagged with the
+variety, Classical Persian first, because a word in a 14th-century ghazal was not said the way
+Tehran says it now. Urdu Wiktionary adds the vowelled spelling and the syllable split in Urdu
+script. When nothing matches at all, the sheet offers near words ranked by shared letters.
+
+Poems that Ganjoor has recordings for show a play button, streamed rather than stored: a famous
+ghazal often has a dozen readings, and downloading them would dwarf the poems. It is the one
+part of the app that needs a connection, and it simply doesn't appear without one.
+
 See [`tools/README.md`](tools/README.md) to rebuild it, and for the licensing of each source.
 
 ## Where the poems come from

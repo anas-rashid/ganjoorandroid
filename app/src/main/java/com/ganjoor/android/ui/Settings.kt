@@ -18,9 +18,6 @@ enum class ThemeMode(@StringRes val label: Int) {
     Dark(R.string.theme_dark),
     Sepia(R.string.theme_sepia),
     SepiaDark(R.string.theme_sepia_dark),
-
-    /** Pure black, so OLED panels can switch the pixels off entirely. */
-    Black(R.string.theme_black),
 }
 
 enum class ReadingFont(@StringRes val label: Int) {
@@ -58,6 +55,8 @@ data class Prefs(
     val showSummaries: Boolean = false,
     val language: Language = Language.Fa,
     val offline: Boolean = false,
+    /** True black backgrounds, applied to whichever dark theme is in use. */
+    val oled: Boolean = false,
     val poetSort: PoetSort = PoetSort.Default,
 )
 
@@ -74,6 +73,8 @@ class Settings(context: Context) {
             showSummaries = prefs.getBoolean("showSummaries", false),
             language = languageOrDefault(prefs.getString(KEY_LANGUAGE, null)),
             offline = prefs.getBoolean("offline", false),
+            // "Black" used to be a sixth theme; it is a flag on the dark ones now.
+            oled = prefs.getBoolean("oled", prefs.getString("theme", null) == "Black"),
             poetSort = enumOrDefault(prefs.getString("poetSort", null), PoetSort.Default),
         )
     )
@@ -91,6 +92,7 @@ class Settings(context: Context) {
                 putBoolean("showSummaries", p.showSummaries)
                 putString(KEY_LANGUAGE, p.language.tag)
                 putBoolean("offline", p.offline)
+                putBoolean("oled", p.oled)
                 putString("poetSort", p.poetSort.name)
             }
         }

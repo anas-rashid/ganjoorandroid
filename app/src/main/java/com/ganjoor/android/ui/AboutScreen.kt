@@ -64,10 +64,16 @@ private val CREDITS = listOf(
     ),
     Credit(
         "Wiktionary",
-        "Wiktionary contributors — the word definitions, and the inflected-form index that " +
-            "finds a conjugated verb's dictionary entry",
+        "Wiktionary contributors — Persian and Urdu definitions, and the inflected-form " +
+            "index that finds a conjugated verb's dictionary entry",
         "CC BY-SA 3.0. The bundled dictionary is therefore also CC BY-SA 3.0.",
         url = "https://en.wiktionary.org",
+    ),
+    Credit(
+        "Urdu Wiktionary",
+        "Urdu Wiktionary contributors — the definitions written in Urdu rather than English",
+        "CC BY-SA 3.0. The bundled dictionary is therefore also CC BY-SA 3.0.",
+        url = "https://ur.wiktionary.org",
     ),
     Credit(
         "Daneshjoo Dictionary",

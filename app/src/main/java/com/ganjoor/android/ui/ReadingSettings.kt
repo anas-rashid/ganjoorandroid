@@ -78,6 +78,15 @@ fun ReadingSettingsSheet(onDismiss: () -> Unit) {
                 settings.update { it.copy(theme = mode) }
             }
 
+            // Only means anything on a dark theme, so it sits with them and says so.
+            Toggle(
+                title = R.string.oled,
+                note = R.string.oled_note,
+                checked = prefs.oled,
+            ) { on ->
+                settings.update { it.copy(oled = on) }
+            }
+
             Label(R.string.font)
             Chips(ReadingFont.entries, prefs.font, { stringResource(it.label) }) { font ->
                 settings.update { it.copy(font = font) }

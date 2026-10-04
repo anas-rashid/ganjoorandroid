@@ -145,6 +145,18 @@ private data class LiveCat(val poems: List<LivePoem> = emptyList())
 @Serializable
 private data class LivePoem(val id: Int = 0, val excerpt: String? = null)
 
+/** A reading of a whole poem, hosted by Ganjoor. */
+@Serializable
+data class Recitation(
+    val id: Int = 0,
+    val audioTitle: String = "",
+    val audioArtist: String = "",
+    val mp3Url: String = "",
+)
+
+@Serializable
+private data class LivePoemRecitations(val recitations: List<Recitation> = emptyList())
+
 private val liveJson = Json { ignoreUnknownKeys = true }
 
 @Serializable
@@ -165,6 +177,37 @@ fun snippet(hit: SearchHit, term: String): String {
 fun catPath(fullUrl: String) = "poets${fullUrl.trimEnd('/')}/_cat.json"
 
 fun poemPath(fullUrl: String) = "poets${fullUrl.trimEnd('/')}.json"
+
+/** A row in a category listing: either a chapter to open, or a poem to read. */
+sealed interface CatEntry {
+    data class Chapter(val category: Category) : CatEntry
+    data class Poem(val poem: PoemRef) : CatEntry
+}
+
+private val PREFACE_TITLES = listOf("دیباچه", "مقدمه", "سرآغاز", "پیشگفتار", "آغاز")
+
+/**
+ * Orders a category the way ganjoor.net does: a book's own preface first, then its chapters,
+ * then whatever other poems sit directly under it. Golestan's دیباچه belongs above the eight
+ * باب, not below them; Hafez's مقدّمه above his five collections, with مثنوی and ساقی‌نامه after.
+ *
+ * Ganjoor decides this with each poem's MixedModeOrder — 1 sorts a poem above the chapters, 0
+ * below — but that field isn't in the exported `_cat.json`, only on the live API's per-poem
+ * record, which would be one request per poem.
+ *
+ * ponytail: so prefaces are recognised by title instead. Adding MixedModeOrder to the Poems
+ * entries in ganjoor-data would make this exact; until then a book whose preface is named
+ * something unusual still lands after its chapters.
+ */
+fun orderedEntries(category: Category): List<CatEntry> {
+    val (prefaces, rest) = category.poems.partition { poem ->
+        val title = normalise(poem.title).trimStart()
+        PREFACE_TITLES.any { title.startsWith(it) }
+    }
+    return prefaces.map(CatEntry::Poem) +
+        category.childCats.map(CatEntry::Chapter) +
+        rest.map(CatEntry::Poem)
+}
 
 /** One step of a poem's path. [url] is null for the poem itself, which is already open. */
 data class Crumb(val label: String, val url: String?)
@@ -322,6 +365,27 @@ object Ganjoor {
                 }
             }.awaitAll().flatten()
         }
+    }
+
+    /**
+     * Readings of a poem, by the people who recorded them for ganjoor.net.
+     *
+     * Streamed, never stored: the files are a few hundred kilobytes each and there are often a
+     * dozen readings of a famous ghazal, so downloading them all would dwarf the poems. Offline
+     * mode therefore has none of this, which is honest — a recording is the one thing here that
+     * genuinely needs the network.
+     */
+    suspend fun recitations(poemId: Int): List<Recitation> = withContext(Dispatchers.IO) {
+        if (offline || poemId == 0) return@withContext emptyList()
+        val url = liveBase.newBuilder()
+            .addPathSegments("api/ganjoor/poem/$poemId")
+            .addQueryParameter("recitations", "true")
+            .addQueryParameter("verseDetails", "false")
+            .build()
+        runCatching {
+            liveJson.decodeFromString<LivePoemRecitations>(fetch(url)).recitations
+                .filter { it.mp3Url.isNotBlank() }
+        }.getOrDefault(emptyList())
     }
 
     /**

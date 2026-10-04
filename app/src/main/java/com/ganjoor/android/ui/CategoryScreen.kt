@@ -38,9 +38,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ganjoor.android.R
+import com.ganjoor.android.data.CatEntry
 import com.ganjoor.android.data.Downloads
 import com.ganjoor.android.data.Ganjoor
 import com.ganjoor.android.data.Offline
+import com.ganjoor.android.data.orderedEntries
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,6 +64,8 @@ fun CategoryScreen(
                 excerpts = runCatching { Ganjoor.excerpts(cat.id) }.getOrDefault(emptyMap())
             }
         }
+
+        val entries = remember(cat) { orderedEntries(cat) }
 
         Scaffold(
             topBar = {
@@ -94,12 +98,25 @@ fun CategoryScreen(
                 cat.description?.takeIf { it.isNotBlank() }?.let { description ->
                     item { Description(description) }
                 }
-                items(cat.childCats, key = { "c${it.id}" }) { child ->
-                    NavRow(child.title, isCategory = true) { onCategory(child.fullUrl) }
-                }
-                items(cat.poems, key = { "p${it.id}" }) { poem ->
-                    NavRow(poem.title, isCategory = false, excerpt = excerpts[poem.id]) {
-                        onPoem(poem.fullUrl)
+                items(
+                    items = entries,
+                    key = { entry ->
+                        when (entry) {
+                            is CatEntry.Chapter -> "c${entry.category.id}"
+                            is CatEntry.Poem -> "p${entry.poem.id}"
+                        }
+                    },
+                ) { entry ->
+                    when (entry) {
+                        is CatEntry.Chapter -> NavRow(entry.category.title, isCategory = true) {
+                            onCategory(entry.category.fullUrl)
+                        }
+
+                        is CatEntry.Poem -> NavRow(
+                            title = entry.poem.title,
+                            isCategory = false,
+                            excerpt = excerpts[entry.poem.id],
+                        ) { onPoem(entry.poem.fullUrl) }
                     }
                 }
             }

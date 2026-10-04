@@ -30,6 +30,39 @@ tables, etymology templates, IPA and descendants. The build keeps the definition
 form→lemma index (149,589 pairs) and drops the rest. That index is what resolves conjugated
 verbs: `افتاد → افتادن`, `بگشاید → گشودن`, `دانند → دانستن`.
 
+## Urdu sources
+
+```sh
+curl -L -o ur.jsonl https://kaikki.org/dictionary/Urdu/kaikki.org-dictionary-Urdu.jsonl
+curl -L -o urwikt.xml.bz2 \
+  https://dumps.wikimedia.org/urwiktionary/latest/urwiktionary-latest-pages-articles.xml.bz2
+bunzip2 -k urwikt.xml.bz2
+```
+
+The first gives Urdu headwords glossed in English. The second is Urdu Wiktionary itself, the only
+source here whose definitions are written **in Urdu** — thin (around 3,100 usable entries out of
+31,000 pages, many being stubs), but for a word it does carry an Urdu reader is better served by
+it than by a translation into English.
+
+## Arabic
+
+```sh
+curl -L -o ar.jsonl https://kaikki.org/dictionary/Arabic/kaikki.org-dictionary-Arabic.jsonl
+```
+
+521 MB, almost all of it the inflection index, and that index is the point: the Arabic quoted
+inside Persian verse is conjugated, so السّاقی, الناس, تَلْقَ and تَهْوی only reach a definition
+through it. 36,627 entries and 819,608 new form pairs for about 59 MB of database.
+
+## Why there is no Persian-to-Urdu
+
+Wiktionary's Persian entries carry no translations at all — the translation tables live only on
+English pages, in a 3.3 GB export. Going Persian to Urdu would mean pivoting through an English
+sense, and a sample of that file projects only about 6,900 Persian words with any Urdu
+equivalent, most of them modern dictionary vocabulary rather than the language of the poems. The
+definitions written in Urdu therefore come from Urdu Wiktionary directly, and are preferred over
+the English ones wherever they exist.
+
 ## Licences
 
 Each row carries its `source`, so attribution stays accurate and either source can be dropped
