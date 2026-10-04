@@ -21,7 +21,7 @@ from source and signs with its own key, so these are for direct installation onl
 43d78b773efca2b1aa2bf790c689b3086389d66c4ea0ffb72c9dba8bddb50770  ganjoor-0.2.0.apk
 5163554eb01845c131c31a9da7bdd748170bb9b5f82edaece754b4cf40b02b0c  ganjoor-0.2.1.apk
 e473269044710813d2cf4119de663fe180f887239df7bdb1ccee0239ef84fd3e  ganjoor-0.2.2.apk
-5ac991ab8fe8676f89f4bc09a1a5d7464e32b6f74d789e7f29038b85f2c64f4a  ganjoor-0.3.0.apk
+9c38d5cacf9e809c2189ba581f8aa6eb4072d4fa0316f00d66434461cf4b1459  ganjoor-0.3.0.apk
 ```
 
 Installing: `adb install -r releases/ganjoor-<version>.apk`. A phone holding a *debug* build has
