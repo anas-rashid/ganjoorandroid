@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import com.ganjoor.android.R
 import com.ganjoor.android.data.Definition
 import com.ganjoor.android.data.Dictionary
+import com.ganjoor.android.data.Pronunciation
 import com.ganjoor.android.ui.theme.readingStyle
 
 /** English prose inside an otherwise right-to-left sheet. */
@@ -69,6 +70,9 @@ fun WordSheet(word: String, onDismiss: () -> Unit) {
     val definitions by produceState<List<Definition>?>(null, current) {
         value = Dictionary.lookup(current)
     }
+    val sounds by produceState(emptyList<Pronunciation>(), current) {
+        value = Dictionary.pronunciations(current)
+    }
     val suggestions by produceState(emptyList<String>(), current, definitions) {
         value = if (definitions?.isEmpty() == true) Dictionary.suggest(current) else emptyList()
     }
@@ -88,6 +92,25 @@ fun WordSheet(word: String, onDismiss: () -> Unit) {
                 style = readingStyle(prefs.font, prefs.fontSize, prefs.fontWeight.weight),
                 modifier = Modifier.fillMaxWidth(),
             )
+            if (sounds.isNotEmpty()) {
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    sounds.forEach { sound ->
+                        Column {
+                            // IPA is Latin-script, so it reads left to right whatever the UI does
+                            LeftToRight {
+                                Text(sound.text, style = MaterialTheme.typography.bodyMedium)
+                            }
+                            if (sound.label.isNotBlank()) {
+                                Text(
+                                    text = sound.label,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                        }
+                    }
+                }
+            }
             HorizontalDivider()
 
             when {

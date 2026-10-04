@@ -29,9 +29,20 @@ c = sqlite3.connect(db)
 c.executescript("""
 CREATE TABLE entry (word TEXT NOT NULL, display TEXT NOT NULL, gloss TEXT NOT NULL, source TEXT NOT NULL);
 CREATE TABLE form  (form TEXT NOT NULL, lemma TEXT NOT NULL);
+CREATE TABLE pron  (word TEXT NOT NULL, text TEXT NOT NULL, label TEXT NOT NULL, source TEXT NOT NULL);
 """)
 
-entries, forms = [], set()
+entries, forms, prons = [], set(), set()
+
+def collect_sounds(word, entry, source):
+    """IPA with whatever dialect it belongs to. Classical Persian matters most here: this is an
+    app for poetry written a long time before modern Tehrani vowels."""
+    for sound in entry.get('sounds') or []:
+        ipa = (sound.get('ipa') or '').strip()
+        if not ipa:
+            continue
+        tags = [t for t in (sound.get('tags') or []) if t not in ('formal',)]
+        prons.add((normalise(word), ipa, ' '.join(tags), source))
 
 for line in open('fa.jsonl', encoding='utf-8'):
     try: e = json.loads(line)
@@ -43,6 +54,7 @@ for line in open('fa.jsonl', encoding='utf-8'):
         pos = e.get('pos') or ''
         gloss = '; '.join(dict.fromkeys(gs))[:600]
         entries.append((normalise(word), word, f"({pos}) {gloss}" if pos else gloss, 'wiktionary-fa'))
+    collect_sounds(word, e, 'wiktionary-fa')
     for f in e.get('forms', []):
         t = f.get('form')
         if t and t != word and not t.startswith('-') and len(t) > 1:
@@ -63,6 +75,7 @@ for line in open('ur.jsonl', encoding='utf-8'):
         pos = e.get('pos') or ''
         gloss = '; '.join(dict.fromkeys(gs))[:600]
         entries.append((normalise(word), word, f"({pos}) {gloss}" if pos else gloss, 'wiktionary-ur'))
+    collect_sounds(word, e, 'wiktionary-ur')
     for f in e.get('forms', []):
         t = f.get('form')
         if t and t != word and not t.startswith('-') and len(t) > 1:
@@ -82,6 +95,7 @@ if os.path.exists('ar.jsonl'):
             pos = e.get('pos') or ''
             gloss = '; '.join(dict.fromkeys(gs))[:600]
             entries.append((normalise(word), word, f"({pos}) {gloss}" if pos else gloss, 'wiktionary-ar'))
+        collect_sounds(word, e, 'wiktionary-ar')
         for f in e.get('forms', []):
             t = f.get('form')
             if t and t != word and not t.startswith('-') and len(t) > 1:
@@ -136,13 +150,23 @@ if os.path.exists('urwikt.xml'):
         gloss = ' '.join(kept).strip()[:300]
         if len(gloss) > 3:
             entries.append((normalise(title), title, gloss, 'urwiktionary'))
+        # {عِشْق} is the fully vowelled spelling; "عِش + قوں" is the syllable split
+        vowelled = re.search(r'\{([\u0600-\u06FF\u064B-\u0652 ]{2,40})\}', t)
+        if vowelled:
+            prons.add((normalise(title), vowelled.group(1).strip(), 'اردو', 'urwiktionary'))
+        syllables = re.search(r'\{([\u0600-\u06FF\u064B-\u0652]+(?: \+ [\u0600-\u06FF\u064B-\u0652]+)+[^}]*)\}', t)
+        if syllables:
+            prons.add((normalise(title), syllables.group(1).strip(), 'ہجے', 'urwiktionary'))
     print(f"urwiktionary : {len(entries) - n_ur} entries (definitions in Urdu)")
 
+print(f"pronunciations: {len(prons)}")
+c.executemany("INSERT INTO pron VALUES (?,?,?,?)", sorted(prons))
 c.executemany("INSERT INTO entry VALUES (?,?,?,?)", entries)
 c.executemany("INSERT INTO form  VALUES (?,?)", sorted(forms))
 c.executescript("""
 CREATE INDEX idx_entry_word ON entry(word);
 CREATE INDEX idx_form_form  ON form(form);
+CREATE INDEX idx_pron_word  ON pron(word);
 """)
 c.commit()
 c.execute("VACUUM")

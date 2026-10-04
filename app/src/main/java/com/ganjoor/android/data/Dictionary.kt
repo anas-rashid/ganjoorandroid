@@ -12,12 +12,18 @@ import java.text.Normalizer
 data class Definition(val word: String, val gloss: String, val source: String)
 
 /**
+ * How a word sounds. [label] is the variety it belongs to — Classical Persian, Dari, Standard
+ * Urdu — because a word in a 14th-century ghazal was not said the way Tehran says it now.
+ */
+data class Pronunciation(val text: String, val label: String)
+
+/**
  * Word lookup over a bundled SQLite built from Wiktionary (CC BY-SA 3.0) and Daneshjoo.
  * See `tools/build_dictionary.py`; the asset ships gzipped and is unpacked once on first use.
  */
 object Dictionary {
     /** Guards against a copy interrupted half-way leaving an unopenable file behind. */
-    private const val ASSET_BYTES = 86663168L
+    private const val ASSET_BYTES = 94384128L
 
     // Not a .gz: the build packager silently gunzips those and drops the extension, which left
     // the asset under a different name than the code was opening.
@@ -45,6 +51,37 @@ object Dictionary {
             }.getOrNull()?.also { db = it }
         }
     }
+
+    /**
+     * How [raw] is pronounced, Classical Persian first: this is an app for poetry written long
+     * before modern Tehrani vowels, and the IPA's dots and stress marks are the syllable
+     * breakdown that goes with it.
+     */
+    suspend fun pronunciations(raw: String, limit: Int = 5): List<Pronunciation> =
+        withContext(Dispatchers.IO) {
+            val database = open() ?: return@withContext emptyList()
+            val word = normalise(raw).takeIf { it.isNotEmpty() } ?: return@withContext emptyList()
+            database.rawQuery(
+                """
+                SELECT text, label FROM pron WHERE word = ?
+                ORDER BY CASE
+                    WHEN label LIKE 'Classical%' THEN 0
+                    WHEN source = 'urwiktionary' THEN 1
+                    WHEN source = 'wiktionary-fa' THEN 2
+                    WHEN source = 'wiktionary-ur' THEN 3
+                    ELSE 4
+                END
+                LIMIT ?
+                """,
+                arrayOf(word, limit.toString()),
+            ).use { cursor ->
+                buildList {
+                    while (cursor.moveToNext()) {
+                        add(Pronunciation(cursor.getString(0), cursor.getString(1)))
+                    }
+                }
+            }
+        }
 
     /**
      * Looks a word up, widening the search until something matches:
