@@ -1,0 +1,8 @@
+An assistant's translation now appears under the summary it translates, in the
+page, instead of over it. Ganjoor writes a summary under each couplet as well
+as under the poem, and both can be translated.
+
+A couplet's save, copy, share and explain are reachable again: a chevron at the
+end of every couplet opens them, and they also sit at the foot of the word
+lookup. They used to need a tap that landed between words, which on a line of
+poetry almost never happens.
