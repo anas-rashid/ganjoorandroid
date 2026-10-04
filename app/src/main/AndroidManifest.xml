@@ -33,9 +33,9 @@
           one. Three aliases rather than a single Ganjoor entry: the menu is a place for verbs, and
           a reader who means "look this up" should not have to pick the app first.
 
-          "Ask an assistant" cannot be an entry per assistant — only Claude or Gemini can put their
-          own name in this menu. It opens the share chooser instead, which lists whichever of them
-          is installed, with the question already written.
+          There is no "ask an assistant" entry: with no local server configured it would open the
+          same chooser Share does, and two entries for one chooser makes the reader choose twice.
+          Asking lives on the lookup screen instead, where it can use a configured server.
         -->
         <activity
             android:name=".ProcessTextActivity"
@@ -48,19 +48,6 @@
             android:targetActivity=".ProcessTextActivity"
             android:exported="true"
             android:label="@string/look_up">
-            <intent-filter>
-                <action android:name="android.intent.action.PROCESS_TEXT" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="text/plain" />
-            </intent-filter>
-        </activity-alias>
-
-        <activity-alias
-            android:name=".AskAssistantText"
-            android:icon="@drawable/ic_ask"
-            android:targetActivity=".ProcessTextActivity"
-            android:exported="true"
-            android:label="@string/assistant_ask">
             <intent-filter>
                 <action android:name="android.intent.action.PROCESS_TEXT" />
                 <category android:name="android.intent.category.DEFAULT" />

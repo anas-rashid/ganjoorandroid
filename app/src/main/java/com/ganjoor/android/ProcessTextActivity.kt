@@ -39,7 +39,7 @@ import androidx.core.graphics.drawable.toDrawable
 import com.ganjoor.android.data.AssistantSettings
 import com.ganjoor.android.data.Dictionary
 import com.ganjoor.android.data.LocalAssistant
-import com.ganjoor.android.ui.AssistantAnswer
+import com.ganjoor.android.ui.AssistantResultSheet
 import com.ganjoor.android.ui.LocalSettings
 import com.ganjoor.android.ui.Settings
 import com.ganjoor.android.ui.WordLookup
@@ -88,11 +88,7 @@ class ProcessTextActivity : ComponentActivity() {
             return
         }
 
-        val action = when (intent.component?.className?.substringAfterLast('.')) {
-            "AskAssistantText" -> SelectionAction.Ask
-            "ShareText" -> SelectionAction.Share
-            else -> SelectionAction.LookUp
-        }
+        val sharing = intent.component?.className?.endsWith("ShareText") == true
 
         val settings = Settings(applicationContext)
         val systemInDark = resources.configuration.uiMode and
@@ -110,48 +106,34 @@ class ProcessTextActivity : ComponentActivity() {
                 LocalLayoutDirection provides LayoutDirection.Rtl,
             ) {
                 GanjoorTheme(settings.value.theme, settings.value.language, settings.value.oled) {
-                    SelectionScreen(selected, action, onClose = ::finish)
+                    SelectionScreen(selected, sharing, onClose = ::finish)
                 }
             }
         }
     }
 }
 
-/** Which verb the reader picked in the selection menu. */
-enum class SelectionAction { LookUp, Ask, Share }
-
 /**
- * Each alias goes straight to its action. Share finishes immediately — the system chooser is the
- * whole interface — so this screen is only ever seen for a lookup or an answer.
+ * Share goes straight to the system chooser and finishes, so this screen is only ever seen for a
+ * lookup. Asking an assistant is a button here rather than an entry of its own in the selection
+ * menu: with no server configured it opens the same chooser Share does, and two menu entries for
+ * one chooser is a menu that makes the reader choose twice.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SelectionScreen(selected: String, action: SelectionAction, onClose: () -> Unit) {
+private fun SelectionScreen(selected: String, sharing: Boolean, onClose: () -> Unit) {
     val context = LocalContext.current
     val assistant = LocalAssistant.current
-    val prefs = LocalSettings.current.value
-
-    // Without a server configured there is nothing to ask, so the question goes to whichever
-    // assistant the reader has installed. That hand-off is also what keeps this F-Droid-clean:
-    // no vendor SDK, no API key, nothing but an intent the reader confirms.
-    val askLocally = action == SelectionAction.Ask && assistant.serverReady
     val prompt = stringResource(R.string.assistant_ask_prompt)
+    var asking by remember { mutableStateOf(false) }
 
-    LaunchedEffect(action) {
-        when {
-            action == SelectionAction.Share -> {
-                context.shareText(selected)
-                onClose()
-            }
-
-            action == SelectionAction.Ask && !askLocally -> {
-                context.shareText("$prompt\n\n$selected")
-                onClose()
-            }
+    LaunchedEffect(sharing) {
+        if (sharing) {
+            context.shareText(selected)
+            onClose()
         }
     }
-
-    if (action == SelectionAction.Share || (action == SelectionAction.Ask && !askLocally)) return
+    if (sharing) return
 
     Scaffold(
         topBar = {
@@ -163,9 +145,18 @@ private fun SelectionScreen(selected: String, action: SelectionAction, onClose: 
                     }
                 },
                 actions = {
-                    // The dictionary knows single words; a whole line is better asked about.
-                    IconButton(onClick = { context.shareText("$prompt\n\n$selected") }) {
-                        Icon(painterResource(R.drawable.ic_ask), stringResource(R.string.assistant_ask))
+                    // The dictionary knows single words; a whole line is better asked about. Your
+                    // own server answers here; without one the question goes to whichever
+                    // assistant is installed, which is what keeps this F-Droid-clean — no vendor
+                    // SDK, no key, nothing but an intent you confirm.
+                    IconButton(onClick = {
+                        if (assistant.serverReady) asking = true
+                        else context.shareText("$prompt\n\n$selected")
+                    }) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_ask),
+                            contentDescription = stringResource(R.string.assistant_ask),
+                        )
                     }
                     IconButton(onClick = { context.shareText(selected) }) {
                         Icon(Icons.Default.Share, stringResource(R.string.share))
@@ -175,7 +166,15 @@ private fun SelectionScreen(selected: String, action: SelectionAction, onClose: 
         },
     ) { insets ->
         Column(modifier = Modifier.fillMaxSize().padding(insets)) {
-            if (askLocally) AssistantAnswer(selected) else WordLookup(selected)
+            WordLookup(selected)
         }
+    }
+
+    if (asking) {
+        AssistantResultSheet(
+            prompt = "explain",
+            text = selected,
+            onDismiss = { asking = false },
+        )
     }
 }
