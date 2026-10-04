@@ -9,6 +9,7 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
@@ -202,3 +203,13 @@ fun GanjoorTheme(
         content = content,
     )
 }
+
+/**
+ * The green on a poet whose poems are already on the device.
+ *
+ * Material's palette has no success colour, and a fixed green goes muddy on the sepia schemes and
+ * glares on OLED black. Picking by the surface's luminance covers all five schemes without each
+ * of them having to declare one.
+ */
+val ColorScheme.downloaded: Color
+    get() = if (surface.luminance() < 0.5f) Color(0xFF81C784) else Color(0xFF2E7D32)

@@ -12,7 +12,7 @@ from source and signs with its own key, so these are for direct installation onl
 | 0.2.0 | 2 | `d92445f` | Share a poem, couplet or selection; look a word up from any app's selection menu; the optional AI assistant. |
 | 0.2.1 | 3 | `ec05989` | Assistant answers in the page rather than over it, a visible chevron for each couplet's actions, and answers remembered so scrolling doesn't re-ask. |
 | 0.2.2 | 4 | `d7568d1` | Credits Material Symbols for the glyphs, and states the terms around the optional assistant. |
-| 0.3.0 | 5 | `HEAD` | Pin poets to the home screen: three views (pinned, Ganjoor's order, alphabetical), as cards or a list. |
+| 0.3.0 | 5 | `HEAD` | Pin poets to the home screen: three views (pinned, Ganjoor's order, alphabetical), as cards or a list, with a download control on each row. |
 
 ## Checksums
 
@@ -21,7 +21,7 @@ from source and signs with its own key, so these are for direct installation onl
 43d78b773efca2b1aa2bf790c689b3086389d66c4ea0ffb72c9dba8bddb50770  ganjoor-0.2.0.apk
 5163554eb01845c131c31a9da7bdd748170bb9b5f82edaece754b4cf40b02b0c  ganjoor-0.2.1.apk
 e473269044710813d2cf4119de663fe180f887239df7bdb1ccee0239ef84fd3e  ganjoor-0.2.2.apk
-d9c49f109854793a0d96a3bd42dffff931dc37825dc49b4ed80cc4de1349ff72  ganjoor-0.3.0.apk
+5ac991ab8fe8676f89f4bc09a1a5d7464e32b6f74d789e7f29038b85f2c64f4a  ganjoor-0.3.0.apk
 ```
 
 Installing: `adb install -r releases/ganjoor-<version>.apk`. A phone holding a *debug* build has

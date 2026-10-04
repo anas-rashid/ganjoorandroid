@@ -113,4 +113,5 @@
     <string name="pin_hint">برای نگه‌داشتن یک شاعر در اینجا، انگشت را روی او نگه دارید</string>
     <string name="view_grid">نمایش کارتی</string>
     <string name="view_list">نمایش فهرستی</string>
+    <string name="downloaded_poet">پیش‌تر دریافت شده</string>
 </resources>

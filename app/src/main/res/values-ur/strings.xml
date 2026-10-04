@@ -113,4 +113,5 @@
     <string name="pin_hint">کسی شاعر کو یہاں رکھنے کے لیے اُس پر دبا کر رکھیں</string>
     <string name="view_grid">کارڈ کی صورت</string>
     <string name="view_list">فہرست کی صورت</string>
+    <string name="downloaded_poet">پہلے سے محفوظ ہے</string>
 </resources>

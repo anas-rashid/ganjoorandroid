@@ -55,6 +55,11 @@ import coil3.compose.AsyncImage
 import java.text.Collator
 import java.util.Locale
 import com.ganjoor.android.R
+import com.ganjoor.android.ui.theme.downloaded
+import com.ganjoor.android.data.Offline
+import com.ganjoor.android.data.Downloads
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material.icons.filled.CheckCircle
 import com.ganjoor.android.data.Ganjoor
 import com.ganjoor.android.data.PoetRef
 
@@ -249,6 +254,49 @@ private fun PinMark(modifier: Modifier = Modifier) {
     )
 }
 
+/**
+ * Fetch a poet's poems, or say they are already here. Three states and no menu: downloading shows
+ * its progress and cancels on a tap, downloaded is a green tick, and anything else offers the
+ * download. Deleting stays on the downloads page, where the sizes are — a tap next to a poet's
+ * name should never be the thing that throws their poems away.
+ */
+@Composable
+private fun DownloadAction(slug: String) {
+    val progress = Downloads.running[slug]
+    val saved = remember(slug, Downloads.revision) { Offline.isSaved(slug) }
+
+    when {
+        progress != null -> IconButton(onClick = { Downloads.cancel(slug) }) {
+            CircularProgressIndicator(
+                strokeWidth = 2.dp,
+                modifier = Modifier.size(18.dp),
+            )
+        }
+
+        // In a box the size of an IconButton, even though nothing here is tappable: a bare icon
+        // sits where the button's padding would have put it, so the ticks and the arrows would
+        // not line up down the column.
+        saved -> Box(
+            modifier = Modifier.size(48.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                imageVector = Icons.Default.CheckCircle,
+                contentDescription = stringResource(R.string.downloaded_poet),
+                tint = MaterialTheme.colorScheme.downloaded,
+            )
+        }
+
+        else -> IconButton(onClick = { Downloads.start(slug) }) {
+            Icon(
+                painter = painterResource(R.drawable.ic_download),
+                contentDescription = stringResource(R.string.download),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+
 /** One poet as a row, for readers who would rather scan names than faces. */
 @Composable
 private fun PoetRow(poet: PoetRef, pinned: Boolean, onClick: () -> Unit, onPin: () -> Unit) {
@@ -271,7 +319,15 @@ private fun PoetRow(poet: PoetRef, pinned: Boolean, onClick: () -> Unit, onPin: 
                 )
             }
         },
-        trailingContent = { if (pinned) PinMark() },
+        trailingContent = {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                if (pinned) PinMark()
+                DownloadAction(poet.slug)
+            }
+        },
         modifier = Modifier.combinedClickable(onClick = onClick, onLongClick = onPin),
     )
 }
