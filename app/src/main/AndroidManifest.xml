@@ -44,6 +44,7 @@
 
         <activity-alias
             android:name=".LookUpText"
+            android:icon="@drawable/ic_lookup"
             android:targetActivity=".ProcessTextActivity"
             android:exported="true"
             android:label="@string/look_up">
@@ -56,6 +57,7 @@
 
         <activity-alias
             android:name=".AskAssistantText"
+            android:icon="@drawable/ic_ask"
             android:targetActivity=".ProcessTextActivity"
             android:exported="true"
             android:label="@string/assistant_ask">
@@ -68,6 +70,7 @@
 
         <activity-alias
             android:name=".ShareText"
+            android:icon="@drawable/ic_share"
             android:targetActivity=".ProcessTextActivity"
             android:exported="true"
             android:label="@string/share">

@@ -6,7 +6,11 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -116,6 +120,11 @@ fun AssistantAnswer(text: String, prompt: String = "translate") {
                         Text(reply, style = MaterialTheme.typography.bodyLarge)
                     }
                     TextButton(onClick = { context.shareText(reply) }) {
+                        Icon(
+                            imageVector = Icons.Default.Share,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp).padding(end = 4.dp),
+                        )
                         Text(stringResource(R.string.share))
                     }
                 }

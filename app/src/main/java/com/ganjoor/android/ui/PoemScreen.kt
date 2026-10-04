@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.selection.SelectionContainer
@@ -385,6 +386,13 @@ private fun PassageActions(passage: Bookmark) {
                 subject = passage.title,
             )
         }) {
+            // The same glyph as the top bar and as every other Android app: share is a shape
+            // people recognise before they read the word next to it.
+            Icon(
+                imageVector = Icons.Default.Share,
+                contentDescription = null,
+                modifier = Modifier.size(18.dp).padding(end = 4.dp),
+            )
             Text(stringResource(R.string.share))
         }
         AssistantAction(
