@@ -78,13 +78,13 @@
     <string name="assistant_off">خاموش</string>
     <string name="assistant_off_note">بدون دستیار. خلاصه‌های فارسی خود گنجور، اگر در تنظیمات خواندن روشن باشند، نمایش داده می‌شوند.</string>
     <string name="assistant_server">سرور خودتان</string>
-    <string name="assistant_server_note">با هر چیزی که API گفت‌وگوی OpenAI را بفهمد کار می‌کند — Ollama، LM Studio، llama.cpp، LocalAI یا سرویسی پولی اگر ترجیح می‌دهید.</string>
+    <string name="assistant_server_note">با هر چیزی که API گفت‌وگوی OpenAI را بفهمد کار می‌کند — Ollama، LM Studio، llama.cpp، LocalAI — و با کلاد که API خودش را دارد.</string>
     <string name="assistant_share">ارسال به یک برنامه</string>
     <string name="assistant_share_note">متن را به هر دستیاری که روی گوشی دارید می‌سپارد. تا خودتان یکی را انتخاب نکنید چیزی از این برنامه بیرون نمی‌رود.</string>
     <string name="assistant_language">پاسخ به زبان</string>
     <string name="assistant_presets">آماده‌ها</string>
     <string name="assistant_base_url">نشانی پایه</string>
-    <string name="assistant_base_url_note">برای نمونه http://127.0.0.1:11434/v1 برای Ollama روی همین دستگاه</string>
+    <string name="assistant_base_url_note">Ollama: http://127.0.0.1:11434/v1 · LM Studio: http://127.0.0.1:1234/v1 · OpenAI: https://api.openai.com/v1 · DeepSeek: https://api.deepseek.com/v1 · Gemini: https://generativelanguage.googleapis.com/v1beta/openai · Claude: https://api.anthropic.com/v1</string>
     <string name="assistant_model">مدل</string>
     <string name="assistant_api_key">کلید API (اختیاری)</string>
     <string name="assistant_api_key_note">سرور روی دستگاه خودتان معمولاً کلید نمی‌خواهد. بدون رمزگذاری روی همین دستگاه ذخیره می‌شود.</string>

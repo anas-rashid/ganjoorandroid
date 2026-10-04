@@ -78,13 +78,13 @@
     <string name="assistant_off">بند</string>
     <string name="assistant_off_note">کوئی معاون نہیں۔ گنجور کے اپنے فارسی خلاصے، اگر مطالعے کی ترتیبات میں آن ہوں، پھر بھی دکھائے جائیں گے۔</string>
     <string name="assistant_server">آپ کا اپنا سرور</string>
-    <string name="assistant_server_note">ہر اس چیز سے بات کرتا ہے جو OpenAI چیٹ API سمجھتی ہو — Ollama، LM Studio، llama.cpp، LocalAI، یا کوئی ادائیگی والی سروس اگر آپ چاہیں۔</string>
+    <string name="assistant_server_note">ہر اس چیز سے بات کرتا ہے جو OpenAI چیٹ API سمجھتی ہو — Ollama، LM Studio، llama.cpp، LocalAI — اور Claude سے بھی، جس کا اپنا API ہے۔</string>
     <string name="assistant_share">کسی ایپ کو بھیجیں</string>
     <string name="assistant_share_note">متن آپ کے فون پر موجود کسی بھی معاون کو دے دیتا ہے۔ جب تک آپ خود انتخاب نہ کریں کچھ باہر نہیں جاتا۔</string>
     <string name="assistant_language">جواب کی زبان</string>
     <string name="assistant_presets">تیار ترتیبات</string>
     <string name="assistant_base_url">بنیادی یو آر ایل</string>
-    <string name="assistant_base_url_note">مثلاً اسی آلے پر Ollama کے لیے http://127.0.0.1:11434/v1</string>
+    <string name="assistant_base_url_note">Ollama: http://127.0.0.1:11434/v1 · LM Studio: http://127.0.0.1:1234/v1 · OpenAI: https://api.openai.com/v1 · DeepSeek: https://api.deepseek.com/v1 · Gemini: https://generativelanguage.googleapis.com/v1beta/openai · Claude: https://api.anthropic.com/v1</string>
     <string name="assistant_model">ماڈل</string>
     <string name="assistant_api_key">API کلید (اختیاری)</string>
     <string name="assistant_api_key_note">آپ کی اپنی مشین کے سرور کو عموماً کلید کی ضرورت نہیں۔ اسی آلے پر بغیر خفیہ کاری محفوظ ہوتی ہے۔</string>

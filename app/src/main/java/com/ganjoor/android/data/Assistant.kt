@@ -8,6 +8,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.core.content.edit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
@@ -130,6 +131,25 @@ private data class ChatResponse(val choices: List<Choice> = emptyList())
 private data class Choice(val message: ChatMessage? = null)
 
 /**
+ * Anthropic's own shape. Everything else worth talking to speaks the OpenAI one, so this is the
+ * single exception the client makes — a different path, a different header, and a reply that
+ * arrives as a list of content blocks rather than a message.
+ */
+@Serializable
+private data class ClaudeRequest(
+    val model: String,
+    val system: String,
+    val messages: List<ChatMessage>,
+    @SerialName("max_tokens") val maxTokens: Int = 2048,
+)
+
+@Serializable
+private data class ClaudeResponse(val content: List<ClaudeBlock> = emptyList())
+
+@Serializable
+private data class ClaudeBlock(val type: String = "", val text: String = "")
+
+/**
  * Talks to anything that speaks the OpenAI chat-completions shape, which Ollama, LM Studio,
  * llama.cpp and LocalAI all do. That one shape is why no vendor library is needed: it is an
  * HTTP POST with a JSON body, and the app already has an HTTP client and a JSON parser.
@@ -146,6 +166,21 @@ object Assistant {
             .build()
     }
 
+    /** Anthropic is the one service that does not speak the OpenAI shape. */
+    internal fun isClaude(baseUrl: String) = baseUrl.contains("anthropic.com", ignoreCase = true)
+
+    /** Pulls the reply out of whichever shape came back, so the callers never see the difference. */
+    internal fun reply(body: String, claude: Boolean): String {
+        val text = if (claude) {
+            json.decodeFromString<ClaudeResponse>(body)
+                .content.firstOrNull { it.type == "text" }?.text
+        } else {
+            json.decodeFromString<ChatResponse>(body)
+                .choices.firstOrNull()?.message?.content
+        }
+        return text?.trim().orEmpty().ifEmpty { throw IOException("empty reply") }
+    }
+
     suspend fun ask(
         settings: AssistantSettings,
         system: String,
@@ -154,31 +189,47 @@ object Assistant {
         if (!settings.serverReady) {
             return@withContext Result.failure(IllegalStateException("not configured"))
         }
-        val url = settings.baseUrl.trimEnd('/') + "/chat/completions"
-        val body = json.encodeToString(
-            ChatRequest(
-                model = settings.model,
-                messages = listOf(
-                    ChatMessage("system", system),
-                    ChatMessage("user", user),
-                ),
+        val claude = isClaude(settings.baseUrl)
+        val base = settings.baseUrl.trimEnd('/')
+        val body = if (claude) {
+            json.encodeToString(
+                ClaudeRequest(
+                    model = settings.model,
+                    system = system,
+                    messages = listOf(ChatMessage("user", user)),
+                )
             )
-        ).toRequestBody(media)
+        } else {
+            json.encodeToString(
+                ChatRequest(
+                    model = settings.model,
+                    messages = listOf(
+                        ChatMessage("system", system),
+                        ChatMessage("user", user),
+                    ),
+                )
+            )
+        }.toRequestBody(media)
 
         val request = Request.Builder()
-            .url(url)
+            .url(if (claude) "$base/messages" else "$base/chat/completions")
             .post(body)
-            .apply { if (settings.apiKey.isNotBlank()) header("Authorization", "Bearer ${settings.apiKey}") }
+            .apply {
+                if (settings.apiKey.isBlank()) return@apply
+                if (claude) {
+                    header("x-api-key", settings.apiKey)
+                    header("anthropic-version", "2023-06-01")
+                } else {
+                    header("Authorization", "Bearer ${settings.apiKey}")
+                }
+            }
             .build()
 
         runCatching {
             http.newCall(request).execute().use { response ->
                 val text = response.body?.string().orEmpty()
                 if (!response.isSuccessful) throw IOException("HTTP ${response.code}: ${text.take(200)}")
-                json.decodeFromString<ChatResponse>(text)
-                    .choices.firstOrNull()?.message?.content?.trim()
-                    .orEmpty()
-                    .ifEmpty { throw IOException("empty reply") }
+                reply(text, claude)
             }
         }
     }

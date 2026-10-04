@@ -83,13 +83,13 @@
     <string name="assistant_off">Off</string>
     <string name="assistant_off_note">No assistant. Ganjoor&#8217;s own Persian summaries are still shown if you enable them in reading settings.</string>
     <string name="assistant_server">Your own server</string>
-    <string name="assistant_server_note">Talks to anything speaking the OpenAI chat API — Ollama, LM Studio, llama.cpp, LocalAI, or a paid service if you prefer one.</string>
+    <string name="assistant_server_note">Talks to anything speaking the OpenAI chat API — Ollama, LM Studio, llama.cpp, LocalAI — and to Claude, which uses its own.</string>
     <string name="assistant_share">Send to an app</string>
     <string name="assistant_share_note">Hands the text to any assistant installed on your phone. Nothing leaves this app until you pick one.</string>
     <string name="assistant_language">Answer in</string>
     <string name="assistant_presets">Presets</string>
     <string name="assistant_base_url">Base URL</string>
-    <string name="assistant_base_url_note">For example http://127.0.0.1:11434/v1 for Ollama on this device</string>
+    <string name="assistant_base_url_note">Ollama: http://127.0.0.1:11434/v1 · LM Studio: http://127.0.0.1:1234/v1 · OpenAI: https://api.openai.com/v1 · DeepSeek: https://api.deepseek.com/v1 · Gemini: https://generativelanguage.googleapis.com/v1beta/openai · Claude: https://api.anthropic.com/v1</string>
     <string name="assistant_model">Model</string>
     <string name="assistant_api_key">API key (optional)</string>
     <string name="assistant_api_key_note">A server on your own machine usually needs none. Stored unencrypted on this device.</string>
