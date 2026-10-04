@@ -30,6 +30,20 @@ tables, etymology templates, IPA and descendants. The build keeps the definition
 form→lemma index (149,589 pairs) and drops the rest. That index is what resolves conjugated
 verbs: `افتاد → افتادن`, `بگشاید → گشودن`, `دانند → دانستن`.
 
+## Urdu sources
+
+```sh
+curl -L -o ur.jsonl https://kaikki.org/dictionary/Urdu/kaikki.org-dictionary-Urdu.jsonl
+curl -L -o urwikt.xml.bz2 \
+  https://dumps.wikimedia.org/urwiktionary/latest/urwiktionary-latest-pages-articles.xml.bz2
+bunzip2 -k urwikt.xml.bz2
+```
+
+The first gives Urdu headwords glossed in English. The second is Urdu Wiktionary itself, the only
+source here whose definitions are written **in Urdu** — thin (around 3,100 usable entries out of
+31,000 pages, many being stubs), but for a word it does carry an Urdu reader is better served by
+it than by a translation into English.
+
 ## Licences
 
 Each row carries its `source`, so attribution stays accurate and either source can be dropped

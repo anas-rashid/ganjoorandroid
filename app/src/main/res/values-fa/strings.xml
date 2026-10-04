@@ -65,4 +65,7 @@
     <string name="source_wiktionary">ویکی‌واژه — فارسی به انگلیسی (CC BY-SA 3.0)</string>
     <string name="source_daneshjoo">فرهنگ دانشجو — فارسی به انگلیسی</string>
     <string name="dictionary">لغت‌نامه</string>
+    <string name="source_wiktionary_ur">ویکی‌واژه — اردو به انگلیسی (CC BY-SA 3.0)</string>
+    <string name="source_urwiktionary">ویکی‌واژهٔ اردو — اردو به اردو (CC BY-SA 3.0)</string>
+    <string name="did_you_mean">واژه‌های نزدیک</string>
 </resources>

@@ -17,7 +17,7 @@ data class Definition(val word: String, val gloss: String, val source: String)
  */
 object Dictionary {
     /** Guards against a copy interrupted half-way leaving an unopenable file behind. */
-    private const val ASSET_BYTES = 22_298_624L
+    private const val ASSET_BYTES = 27742208L
 
     // Not a .gz: the build packager silently gunzips those and drops the extension, which left
     // the asset under a different name than the code was opening.
@@ -95,6 +95,47 @@ object Dictionary {
             }
         }
 
+    /**
+     * Headwords that look like [raw], for when nothing matched exactly — a misread letter, an
+     * unusual spelling, or a word the dictionary simply spells differently.
+     *
+     * Candidates come from an index range scan on the first letters, then are ranked by how
+     * many letters they share with the query. ponytail: shared letters rather than an edit
+     * distance, which would need the whole table scanned to be worth the extra precision.
+     */
+    suspend fun suggest(raw: String, limit: Int = 6): List<String> = withContext(Dispatchers.IO) {
+        val database = open() ?: return@withContext emptyList()
+        val word = normalise(raw).takeIf { it.length > 1 } ?: return@withContext emptyList()
+
+        // Widen the prefix until there is something to rank, but never scan the whole table.
+        val candidates = generateSequence(minOf(3, word.length - 1)) { (it - 1).takeIf { n -> n >= 1 } }
+            .map { prefixLength -> byPrefix(database, word.take(prefixLength)) }
+            .firstOrNull { it.size >= 3 }
+            ?: return@withContext emptyList()
+
+        candidates
+            .asSequence()
+            .filter { it.first != word }
+            .map { (normalised, display) -> display to letterOverlap(word, normalised) }
+            .filter { it.second > 0.45f }
+            .sortedByDescending { it.second }
+            .map { it.first }
+            .distinct()
+            .take(limit)
+            .toList()
+    }
+
+    /** Index range scan: everything whose normalised form starts with [prefix]. */
+    private fun byPrefix(database: SQLiteDatabase, prefix: String): List<Pair<String, String>> =
+        database.rawQuery(
+            "SELECT DISTINCT word, display FROM entry WHERE word >= ? AND word < ? LIMIT 400",
+            arrayOf(prefix, prefix + '\uFFFF'),
+        ).use { cursor ->
+            buildList {
+                while (cursor.moveToNext()) add(cursor.getString(0) to cursor.getString(1))
+            }
+        }
+
     private fun lemmas(database: SQLiteDatabase, form: String): List<String> =
         database.rawQuery(
             "SELECT lemma FROM form WHERE form = ? LIMIT 6",
@@ -150,6 +191,17 @@ internal fun normalise(text: String, keepZwnj: Boolean = false): String {
         }
     }.joinToString("")
     return (if (keepZwnj) folded else folded.replace(ZWNJ.toString(), "")).trim()
+}
+
+/**
+ * How much of two words' letters coincide — the overlapping letters counted against the longer
+ * word, so مشکل and مشکلها score high while a word that merely starts the same does not.
+ */
+internal fun letterOverlap(a: String, b: String): Float {
+    if (a.isEmpty() || b.isEmpty()) return 0f
+    val remaining = b.toMutableList()
+    val shared = a.count { remaining.remove(it) }
+    return shared.toFloat() / maxOf(a.length, b.length)
 }
 
 /** The whole word surrounding [index], for turning a tap into something to look up. */

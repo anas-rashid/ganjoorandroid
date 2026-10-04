@@ -1,6 +1,7 @@
 package com.ganjoor.android
 
 import com.ganjoor.android.data.affixes
+import com.ganjoor.android.data.letterOverlap
 import com.ganjoor.android.data.normalise
 import com.ganjoor.android.data.wordAt
 import org.junit.Assert.assertEquals
@@ -104,5 +105,33 @@ class PersianMorphologyTest {
     fun `stripping never produces a single letter`() {
         assertTrue(affixes("شان").none { it.length < 2 })
         assertTrue(affixes("بها").none { it.length < 2 })
+    }
+}
+
+class LetterOverlapTest {
+    @Test
+    fun `an identical word overlaps completely`() {
+        assertEquals(1f, letterOverlap("عشق", "عشق"), 0.001f)
+    }
+
+    @Test
+    fun `a suffixed form still scores high against its stem`() {
+        assertTrue(letterOverlap("مشکل", "مشکلها") > 0.6f)
+    }
+
+    @Test
+    fun `sharing only a first letter scores low`() {
+        assertTrue(letterOverlap("عشق", "عبادتگاه") < 0.4f)
+    }
+
+    @Test
+    fun `letters are counted once each, not by presence alone`() {
+        // ااا against ا shares one letter, not three
+        assertEquals(1f / 3f, letterOverlap("ااا", "ا"), 0.001f)
+    }
+
+    @Test
+    fun `an empty word never matches`() {
+        assertEquals(0f, letterOverlap("", "عشق"), 0.001f)
     }
 }

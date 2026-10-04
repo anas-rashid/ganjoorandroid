@@ -1,5 +1,11 @@
 """Builds the app's dictionary from Wiktionary (CC BY-SA 3.0) and Daneshjoo (MIT).
 
+Three sources, each row tagged so the app can say which one answered and in which language:
+  wiktionary-fa  Persian headwords, English definitions
+  daneshjoo      Persian headwords, English definitions
+  wiktionary-ur  Urdu headwords, English definitions
+
+
 Wiktionary's export is 93 MB of linguistic metadata around 0.94 MB of definitions, so this keeps
 the definitions and the form->lemma index and discards the rest. The `source` column is what
 keeps the attribution honest and lets either source be dropped later.
@@ -36,13 +42,32 @@ for line in open('fa.jsonl', encoding='utf-8'):
     if gs:
         pos = e.get('pos') or ''
         gloss = '; '.join(dict.fromkeys(gs))[:600]
-        entries.append((normalise(word), word, f"({pos}) {gloss}" if pos else gloss, 'wiktionary'))
+        entries.append((normalise(word), word, f"({pos}) {gloss}" if pos else gloss, 'wiktionary-fa'))
     for f in e.get('forms', []):
         t = f.get('form')
         if t and t != word and not t.startswith('-') and len(t) > 1:
             forms.add((normalise(t), normalise(word)))
 
-print(f"wiktionary: {len(entries)} entries, {len(forms)} forms")
+print(f"wiktionary-fa: {len(entries)} entries, {len(forms)} forms")
+
+# Urdu shares a great deal of vocabulary with Persian, so these entries answer words the
+# Persian sources miss. Headwords are Urdu; the definitions are still English.
+n_fa = len(entries)
+for line in open('ur.jsonl', encoding='utf-8'):
+    try: e = json.loads(line)
+    except Exception: continue
+    word = e.get('word')
+    if not word: continue
+    gs = [g.strip() for s in e.get('senses', []) for g in (s.get('glosses') or []) if g.strip()]
+    if gs:
+        pos = e.get('pos') or ''
+        gloss = '; '.join(dict.fromkeys(gs))[:600]
+        entries.append((normalise(word), word, f"({pos}) {gloss}" if pos else gloss, 'wiktionary-ur'))
+    for f in e.get('forms', []):
+        t = f.get('form')
+        if t and t != word and not t.startswith('-') and len(t) > 1:
+            forms.add((normalise(t), normalise(word)))
+print(f"wiktionary-ur: {len(entries) - n_fa} entries, {len(forms)} forms total")
 
 tag = re.compile(r'<[^>]+>')
 n0 = len(entries)
@@ -57,6 +82,42 @@ for k, v in MDX('daneshjoo.mdx').items():
     if txt:
         entries.append((normalise(word), word, txt[:600], 'daneshjoo'))
 print(f"daneshjoo : {len(entries) - n0} entries")
+
+# Urdu Wiktionary, the only source here whose definitions are written in Urdu rather than
+# English. Thin — a few thousand usable entries, many pages being stubs — but for a word it
+# does carry, an Urdu reader is better served by it than by a translation into English.
+if os.path.exists('urwikt.xml'):
+    import html as _html
+    raw = open('urwikt.xml', encoding='utf-8', errors='ignore').read()
+    n_ur = len(entries)
+    for title, ns, body in re.findall(
+        r'<title>(.*?)</title>.*?<ns>(\d+)</ns>.*?<text[^>]*>(.*?)</text>', raw, re.S
+    ):
+        if ns != '0' or not re.match(r'^[\u0600-\u06FF]', title):
+            continue
+        t = re.sub(r'\{\{[^}]*\}\}', ' ', body)
+        t = re.sub(r'\[\[([^\]|]*\|)?([^\]]*)\]\]', r'\2', t)
+        t = re.sub(r"'{2,}|<[^>]+>", '', _html.unescape(t))
+        section = re.search(r'==\s*معانی\s*==(.*?)(?:\n==|\Z)', t, re.S)
+        lines = (section.group(1) if section else
+                 '\n'.join(l.strip(' #') for l in t.split('\n') if l.strip().startswith('#')))
+        kept = []
+        for line in lines.split('\n'):
+            line = re.sub(r'^\d+\.\s*', '', line.strip())
+            # ؎ introduces a verse citation, and "ref"/a year starts the source note; the
+            # definition itself is what comes before either.
+            if line.startswith('؎') or re.match(r'^\(?\s*\d{3,4}ء', line):
+                break
+            line = re.split(r'\bref\b|؎', line)[0].strip()
+            if not line or not re.search(r'[\u0600-\u06FF]', line):
+                continue
+            kept.append(line)
+            if len(' '.join(kept)) > 220:
+                break
+        gloss = ' '.join(kept).strip()[:300]
+        if len(gloss) > 3:
+            entries.append((normalise(title), title, gloss, 'urwiktionary'))
+    print(f"urwiktionary : {len(entries) - n_ur} entries (definitions in Urdu)")
 
 c.executemany("INSERT INTO entry VALUES (?,?,?,?)", entries)
 c.executemany("INSERT INTO form  VALUES (?,?)", sorted(forms))

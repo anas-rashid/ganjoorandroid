@@ -19,6 +19,25 @@ bundled rather than merely linked.
 
 Nothing in Ganjoor's repositories restricts AI-assisted use.
 
+## Dictionary
+
+Four sources, each row in the database tagged with the one it came from so the app can name it
+and so any of them can be dropped without rebuilding the others.
+
+| Source | Direction | Licence |
+|---|---|---|
+| [Wiktionary](https://en.wiktionary.org) | Persian → English | CC BY-SA 3.0 |
+| [Wiktionary](https://en.wiktionary.org) | Urdu → English | CC BY-SA 3.0 |
+| [Urdu Wiktionary](https://ur.wiktionary.org) | Urdu → Urdu | CC BY-SA 3.0 |
+| [Daneshjoo](https://github.com/0xdolan/Daneshjoo) | Persian → English | Repository states MIT |
+
+Because three of the four are CC BY-SA 3.0, **the generated `dictionary.db` is CC BY-SA 3.0**.
+Attribution is shown in the app beside every definition. See [`../tools/README.md`](../tools/README.md)
+to rebuild it.
+
+The Daneshjoo entry is worth a caveat: the repository states MIT, but the underlying lexicon is
+a published Iranian dictionary, so that relicensing is worth verifying before relying on it.
+
 ## Fonts
 
 | Font | Copyright | Licence | File |

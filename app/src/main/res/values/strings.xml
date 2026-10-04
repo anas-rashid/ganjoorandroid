@@ -70,4 +70,7 @@
     <string name="source_wiktionary">Wiktionary — Persian to English (CC BY-SA 3.0)</string>
     <string name="source_daneshjoo">Daneshjoo — Persian to English</string>
     <string name="dictionary">Dictionary</string>
+    <string name="source_wiktionary_ur">Wiktionary — Urdu to English (CC BY-SA 3.0)</string>
+    <string name="source_urwiktionary">Urdu Wiktionary — Urdu to Urdu (CC BY-SA 3.0)</string>
+    <string name="did_you_mean">Similar words</string>
 </resources>
