@@ -108,4 +108,6 @@
     <string name="selection_actions">What would you like to do?</string>
     <string name="assistant_ask">Ask an assistant</string>
     <string name="assistant_ask_prompt">Translate this Persian poetry and explain what it means:</string>
+    <string name="assistant_title">AI assistant</string>
+    <string name="assistant_translate_prompt">Translate this:</string>
 </resources>

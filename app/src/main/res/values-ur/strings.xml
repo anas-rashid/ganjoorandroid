@@ -72,7 +72,7 @@
     <string name="oled_note">تاریک تھیمز پر لاگو ہوتا ہے؛ OLED اسکرین پر بیٹری بچاتا ہے</string>
     <string name="play_recitation">قرات سنیں</string>
     <string name="pause">وقفہ</string>
-    <string name="assistant">اے آئی معاون</string>
+    <string name="assistant">مصنوعی ذہانت کا معاون</string>
     <string name="assistant_intro">اختیاری ہے۔ ایپ کا ہر حصہ اس کے بغیر کام کرتا ہے۔ جب تک آپ خود ترتیب نہ دیں کچھ کہیں نہیں بھیجا جاتا، اور ایپ کے ساتھ کوئی اکاؤنٹ یا کلید نہیں آتی۔</string>
     <string name="assistant_mode">ماڈل تک رسائی کا طریقہ</string>
     <string name="assistant_off">بند</string>
@@ -103,4 +103,6 @@
     <string name="selection_actions">آپ کیا کرنا چاہیں گے؟</string>
     <string name="assistant_ask">اسسٹنٹ سے پوچھیں</string>
     <string name="assistant_ask_prompt">اس فارسی کلام کا ترجمہ کریں اور اس کا مطلب بیان کریں:</string>
+    <string name="assistant_title">مصنوعی ذہانت</string>
+    <string name="assistant_translate_prompt">اس کا ترجمہ کریں:</string>
 </resources>

@@ -387,6 +387,12 @@ private fun PassageActions(passage: Bookmark) {
         }) {
             Text(stringResource(R.string.share))
         }
+        AssistantAction(
+            prompt = "explain",
+            text = passage.excerpt.orEmpty(),
+            label = R.string.assistant_explain,
+            instruction = R.string.assistant_ask_prompt,
+        )
     }
 }
 
@@ -404,6 +410,12 @@ private fun PoemSummary(summary: String) {
             text = summary,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        AssistantAction(
+            prompt = "summary",
+            text = summary,
+            label = R.string.assistant_translate,
+            instruction = R.string.assistant_translate_prompt,
         )
     }
 }

@@ -44,6 +44,7 @@ val LocalOpenReadingSettings = staticCompositionLocalOf<() -> Unit> {
 
 /** Opens the About and licences screen; the sheet is the only place that needs it. */
 val LocalOpenAbout = staticCompositionLocalOf<() -> Unit> { error("No about host") }
+val LocalOpenAssistant = staticCompositionLocalOf<() -> Unit> { error("No assistant host") }
 
 /** Top-bar button that opens the reading settings sheet. */
 @Composable
@@ -137,11 +138,13 @@ fun ReadingSettingsSheet(onDismiss: () -> Unit) {
                 settings.update { it.copy(showSummaries = on) }
             }
 
+            val openAssistant = LocalOpenAssistant.current
+            TextButton(onClick = openAssistant, modifier = Modifier.padding(top = 16.dp)) {
+                Text(stringResource(R.string.assistant_title))
+            }
+
             val openAbout = LocalOpenAbout.current
-            TextButton(
-                onClick = openAbout,
-                modifier = Modifier.padding(top = 16.dp),
-            ) {
+            TextButton(onClick = openAbout) {
                 Text(stringResource(R.string.about))
             }
         }

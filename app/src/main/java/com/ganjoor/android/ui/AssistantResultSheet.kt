@@ -16,7 +16,9 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -44,6 +46,26 @@ fun AssistantResultSheet(prompt: String, text: String, onDismiss: () -> Unit) {
     ) {
         AssistantAnswer(text = text, prompt = prompt)
     }
+}
+
+/**
+ * A button that asks the reader's own assistant, or hands the question to another app when no
+ * server is configured. Both paths are one tap and neither requires any setting up, which is the
+ * point: the feature is optional, so it cannot assume anyone switched it on.
+ */
+@Composable
+fun AssistantAction(prompt: String, text: String, label: Int, instruction: Int) {
+    val assistant = LocalAssistant.current
+    val context = LocalContext.current
+    val ask = stringResource(instruction)
+    var open by remember { mutableStateOf(false) }
+
+    TextButton(onClick = {
+        if (assistant.serverReady) open = true else context.shareText("$ask\n\n$text")
+    }) {
+        Text(stringResource(label))
+    }
+    if (open) AssistantResultSheet(prompt = prompt, text = text, onDismiss = { open = false })
 }
 
 /** The same answer as a plain screen, for the selection-menu activity. */
