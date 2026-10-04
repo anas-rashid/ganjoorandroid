@@ -43,7 +43,7 @@ private fun LeftToRight(content: @Composable () -> Unit) {
 
 /** Lays a definition out the way its own script reads. */
 @Composable
-private fun InDirectionOf(text: String, content: @Composable () -> Unit) {
+internal fun InDirectionOf(text: String, content: @Composable () -> Unit) {
     val arabicScript = text.count { it in '\u0600'..'\u06FF' }
     val latin = text.count { it in 'A'..'Z' || it in 'a'..'z' }
     CompositionLocalProvider(
@@ -62,10 +62,20 @@ private fun sourceLabel(source: String) = when (source) {
     else -> R.string.source_daneshjoo
 }
 
-/** What the dictionary knows about a tapped word. */
+/** What the dictionary knows about a tapped word, as a sheet over the poem. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WordSheet(word: String, onDismiss: () -> Unit) {
+    ModalBottomSheet(onDismissRequest = onDismiss) { WordLookup(word) }
+}
+
+/**
+ * The lookup itself. Split out from the sheet because the selection-menu activity shows the same
+ * thing as a plain screen: it launches in its own task, so there is nothing behind it for a sheet
+ * to sit over, and a scrim with no content under it is just a grey window.
+ */
+@Composable
+fun WordLookup(word: String) {
     val prefs = LocalSettings.current.value
     // A suggestion replaces what is being looked up, so the sheet can be followed like a trail.
     var current by remember(word) { mutableStateOf(word) }
@@ -79,8 +89,7 @@ fun WordSheet(word: String, onDismiss: () -> Unit) {
         value = if (definitions?.isEmpty() == true) Dictionary.suggest(current) else emptyList()
     }
 
-    ModalBottomSheet(onDismissRequest = onDismiss) {
-        Column(
+    Column(
             modifier = Modifier
                 .navigationBarsPadding()
                 .verticalScroll(rememberScrollState())
@@ -183,5 +192,4 @@ fun WordSheet(word: String, onDismiss: () -> Unit) {
                 }
             }
         }
-    }
 }

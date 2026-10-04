@@ -42,6 +42,9 @@ object DownloadsRoute
 @Serializable
 object AboutRoute
 
+@Serializable
+object AssistantRoute
+
 /**
  * Opens a page with the poet list as the only thing beneath it.
  *
@@ -74,6 +77,10 @@ fun GanjoorApp() {
         LocalOpenAbout provides {
             settingsOpen = false
             nav.navigate(AboutRoute)
+        },
+        LocalOpenAssistant provides {
+            settingsOpen = false
+            nav.navigate(AssistantRoute)
         },
     ) {
         NavHost(
@@ -143,6 +150,9 @@ fun GanjoorApp() {
             }
             composable<DownloadsRoute> {
                 DownloadsScreen(onUp = { nav.goHome() })
+            }
+            composable<AssistantRoute> {
+                AssistantScreen(onUp = { nav.navigateUp() }, onHome = { nav.goHome() })
             }
             composable<AboutRoute> {
                 AboutScreen(onUp = { nav.navigateUp() }, onHome = { nav.goHome() })
