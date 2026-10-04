@@ -2,6 +2,10 @@ package com.ganjoor.android.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import com.ganjoor.android.data.LocalPinnedPoets
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items as listItems
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -70,6 +74,7 @@ fun PoetsScreen(
             TopAppBar(
                 title = { Text(stringResource(R.string.app_name)) },
                 actions = {
+                    ViewAction()
                     LanguageAction()
                     IconButton(onClick = onBookmarks) {
                         Icon(Icons.Default.Favorite, stringResource(R.string.bookmarks))
@@ -92,39 +97,39 @@ fun PoetsScreen(
         Load(key = Unit, block = { Ganjoor.manifest() }) { manifest ->
             val settings = LocalSettings.current
             val sort = settings.value.poetSort
-            val poets = remember(query, manifest, sort) {
+            val pinned = LocalPinnedPoets.current
+            val poets = remember(query, manifest, sort, pinned.items.toList()) {
                 val matches =
                     if (query.isBlank()) manifest.poets
                     else manifest.poets.filter {
                         it.nickname.contains(query.trim(), ignoreCase = true)
                     }
-                // Persian letters don't sort correctly by code point (آ vs ا, ی vs ي), so hand
-                // the ordering to a collator rather than String.compareTo.
-                if (sort == PoetSort.Name) {
-                    val collator = Collator.getInstance(Locale.forLanguageTag("fa"))
-                    matches.sortedWith { a, b -> collator.compare(a.nickname, b.nickname) }
-                } else {
-                    matches
+                when (sort) {
+                    // Persian letters don't sort correctly by code point (آ vs ا, ی vs ي), so hand
+                    // the ordering to a collator rather than String.compareTo.
+                    PoetSort.Name -> {
+                        val collator = Collator.getInstance(Locale.forLanguageTag("fa"))
+                        matches.sortedWith { a, b -> collator.compare(a.nickname, b.nickname) }
+                    }
+
+                    // Pinned first, in the order they were pinned, then the rest untouched. With
+                    // nothing pinned this is Ganjoor's order, which is why it can be the default.
+                    PoetSort.Pinned -> pinnedFirst(matches, pinned.items)
+
+                    PoetSort.Default -> matches
                 }
             }
 
-            LazyVerticalGrid(
-                columns = GridCells.Adaptive(132.dp),
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(
-                    start = 12.dp,
-                    end = 12.dp,
-                    top = insets.calculateTopPadding() + 8.dp,
-                    bottom = insets.calculateBottomPadding() + 16.dp,
-                ),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                item(span = { GridItemSpan(maxLineSpan) }) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
+            val padding = PaddingValues(
+                start = 12.dp,
+                end = 12.dp,
+                top = insets.calculateTopPadding() + 8.dp,
+                bottom = insets.calculateBottomPadding() + 16.dp,
+            )
+            // The chips and the hint are the same whichever shape the poets take.
+            val header: @Composable () -> Unit = {
+                Column(modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp)) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         PoetSort.entries.forEach { option ->
                             FilterChip(
                                 selected = sort == option,
@@ -133,9 +138,51 @@ fun PoetsScreen(
                             )
                         }
                     }
+                    // Only while the shelf is empty: once there is something on it, it explains
+                    // itself, and a standing instruction is just clutter.
+                    if (sort == PoetSort.Pinned && pinned.items.isEmpty()) {
+                        Text(
+                            text = stringResource(R.string.pin_hint),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(top = 8.dp),
+                        )
+                    }
                 }
-                items(poets, key = { it.id }) { poet ->
-                    PoetCard(poet) { onPoet(poet.fullUrl) }
+            }
+
+            if (settings.value.poetGrid) {
+                LazyVerticalGrid(
+                    columns = GridCells.Adaptive(132.dp),
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = padding,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    item(span = { GridItemSpan(maxLineSpan) }) { header() }
+                    items(poets, key = { it.id }) { poet ->
+                        PoetCard(
+                            poet = poet,
+                            pinned = pinned.contains(poet.fullUrl),
+                            onClick = { onPoet(poet.fullUrl) },
+                            onPin = { pinned.toggle(poet.fullUrl) },
+                        )
+                    }
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = padding,
+                ) {
+                    item { header() }
+                    listItems(poets, key = { it.id }) { poet ->
+                        PoetRow(
+                            poet = poet,
+                            pinned = pinned.contains(poet.fullUrl),
+                            onClick = { onPoet(poet.fullUrl) },
+                            onPin = { pinned.toggle(poet.fullUrl) },
+                        )
+                    }
                 }
             }
         }
@@ -176,9 +223,62 @@ private fun SearchBar(query: String, onQueryChange: (String) -> Unit, onSearchPo
     }
 }
 
+/** Switches the poets between cards and a list, and remembers which. */
 @Composable
-private fun PoetCard(poet: PoetRef, onClick: () -> Unit) {
-    Card(modifier = Modifier.clickable(onClick = onClick)) {
+private fun ViewAction() {
+    val settings = LocalSettings.current
+    val grid = settings.value.poetGrid
+    IconButton(onClick = { settings.update { it.copy(poetGrid = !grid) } }) {
+        Icon(
+            painter = painterResource(
+                if (grid) R.drawable.ic_view_list else R.drawable.ic_view_grid
+            ),
+            contentDescription = stringResource(if (grid) R.string.view_list else R.string.view_grid),
+        )
+    }
+}
+
+/** The pin marker, shown only on a poet someone chose to keep. */
+@Composable
+private fun PinMark(modifier: Modifier = Modifier) {
+    Icon(
+        painter = painterResource(R.drawable.ic_pin),
+        contentDescription = stringResource(R.string.unpin_poet),
+        tint = MaterialTheme.colorScheme.primary,
+        modifier = modifier.size(16.dp),
+    )
+}
+
+/** One poet as a row, for readers who would rather scan names than faces. */
+@Composable
+private fun PoetRow(poet: PoetRef, pinned: Boolean, onClick: () -> Unit, onPin: () -> Unit) {
+    ListItem(
+        headlineContent = { Text(poet.nickname, style = MaterialTheme.typography.titleMedium) },
+        leadingContent = {
+            Box(
+                modifier = Modifier
+                    .size(44.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.secondaryContainer),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(poet.nickname.take(1), color = MaterialTheme.colorScheme.onSecondaryContainer)
+                AsyncImage(
+                    model = poet.imageUrl,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
+        },
+        trailingContent = { if (pinned) PinMark() },
+        modifier = Modifier.combinedClickable(onClick = onClick, onLongClick = onPin),
+    )
+}
+
+@Composable
+private fun PoetCard(poet: PoetRef, pinned: Boolean, onClick: () -> Unit, onPin: () -> Unit) {
+    Card(modifier = Modifier.combinedClickable(onClick = onClick, onLongClick = onPin)) {
         Column(
             modifier = Modifier.fillMaxWidth().padding(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -204,13 +304,31 @@ private fun PoetCard(poet: PoetRef, onClick: () -> Unit) {
                     modifier = Modifier.fillMaxSize(),
                 )
             }
-            Text(
-                text = poet.nickname,
-                style = MaterialTheme.typography.titleMedium,
-                textAlign = TextAlign.Center,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-            )
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                if (pinned) PinMark()
+                Text(
+                    text = poet.nickname,
+                    style = MaterialTheme.typography.titleMedium,
+                    textAlign = TextAlign.Center,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
         }
     }
+}
+
+/**
+ * Pinned poets first, in the order they were pinned, then everyone else as Ganjoor has them.
+ *
+ * With nothing pinned this is Ganjoor's order untouched, which is what lets it be the default
+ * without anyone opening the app to an empty screen.
+ */
+internal fun pinnedFirst(poets: List<PoetRef>, pins: List<String>): List<PoetRef> {
+    if (pins.isEmpty()) return poets
+    val (kept, rest) = poets.partition { it.fullUrl in pins }
+    return kept.sortedBy { pins.indexOf(it.fullUrl) } + rest
 }

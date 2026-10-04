@@ -112,4 +112,10 @@
     <string name="assistant_translate_prompt">Translate this:</string>
     <string name="this_couplet">This couplet</string>
     <string name="couplet_options">Options for this couplet</string>
+    <string name="sort_pinned">Pinned</string>
+    <string name="pin_poet">Pin to the top</string>
+    <string name="unpin_poet">Unpin</string>
+    <string name="pin_hint">Press and hold a poet to keep them here</string>
+    <string name="view_grid">Show as cards</string>
+    <string name="view_list">Show as a list</string>
 </resources>

@@ -42,6 +42,12 @@ enum class Language(val tag: String, val label: String) {
 
 /** How the poet grid is ordered. */
 enum class PoetSort(@StringRes val label: Int) {
+    /**
+     * Whoever the reader pinned, first. With nothing pinned it is Ganjoor's order, so this can be
+     * the default without anyone ever opening the app to an empty screen.
+     */
+    Pinned(R.string.sort_pinned),
+
     /** The data set's own order, which is Ganjoor's — best known poets first. */
     Default(R.string.sort_default),
     Name(R.string.sort_name),
@@ -57,7 +63,8 @@ data class Prefs(
     val offline: Boolean = false,
     /** True black backgrounds, applied to whichever dark theme is in use. */
     val oled: Boolean = false,
-    val poetSort: PoetSort = PoetSort.Default,
+    val poetSort: PoetSort = PoetSort.Pinned,
+    val poetGrid: Boolean = true,
 )
 
 /** Reading preferences, kept in SharedPreferences and read once at startup. */
@@ -75,7 +82,8 @@ class Settings(context: Context) {
             offline = prefs.getBoolean("offline", false),
             // "Black" used to be a sixth theme; it is a flag on the dark ones now.
             oled = prefs.getBoolean("oled", prefs.getString("theme", null) == "Black"),
-            poetSort = enumOrDefault(prefs.getString("poetSort", null), PoetSort.Default),
+            poetSort = enumOrDefault(prefs.getString("poetSort", null), PoetSort.Pinned),
+            poetGrid = prefs.getBoolean("poetGrid", true),
         )
     )
         private set
@@ -94,6 +102,7 @@ class Settings(context: Context) {
                 putBoolean("offline", p.offline)
                 putBoolean("oled", p.oled)
                 putString("poetSort", p.poetSort.name)
+                putBoolean("poetGrid", p.poetGrid)
             }
         }
     }

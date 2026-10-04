@@ -107,4 +107,10 @@
     <string name="assistant_translate_prompt">اس کا ترجمہ کریں:</string>
     <string name="this_couplet">یہ شعر</string>
     <string name="couplet_options">اس شعر کے اختیارات</string>
+    <string name="sort_pinned">منتخب</string>
+    <string name="pin_poet">اوپر رکھیں</string>
+    <string name="unpin_poet">ہٹا دیں</string>
+    <string name="pin_hint">کسی شاعر کو یہاں رکھنے کے لیے اُس پر دبا کر رکھیں</string>
+    <string name="view_grid">کارڈ کی صورت</string>
+    <string name="view_list">فہرست کی صورت</string>
 </resources>

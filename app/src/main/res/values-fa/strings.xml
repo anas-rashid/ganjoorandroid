@@ -107,4 +107,10 @@
     <string name="assistant_translate_prompt">این متن را ترجمه کن:</string>
     <string name="this_couplet">این بیت</string>
     <string name="couplet_options">گزینه‌های این بیت</string>
+    <string name="sort_pinned">برگزیده</string>
+    <string name="pin_poet">نگه‌داشتن در بالا</string>
+    <string name="unpin_poet">برداشتن</string>
+    <string name="pin_hint">برای نگه‌داشتن یک شاعر در اینجا، انگشت را روی او نگه دارید</string>
+    <string name="view_grid">نمایش کارتی</string>
+    <string name="view_list">نمایش فهرستی</string>
 </resources>
