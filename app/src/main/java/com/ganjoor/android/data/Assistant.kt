@@ -166,6 +166,27 @@ object Assistant {
             .build()
     }
 
+    /**
+     * Answers already received, so scrolling a poem does not ask twice for the same thing. A
+     * LazyColumn disposes what scrolls out of view, which restarts the request behind it; on a
+     * metered API that is money, and on a model running locally it is a wait the reader already
+     * sat through. Access-ordered, so the oldest falls out first.
+     */
+    private val answers = object : LinkedHashMap<String, String>(16, 0.75f, true) {
+        override fun removeEldestEntry(eldest: Map.Entry<String, String>) = size > 32
+    }
+
+    internal fun cacheKey(prompt: String, language: AssistantLanguage, text: String) =
+        "$prompt|${language.code}|$text"
+
+    @Synchronized
+    internal fun cached(key: String): String? = answers[key]
+
+    @Synchronized
+    internal fun remember(key: String, reply: String) {
+        answers[key] = reply
+    }
+
     /** Anthropic is the one service that does not speak the OpenAI shape. */
     internal fun isClaude(baseUrl: String) = baseUrl.contains("anthropic.com", ignoreCase = true)
 

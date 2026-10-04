@@ -105,4 +105,6 @@
     <string name="assistant_ask_prompt">اس فارسی کلام کا ترجمہ کریں اور اس کا مطلب بیان کریں:</string>
     <string name="assistant_title">مصنوعی ذہانت</string>
     <string name="assistant_translate_prompt">اس کا ترجمہ کریں:</string>
+    <string name="this_couplet">یہ شعر</string>
+    <string name="couplet_options">اس شعر کے اختیارات</string>
 </resources>

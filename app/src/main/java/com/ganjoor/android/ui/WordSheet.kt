@@ -2,6 +2,7 @@ package com.ganjoor.android.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -31,7 +32,9 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.ganjoor.android.R
 import com.ganjoor.android.data.Definition
+import com.ganjoor.android.data.Bookmark
 import com.ganjoor.android.data.Dictionary
+import com.ganjoor.android.data.LocalAssistant
 import com.ganjoor.android.data.Pronunciation
 import com.ganjoor.android.ui.theme.readingStyle
 
@@ -62,11 +65,38 @@ private fun sourceLabel(source: String) = when (source) {
     else -> R.string.source_daneshjoo
 }
 
-/** What the dictionary knows about a tapped word, as a sheet over the poem. */
+/**
+ * What the dictionary knows about a tapped word, as a sheet over the poem.
+ *
+ * When the word came from a couplet, that couplet's own actions sit at the foot. Tapping a word
+ * is the one gesture every reader finds; saving, copying or sharing the line used to be behind a
+ * tap that landed between words, which on a full line of poetry almost never happens.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WordSheet(word: String, onDismiss: () -> Unit) {
-    ModalBottomSheet(onDismissRequest = onDismiss) { WordLookup(word) }
+fun WordSheet(word: String, onDismiss: () -> Unit, passage: Bookmark? = null) {
+    ModalBottomSheet(onDismissRequest = onDismiss) {
+        // Inside the lookup's own scroll, not after it: the lookup scrolls, so anything placed
+        // below it is pushed past the bottom of the sheet with no way to reach it.
+        WordLookup(word) {
+            if (passage == null) return@WordLookup
+            HorizontalDivider(modifier = Modifier.padding(top = 8.dp))
+            Text(
+                text = stringResource(R.string.this_couplet),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.primary,
+            )
+            PassageActions(passage)
+            if (LocalAssistant.current.serverReady) {
+                AssistantInline(
+                    prompt = "explain",
+                    text = passage.excerpt.orEmpty(),
+                    label = R.string.assistant_explain,
+                    instruction = R.string.assistant_ask_prompt,
+                )
+            }
+        }
+    }
 }
 
 /**
@@ -75,7 +105,7 @@ fun WordSheet(word: String, onDismiss: () -> Unit) {
  * to sit over, and a scrim with no content under it is just a grey window.
  */
 @Composable
-fun WordLookup(word: String) {
+fun WordLookup(word: String, footer: @Composable ColumnScope.() -> Unit = {}) {
     val prefs = LocalSettings.current.value
     // A suggestion replaces what is being looked up, so the sheet can be followed like a trail.
     var current by remember(word) { mutableStateOf(word) }
@@ -191,5 +221,8 @@ fun WordLookup(word: String) {
                     }
                 }
             }
-        }
+        
+        footer()
+    }
+
 }

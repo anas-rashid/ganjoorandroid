@@ -105,4 +105,6 @@
     <string name="assistant_ask_prompt">این شعر فارسی را ترجمه کن و معنایش را توضیح بده:</string>
     <string name="assistant_title">هوش مصنوعی</string>
     <string name="assistant_translate_prompt">این متن را ترجمه کن:</string>
+    <string name="this_couplet">این بیت</string>
+    <string name="couplet_options">گزینه‌های این بیت</string>
 </resources>

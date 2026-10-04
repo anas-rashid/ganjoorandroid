@@ -16,6 +16,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
@@ -53,6 +55,7 @@ import com.ganjoor.android.data.Bookmark
 import com.ganjoor.android.data.breadcrumbs
 import com.ganjoor.android.data.wordAt
 import com.ganjoor.android.data.Ganjoor
+import com.ganjoor.android.data.LocalAssistant
 import com.ganjoor.android.data.LocalBookmarks
 import com.ganjoor.android.data.Poem
 import com.ganjoor.android.data.PoemRef
@@ -71,7 +74,9 @@ fun PoemScreen(
 ) {
     BackHandler(onBack = onUp)
 
-    var tappedWord by remember { mutableStateOf<String?>(null) }
+    // The couplet travels with the word: the dictionary sheet is the one gesture every reader
+    // finds, so the couplet's own actions live at its foot rather than behind a tap between words.
+    var tapped by remember { mutableStateOf<Pair<String, Bookmark>?>(null) }
 
     Load(key = fullUrl, block = { Ganjoor.poem(fullUrl) }) { poem ->
         val prefs = LocalSettings.current.value
@@ -148,7 +153,7 @@ fun PoemScreen(
                         style = style,
                         showSummaries = prefs.showSummaries,
                         source = Bookmark(fullUrl, poem.title, poem.fullTitle),
-                        onWord = { tappedWord = it },
+                        onWord = { word, passage -> tapped = word to passage },
                     )
                 }
 
@@ -181,8 +186,12 @@ fun PoemScreen(
         }
     }
 
-    tappedWord?.let { word ->
-        WordSheet(word = word, onDismiss = { tappedWord = null })
+    tapped?.let { (word, passage) ->
+        WordSheet(
+            word = word,
+            passage = passage,
+            onDismiss = { tapped = null },
+        )
     }
 }
 
@@ -262,17 +271,18 @@ private fun Couplet(
     style: androidx.compose.ui.text.TextStyle,
     showSummaries: Boolean,
     source: Bookmark,
-    onWord: (String) -> Unit,
+    onWord: (String, Bookmark) -> Unit,
 ) {
     // Tap, not long-press: long-press belongs to the text selection this sits inside.
     var actionsOpen by remember(couplet) { mutableStateOf(false) }
+    val passage = source.copy(excerpt = couplet.joinToString("\n") { it.text })
 
     Column(modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp)) {
         couplet.forEach { verse ->
             VerseText(
                 verse = verse,
                 style = style,
-                onWord = onWord,
+                onWord = { onWord(it, passage) },
                 // A tap that lands between words still opens the couplet's own actions.
                 onElsewhere = { actionsOpen = !actionsOpen },
             )
@@ -285,12 +295,49 @@ private fun Couplet(
                         text = summary,
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(top = 4.dp, bottom = 8.dp),
+                        modifier = Modifier.padding(top = 4.dp),
                     )
+                    // Ganjoor writes these in Persian. Offered only once an assistant is set up:
+                    // a button under every couplet earns its space only if it can answer, and the
+                    // couplet's own actions are behind a tap between words that few will find.
+                    if (LocalAssistant.current.serverReady) {
+                        AssistantInline(
+                            prompt = "summary",
+                            text = summary,
+                            label = R.string.assistant_translate,
+                            instruction = R.string.assistant_translate_prompt,
+                        )
+                    }
                 }
         }
+        // A visible way in. The tap between words still works, but on a full line of poetry it
+        // almost never lands there, so the actions were effectively unreachable without this.
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End,
+        ) {
+            IconButton(
+                onClick = { actionsOpen = !actionsOpen },
+                modifier = Modifier.size(32.dp),
+            ) {
+                Icon(
+                    imageVector = if (actionsOpen) Icons.Default.KeyboardArrowUp
+                    else Icons.Default.KeyboardArrowDown,
+                    contentDescription = stringResource(R.string.couplet_options),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(20.dp),
+                )
+            }
+        }
         if (actionsOpen) {
-            PassageActions(source.copy(excerpt = couplet.joinToString("\n") { it.text }))
+            PassageActions(passage)
+            // Below the buttons rather than among them: the answer needs the full width.
+            AssistantInline(
+                prompt = "explain",
+                text = passage.excerpt.orEmpty(),
+                label = R.string.assistant_explain,
+                instruction = R.string.assistant_ask_prompt,
+            )
         }
     }
 }
@@ -358,7 +405,7 @@ internal fun wordTappedAt(
 
 /** Save this passage, or copy it. Saving keeps the link back to the poem; copying doesn't. */
 @Composable
-private fun PassageActions(passage: Bookmark) {
+internal fun PassageActions(passage: Bookmark) {
     val bookmarks = LocalBookmarks.current
     val clipboard = LocalClipboardManager.current
     val context = LocalContext.current
@@ -395,12 +442,6 @@ private fun PassageActions(passage: Bookmark) {
             )
             Text(stringResource(R.string.share))
         }
-        AssistantAction(
-            prompt = "explain",
-            text = passage.excerpt.orEmpty(),
-            label = R.string.assistant_explain,
-            instruction = R.string.assistant_ask_prompt,
-        )
     }
 }
 
@@ -419,7 +460,7 @@ private fun PoemSummary(summary: String) {
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        AssistantAction(
+        AssistantInline(
             prompt = "summary",
             text = summary,
             label = R.string.assistant_translate,

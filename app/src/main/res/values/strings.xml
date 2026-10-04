@@ -110,4 +110,6 @@
     <string name="assistant_ask_prompt">Translate this Persian poetry and explain what it means:</string>
     <string name="assistant_title">AI assistant</string>
     <string name="assistant_translate_prompt">Translate this:</string>
+    <string name="this_couplet">This couplet</string>
+    <string name="couplet_options">Options for this couplet</string>
 </resources>
