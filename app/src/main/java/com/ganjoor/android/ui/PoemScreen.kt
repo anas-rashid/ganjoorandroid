@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
@@ -39,6 +40,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -51,6 +53,7 @@ import com.ganjoor.android.data.breadcrumbs
 import com.ganjoor.android.data.wordAt
 import com.ganjoor.android.data.Ganjoor
 import com.ganjoor.android.data.LocalBookmarks
+import com.ganjoor.android.data.Poem
 import com.ganjoor.android.data.PoemRef
 import com.ganjoor.android.data.Verse
 import com.ganjoor.android.data.couplets
@@ -95,6 +98,7 @@ fun PoemScreen(
                     },
                     actions = {
                         HomeAction(onHome)
+                        ShareAction(poem = poem, couplets = couplets)
                         BookmarkAction(
                             url = fullUrl,
                             title = poem.title,
@@ -109,10 +113,10 @@ fun PoemScreen(
             // per-couplet actions save a passage with the reference attached, which a raw copy
             // would lose.
             //
-            // ponytail: no dictionary entry in the selection toolbar. Compose 1.10 stopped
-            // routing SelectionContainer through LocalTextToolbar — a custom TextToolbar is
-            // simply never asked to show — and the replacement, foundation's contextmenu
-            // package, is internal. Revisit when that becomes public API.
+            // The system selection menu gets its own entries from ProcessTextActivity, not from
+            // here: Compose 1.10 stopped routing SelectionContainer through LocalTextToolbar, so
+            // a custom TextToolbar is never asked to show. ACTION_PROCESS_TEXT goes round that,
+            // and reaches every other app's selection menu as a side effect.
             SelectionContainer {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
@@ -208,6 +212,27 @@ private fun Breadcrumbs(fullTitle: String, fullUrl: String, onCategory: (String)
                 else Modifier.clickable { onCategory(crumb.url) },
             )
         }
+    }
+}
+
+/**
+ * Shares the poem as text, with its title and link. The verses are joined couplet by couplet so
+ * the shape survives in apps that know nothing about Persian prosody.
+ */
+@Composable
+private fun ShareAction(poem: Poem, couplets: List<List<Verse>>) {
+    val context = LocalContext.current
+    IconButton(onClick = {
+        val body = couplets.joinToString("\n\n") { couplet ->
+            couplet.joinToString("\n") { it.text }
+        }
+        context.shareText(
+            text = "${poem.fullTitle}\n\n$body",
+            url = poem.fullUrl,
+            subject = poem.fullTitle,
+        )
+    }) {
+        Icon(Icons.Default.Share, stringResource(R.string.share_poem))
     }
 }
 
@@ -335,6 +360,7 @@ internal fun wordTappedAt(
 private fun PassageActions(passage: Bookmark) {
     val bookmarks = LocalBookmarks.current
     val clipboard = LocalClipboardManager.current
+    val context = LocalContext.current
     val saved = bookmarks.contains(passage)
 
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -351,6 +377,15 @@ private fun PassageActions(passage: Bookmark) {
             clipboard.setText(AnnotatedString(passage.excerpt.orEmpty()))
         }) {
             Text(stringResource(R.string.copy))
+        }
+        TextButton(onClick = {
+            context.shareText(
+                text = passage.excerpt.orEmpty(),
+                url = passage.url,
+                subject = passage.title,
+            )
+        }) {
+            Text(stringResource(R.string.share))
         }
     }
 }

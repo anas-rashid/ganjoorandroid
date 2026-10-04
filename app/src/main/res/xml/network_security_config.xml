@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  A language model the reader runs themselves — Ollama, LM Studio, llama.cpp — listens on plain
+  HTTP, usually on their own machine over the local network. Android's config can name domains
+  but not address ranges, so there is no way to permit exactly "the reader's own server" and
+  nothing else; cleartext is allowed and the choice of endpoint is left to them.
+
+  Everything the app fetches on its own account — the poems, the poet portraits, the recitations
+  — is HTTPS regardless, and none of it goes through this.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>
