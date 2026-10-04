@@ -12,6 +12,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.core.graphics.drawable.toDrawable
 import com.ganjoor.android.data.Bookmarks
+import com.ganjoor.android.data.Dictionary
 import com.ganjoor.android.data.Ganjoor
 import com.ganjoor.android.data.LocalBookmarks
 import com.ganjoor.android.ui.GanjoorApp
@@ -37,6 +38,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Ganjoor.init(applicationContext)
+        Dictionary.init(applicationContext)
 
         // Before the first frame: otherwise the window keeps the platform's white through
         // startup and every screen transition, whatever theme is chosen.

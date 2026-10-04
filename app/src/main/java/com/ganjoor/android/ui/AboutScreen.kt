@@ -63,6 +63,19 @@ private val CREDITS = listOf(
         url = "https://github.com/anas-rashid/ganjoor-data",
     ),
     Credit(
+        "Wiktionary",
+        "Wiktionary contributors — the word definitions, and the inflected-form index that " +
+            "finds a conjugated verb's dictionary entry",
+        "CC BY-SA 3.0. The bundled dictionary is therefore also CC BY-SA 3.0.",
+        url = "https://en.wiktionary.org",
+    ),
+    Credit(
+        "Daneshjoo Dictionary",
+        "Layered under Wiktionary for the words it doesn't carry",
+        "The source repository states MIT",
+        url = "https://github.com/0xdolan/Daneshjoo",
+    ),
+    Credit(
         "Noto Naskh Arabic",
         "The Noto Project Authors",
         "SIL Open Font License 1.1",

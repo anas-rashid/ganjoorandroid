@@ -2,6 +2,7 @@ package com.ganjoor.android.ui
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Column
@@ -34,7 +35,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextAlign
@@ -43,6 +48,7 @@ import androidx.compose.ui.unit.dp
 import com.ganjoor.android.R
 import com.ganjoor.android.data.Bookmark
 import com.ganjoor.android.data.breadcrumbs
+import com.ganjoor.android.data.wordAt
 import com.ganjoor.android.data.Ganjoor
 import com.ganjoor.android.data.LocalBookmarks
 import com.ganjoor.android.data.PoemRef
@@ -60,6 +66,8 @@ fun PoemScreen(
     onCategory: (String) -> Unit,
 ) {
     BackHandler(onBack = onUp)
+
+    var tappedWord by remember { mutableStateOf<String?>(null) }
 
     Load(key = fullUrl, block = { Ganjoor.poem(fullUrl) }) { poem ->
         val prefs = LocalSettings.current.value
@@ -128,6 +136,7 @@ fun PoemScreen(
                         style = style,
                         showSummaries = prefs.showSummaries,
                         source = Bookmark(fullUrl, poem.title, poem.fullTitle),
+                        onWord = { tappedWord = it },
                     )
                 }
 
@@ -158,6 +167,10 @@ fun PoemScreen(
             }
             }
         }
+    }
+
+    tappedWord?.let { word ->
+        WordSheet(word = word, onDismiss = { tappedWord = null })
     }
 }
 
@@ -216,28 +229,19 @@ private fun Couplet(
     style: androidx.compose.ui.text.TextStyle,
     showSummaries: Boolean,
     source: Bookmark,
+    onWord: (String) -> Unit,
 ) {
     // Tap, not long-press: long-press belongs to the text selection this sits inside.
     var actionsOpen by remember(couplet) { mutableStateOf(false) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { actionsOpen = !actionsOpen }
-            .padding(vertical = 6.dp)
-    ) {
+    Column(modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp)) {
         couplet.forEach { verse ->
-            Text(
-                text = verse.text,
+            VerseText(
+                verse = verse,
                 style = style,
-                textAlign = when (verse.position) {
-                    Verse.RIGHT -> TextAlign.Start
-                    Verse.LEFT -> TextAlign.End
-                    Verse.CENTERED_1, Verse.CENTERED_2 -> TextAlign.Center
-                    // Single / Paragraph / Comment: prose, so let it fill the column.
-                    else -> TextAlign.Justify
-                },
-                modifier = Modifier.fillMaxWidth(),
+                onWord = onWord,
+                // A tap that lands between words still opens the couplet's own actions.
+                onElsewhere = { actionsOpen = !actionsOpen },
             )
         }
         if (showSummaries) {
@@ -256,6 +260,67 @@ private fun Couplet(
             PassageActions(source.copy(excerpt = couplet.joinToString("\n") { it.text }))
         }
     }
+}
+
+/**
+ * One hemistich. Tapping a word looks it up; tapping between words falls through to the
+ * couplet's save and copy actions, so both live on the same gesture without fighting.
+ */
+@Composable
+private fun VerseText(
+    verse: Verse,
+    style: androidx.compose.ui.text.TextStyle,
+    onWord: (String) -> Unit,
+    onElsewhere: () -> Unit,
+) {
+    var layout by remember(verse.text) { mutableStateOf<TextLayoutResult?>(null) }
+    val fontSizePx = with(LocalDensity.current) { style.fontSize.toPx() }
+
+    Text(
+        text = verse.text,
+        style = style,
+        textAlign = when (verse.position) {
+            Verse.RIGHT -> TextAlign.Start
+            Verse.LEFT -> TextAlign.End
+            Verse.CENTERED_1, Verse.CENTERED_2 -> TextAlign.Center
+            // Single / Paragraph / Comment: prose, so let it fill the column.
+            else -> TextAlign.Justify
+        },
+        onTextLayout = { layout = it },
+        modifier = Modifier
+            .fillMaxWidth()
+            .pointerInput(verse.text) {
+                detectTapGestures { position ->
+                    val word = layout?.let { wordTappedAt(it, verse.text, position, fontSizePx) }
+                    if (word != null) onWord(word) else onElsewhere()
+                }
+            },
+    )
+}
+
+/**
+ * The word actually under [position], or null if the tap missed the glyphs.
+ *
+ * getOffsetForPosition alone isn't enough: nastaliq is set with 2.4x leading, so most of a line
+ * box is empty space above the glyphs, and a tap there clamps to the line's first character —
+ * which made every tap return the opening word. Checking the character's own bounding box is
+ * what distinguishes "on a word" from "in the gap between lines".
+ */
+internal fun wordTappedAt(
+    layout: TextLayoutResult,
+    text: String,
+    position: Offset,
+    fontSizePx: Float,
+): String? {
+    if (text.isEmpty() || fontSizePx <= 0f) return null
+    val offset = layout.getOffsetForPosition(position).coerceIn(0, text.length - 1)
+    val baseline = layout.getLineBaseline(layout.getLineForOffset(offset))
+    // The band the ink actually occupies, measured from the baseline. Nastaliq hangs far above
+    // it and dips a little below; these two multipliers are the knob to turn if a font is
+    // swapped and taps start feeling off.
+    if (position.y < baseline - fontSizePx * 1.4f) return null
+    if (position.y > baseline + fontSizePx * 0.6f) return null
+    return wordAt(text, offset)
 }
 
 /** Save this passage, or copy it. Saving keeps the link back to the poem; copying doesn't. */

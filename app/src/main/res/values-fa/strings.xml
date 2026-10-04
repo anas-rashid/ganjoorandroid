@@ -61,4 +61,8 @@
     <string name="theme_black">سیاه (OLED)</string>
     <string name="about">درباره و پروانه‌ها</string>
     <string name="about_intro">گنجور برای اندروید نرم‌افزار آزاد است. شعرها، قلم‌ها و همهٔ کتابخانه‌هایی که این برنامه بر آن‌ها ساخته شده در زیر آمده‌اند؛ برای خواندن متن کامل پروانه روی هر مورد بزنید.</string>
+    <string name="no_definition">برای این واژه مدخلی یافت نشد.</string>
+    <string name="source_wiktionary">ویکی‌واژه (CC BY-SA 3.0)</string>
+    <string name="source_daneshjoo">فرهنگ دانشجو</string>
+    <string name="dictionary">لغت‌نامه</string>
 </resources>

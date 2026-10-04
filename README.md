@@ -58,6 +58,27 @@ downloaded, rather than blaming your connection.
 Downloads run one poet at a time and are resumable: anything already on disk is skipped, so
 restarting an interrupted download picks up where it left off.
 
+## Dictionary
+
+Tap any word in a poem for its meaning. The bundled database layers two sources — neither is
+enough alone:
+
+| | coverage of real poem vocabulary |
+|---|---|
+| Daneshjoo alone | 71% |
+| **Both, with the lookup chain** | **88%** |
+
+Measured over every distinct word in five poems (Hafez ×2, Golestan, Masnavi, a Khayyam rubaʿi).
+13 of the 55 remaining misses are Arabic lines quoted inside Persian poems, so Persian coverage
+is about 91%.
+
+Lookup widens until something matches: the word as written, then the lemma it inflects from,
+then with an affix stripped, then the parts of a ZWNJ compound. The lemma step is what makes
+classical verse readable — `افتاد` is only findable as `افتادن`, and Wiktionary ships 149,589
+form→lemma pairs that make that possible.
+
+See [`tools/README.md`](tools/README.md) to rebuild it, and for the licensing of each source.
+
 ## Where the poems come from
 
 There is no backend. Every "endpoint" is a JSON file in
