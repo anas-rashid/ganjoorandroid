@@ -126,6 +126,7 @@ fun PoemScreen(
                 item {
                     Column(Modifier.padding(bottom = 12.dp)) {
                         Breadcrumbs(poem.fullTitle, poem.fullUrl.ifBlank { fullUrl }, onCategory)
+                        RecitationPlayer(poem.id)
                         poem.metre?.rhythm?.let { rhythm ->
                             Text(
                                 text = rhythm,

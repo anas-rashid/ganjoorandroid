@@ -2,6 +2,7 @@ package com.ganjoor.android.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -22,6 +23,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
@@ -93,19 +95,29 @@ fun WordSheet(word: String, onDismiss: () -> Unit) {
                 modifier = Modifier.fillMaxWidth(),
             )
             if (sounds.isNotEmpty()) {
-                FlowRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    sounds.forEach { sound ->
-                        Column {
-                            // IPA is Latin-script, so it reads left to right whatever the UI does
-                            LeftToRight {
-                                Text(sound.text, style = MaterialTheme.typography.bodyMedium)
-                            }
-                            if (sound.label.isNotBlank()) {
+                // One direction for the whole block, and one pronunciation per line. Flowing
+                // them side by side put Latin IPA and Urdu spelling in the same right-to-left
+                // run, which reordered the chips and left each label under someone else's value.
+                LeftToRight {
+                    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                        sounds.forEach { sound ->
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
                                 Text(
-                                    text = sound.label,
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    text = sound.text,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    modifier = Modifier.weight(1f, fill = false),
                                 )
+                                if (sound.label.isNotBlank()) {
+                                    Text(
+                                        text = sound.label,
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                }
                             }
                         }
                     }

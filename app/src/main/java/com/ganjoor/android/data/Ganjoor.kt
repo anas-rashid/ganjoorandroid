@@ -145,6 +145,18 @@ private data class LiveCat(val poems: List<LivePoem> = emptyList())
 @Serializable
 private data class LivePoem(val id: Int = 0, val excerpt: String? = null)
 
+/** A reading of a whole poem, hosted by Ganjoor. */
+@Serializable
+data class Recitation(
+    val id: Int = 0,
+    val audioTitle: String = "",
+    val audioArtist: String = "",
+    val mp3Url: String = "",
+)
+
+@Serializable
+private data class LivePoemRecitations(val recitations: List<Recitation> = emptyList())
+
 private val liveJson = Json { ignoreUnknownKeys = true }
 
 @Serializable
@@ -353,6 +365,27 @@ object Ganjoor {
                 }
             }.awaitAll().flatten()
         }
+    }
+
+    /**
+     * Readings of a poem, by the people who recorded them for ganjoor.net.
+     *
+     * Streamed, never stored: the files are a few hundred kilobytes each and there are often a
+     * dozen readings of a famous ghazal, so downloading them all would dwarf the poems. Offline
+     * mode therefore has none of this, which is honest — a recording is the one thing here that
+     * genuinely needs the network.
+     */
+    suspend fun recitations(poemId: Int): List<Recitation> = withContext(Dispatchers.IO) {
+        if (offline || poemId == 0) return@withContext emptyList()
+        val url = liveBase.newBuilder()
+            .addPathSegments("api/ganjoor/poem/$poemId")
+            .addQueryParameter("recitations", "true")
+            .addQueryParameter("verseDetails", "false")
+            .build()
+        runCatching {
+            liveJson.decodeFromString<LivePoemRecitations>(fetch(url)).recitations
+                .filter { it.mp3Url.isNotBlank() }
+        }.getOrDefault(emptyList())
     }
 
     /**

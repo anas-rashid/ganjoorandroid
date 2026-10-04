@@ -63,7 +63,6 @@
     <string name="search_needs_connection">Search needs a connection. Turn off offline mode to use it.</string>
     <string name="load_more">Load more</string>
     <string name="done">Done</string>
-    <string name="theme_black">Black (OLED)</string>
     <string name="about">About &amp; licences</string>
     <string name="about_intro">Ganjoor for Android is free software. The poems, the fonts and every library it is built on are credited below; tap an entry to read its full licence.</string>
     <string name="no_definition">No entry for this word.</string>
@@ -74,4 +73,8 @@
     <string name="source_urwiktionary">Urdu Wiktionary — Urdu to Urdu (CC BY-SA 3.0)</string>
     <string name="did_you_mean">Similar words</string>
     <string name="source_wiktionary_ar">Wiktionary — Arabic to English (CC BY-SA 3.0)</string>
+    <string name="oled">Black backgrounds (OLED)</string>
+    <string name="oled_note">Applies to the dark themes; saves power on OLED screens</string>
+    <string name="play_recitation">Play recitation</string>
+    <string name="pause">Pause</string>
 </resources>

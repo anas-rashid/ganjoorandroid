@@ -58,7 +58,6 @@
     <string name="search_needs_connection">تلاش کے لیے انٹرنیٹ درکار ہے۔ آف لائن موڈ بند کریں۔</string>
     <string name="load_more">مزید</string>
     <string name="done">مکمل</string>
-    <string name="theme_black">سیاہ (OLED)</string>
     <string name="about">تعارف اور لائسنس</string>
     <string name="about_intro">گنجور فار اینڈرائیڈ آزاد سافٹ ویئر ہے۔ کلام، فونٹس اور تمام لائبریریاں ذیل میں درج ہیں؛ مکمل لائسنس پڑھنے کے لیے کسی اندراج پر ٹیپ کریں۔</string>
     <string name="no_definition">اس لفظ کا کوئی اندراج نہیں ملا۔</string>
@@ -69,4 +68,8 @@
     <string name="source_urwiktionary">اردو ویکی لغت — اردو سے اردو (CC BY-SA 3.0)</string>
     <string name="did_you_mean">ملتے جلتے الفاظ</string>
     <string name="source_wiktionary_ar">ویکی لغت — عربی سے انگریزی (CC BY-SA 3.0)</string>
+    <string name="oled">سیاہ پس منظر (OLED)</string>
+    <string name="oled_note">تاریک تھیمز پر لاگو ہوتا ہے؛ OLED اسکرین پر بیٹری بچاتا ہے</string>
+    <string name="play_recitation">قرات سنیں</string>
+    <string name="pause">وقفہ</string>
 </resources>
