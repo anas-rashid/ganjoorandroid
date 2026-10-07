@@ -13,33 +13,16 @@ An Android reader for [Ganjoor](https://ganjoor.net), the open archive of Persia
 240 poets and ~135,000 poems, laid out for comfortable long-form reading in Persian, Urdu
 and Arabic script, online or fully offline.
 
+### ⬇ [Download ganjoor-0.4.0.apk](releases/ganjoor-0.4.0.apk)
+
+Android 7.0 and up · 31.7 MB · [older releases](releases/) · `sha256 1c64cefa…fb863ab9fc7`
+
+Android will call the developer unknown and offer to install anyway — it says that about every
+app installed outside a store. Allow installs from your browser once and it will go through.
+Every release is signed with the same key, so a new one upgrades the last without losing your
+bookmarks. [Build it yourself](#build) instead if you would rather.
+
 Jetpack Compose, Material 3, `minSdk 24`. No account, no tracking, no server of its own.
-
-## Download
-
-**[ganjoor-0.4.0.apk](releases/ganjoor-0.4.0.apk)** — 31.7 MB, `minSdk 24` (Android 7.0 and up).
-
-Direct link, if you are reading this somewhere the one above does not resolve:
-
-```
-https://github.com/anas-rashid/ganjoorandroid/raw/main/releases/ganjoor-0.4.0.apk
-```
-
-Every version ever released is kept in [`releases/`](releases/) with its checksum, and all of
-them are signed with the same key, so any one upgrades any other in place without losing your
-bookmarks. Check what you downloaded:
-
-```sh
-sha256sum ganjoor-0.4.0.apk
-# 1c64cefa0fb2b51bf73386460ec1b88bda3e20832fa6926c2f7f1fb863ab9fc7
-```
-
-Android will warn that the developer is unknown and ask you to install anyway. That is what it
-says about **any** app installed outside a store; this one is signed with its own certificate
-rather than distributed through Play. Allow installs from your browser once, and it will go
-through.
-
-To build it yourself instead, see [Build](#build).
 
 ## Reading
 
