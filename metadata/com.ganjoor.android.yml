@@ -1,0 +1,35 @@
+# F-Droid metadata for Ganjoor for Android.
+#
+# This file is not read by the app or the build; it is the recipe F-Droid's build
+# server uses, kept here so it travels with the source it describes. To submit or
+# update the listing, copy it into a fork of gitlab.com/fdroid/fdroiddata as
+# metadata/com.ganjoor.android.yml and open a merge request.
+#
+# F-Droid builds from source and signs with their own key, which is why the
+# release build must succeed with no keystore present — see app/build.gradle.kts.
+
+Categories:
+  - Reading
+License: MIT
+AuthorName: Muhammad Anas Rashid
+SourceCode: https://github.com/anas-rashid/ganjoorandroid
+IssueTracker: https://github.com/anas-rashid/ganjoorandroid/issues
+Changelog: https://github.com/anas-rashid/ganjoorandroid/releases
+
+AutoName: گنجور
+
+RepoType: git
+Repo: https://github.com/anas-rashid/ganjoorandroid.git
+
+Builds:
+  - versionName: 0.4.0
+    versionCode: 6
+    commit: v0.4.0
+    subdir: app
+    gradle:
+      - yes
+
+AutoUpdateMode: Version
+UpdateCheckMode: Tags
+CurrentVersion: 0.4.0
+CurrentVersionCode: 6
