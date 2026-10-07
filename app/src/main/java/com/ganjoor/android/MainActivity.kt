@@ -18,6 +18,8 @@ import com.ganjoor.android.data.LocalBookmarks
 import com.ganjoor.android.ui.GanjoorApp
 import com.ganjoor.android.data.AssistantSettings
 import com.ganjoor.android.data.LocalAssistant
+import com.ganjoor.android.data.LocalPinnedPoets
+import com.ganjoor.android.data.PinnedPoets
 import com.ganjoor.android.ui.LocalSettings
 import com.ganjoor.android.ui.Settings
 import com.ganjoor.android.ui.theme.GanjoorTheme
@@ -56,12 +58,14 @@ class MainActivity : ComponentActivity() {
             val settings = remember { settings }
             val bookmarks = remember { Bookmarks(applicationContext) }
             val assistant = remember { AssistantSettings(applicationContext) }
+            val pinned = remember { PinnedPoets(applicationContext) }
             // The client reads this flag on every request, so keep it in step with the setting.
             Ganjoor.offline = settings.value.offline
             CompositionLocalProvider(
                 LocalSettings provides settings,
                 LocalBookmarks provides bookmarks,
                 LocalAssistant provides assistant,
+                LocalPinnedPoets provides pinned,
                 // The poetry is Persian, Urdu and Arabic throughout, so the whole app reads and
                 // navigates right-to-left whichever UI language is selected.
                 LocalLayoutDirection provides LayoutDirection.Rtl,

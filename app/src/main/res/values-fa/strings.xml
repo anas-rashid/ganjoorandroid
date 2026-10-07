@@ -59,6 +59,7 @@
     <string name="load_more">بیشتر</string>
     <string name="done">تمام</string>
     <string name="about">درباره و پروانه‌ها</string>
+    <string name="about_unofficial">غیررسمی. «گنجور برای اندروید» یک کارخواه اندرویدیِ مستقل و غیررسمی برای ganjoor.net است. این برنامه پروژه‌ای جدا از ganjoor.net و مخزن‌های گیت‌هاب آن است و به‌دست انس رشید ساخته و نگهداری می‌شود. هیچ وابستگی، تأیید یا مدیریتی از سوی صاحبان ganjoor.net ندارد و آنان هیچ مسئولیتی در قبال آن بر عهده ندارند.</string>
     <string name="about_intro">گنجور برای اندروید نرم‌افزار آزاد است. شعرها، قلم‌ها و همهٔ کتابخانه‌هایی که این برنامه بر آن‌ها ساخته شده در زیر آمده‌اند؛ برای خواندن متن کامل پروانه روی هر مورد بزنید.</string>
     <string name="no_definition">برای این واژه مدخلی یافت نشد.</string>
     <string name="source_wiktionary">ویکی‌واژه — فارسی به انگلیسی (CC BY-SA 3.0)</string>
@@ -107,4 +108,11 @@
     <string name="assistant_translate_prompt">این متن را ترجمه کن:</string>
     <string name="this_couplet">این بیت</string>
     <string name="couplet_options">گزینه‌های این بیت</string>
+    <string name="sort_pinned">برگزیده</string>
+    <string name="pin_poet">نگه‌داشتن در بالا</string>
+    <string name="unpin_poet">برداشتن</string>
+    <string name="pin_hint">برای نگه‌داشتن یک شاعر در اینجا، انگشت را روی او نگه دارید</string>
+    <string name="view_grid">نمایش کارتی</string>
+    <string name="view_list">نمایش فهرستی</string>
+    <string name="downloaded_poet">پیش‌تر دریافت شده</string>
 </resources>

@@ -1,0 +1,11 @@
+Keep the poets you read on the home screen. Press and hold any poet to pin
+them; pinned poets sit first, in the order you pinned them.
+
+The home screen now opens on that shelf, with Ganjoor's own order and an
+alphabetical listing a tap away. Until you pin anything the shelf is simply
+Ganjoor's order, so there is never an empty screen.
+
+Poets can be shown as cards or as a list, whichever reads better.
+
+Each poet in the list view carries a download button, and a green tick once their
+poems are on the device. Text only — recitations are still streamed when you play them.

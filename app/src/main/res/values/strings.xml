@@ -64,6 +64,7 @@
     <string name="load_more">Load more</string>
     <string name="done">Done</string>
     <string name="about">About &amp; licences</string>
+    <string name="about_unofficial">Unofficial. Ganjoor for Android is an independent, unofficial Android client for ganjoor.net. It is a separate project from ganjoor.net and its GitHub repositories, built and maintained by Anas Rashid. It is not affiliated with, endorsed by, or managed by the owners of ganjoor.net, who bear no responsibility for it.</string>
     <string name="about_intro">Ganjoor for Android is free software. The poems, the fonts and every library it is built on are credited below; tap an entry to read its full licence.</string>
     <string name="no_definition">No entry for this word.</string>
     <string name="source_wiktionary">Wiktionary — Persian to English (CC BY-SA 3.0)</string>
@@ -112,4 +113,11 @@
     <string name="assistant_translate_prompt">Translate this:</string>
     <string name="this_couplet">This couplet</string>
     <string name="couplet_options">Options for this couplet</string>
+    <string name="sort_pinned">Pinned</string>
+    <string name="pin_poet">Pin to the top</string>
+    <string name="unpin_poet">Unpin</string>
+    <string name="pin_hint">Press and hold a poet to keep them here</string>
+    <string name="view_grid">Show as cards</string>
+    <string name="view_list">Show as a list</string>
+    <string name="downloaded_poet">Already downloaded</string>
 </resources>

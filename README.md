@@ -2,6 +2,14 @@
 
 <div dir="rtl">گنجور — خوانندهٔ شعر پارسی برای اندروید</div>
 
+> **Unofficial.** This is an independent, unofficial Android client for
+> [ganjoor.net](https://ganjoor.net). It is a **separate project** from ganjoor.net and its
+> GitHub repositories ([`ganjoor/ganjoor`](https://github.com/ganjoor),
+> `GanjoorService`, and the rest), built and maintained by **Anas Rashid**. It is not
+> affiliated with, endorsed by, or managed by the owners of ganjoor.net, and they bear no
+> responsibility for it. Please direct any issue with this app
+> [here](https://github.com/anas-rashid/ganjoorandroid/issues) — never to the Ganjoor project.
+
 An Android reader for [Ganjoor](https://ganjoor.net), the open archive of Persian poetry —
 240 poets and ~135,000 poems, laid out for comfortable long-form reading in Persian, Urdu
 and Arabic script, online or fully offline.
@@ -164,6 +172,61 @@ guide](https://f-droid.org/en/docs/Submitting_to_F-Droid_Quick_Start_Guide/):
 Two things to do before submitting: tag a release (`v0.1.0`), and check that F-Droid's build
 server supports **AGP 9.4.1** — it is new, and that is the most likely thing to hold up a merge.
 
+## Open source this app is built on
+
+Every third-party project this app uses, with its repository and terms. None of these projects
+endorse or maintain this app. Full licence texts are in [`licenses/`](licenses/) and ship inside
+the APK.
+
+### Content and data
+
+| Project | Repository / source | Terms | How it is used |
+|---|---|---|---|
+| Ganjoor | [ganjoor.net](https://ganjoor.net) | Classical Persian verse, long out of copyright | The poems themselves |
+| GanjoorService | [ganjoor/GanjoorService](https://github.com/ganjoor/GanjoorService) | GPL-3.0 | **No code used.** Only `api.ganjoor.net` over HTTPS, for poem search, opening lines and poet portraits — so this app is not a derivative work |
+| ganjoor-data | [anas-rashid/ganjoor-data](https://github.com/anas-rashid/ganjoor-data) | **No licence file stated** | The static JSON export every poem is read from |
+
+### Dictionary
+
+| Project | Repository / source | Terms | How it is used |
+|---|---|---|---|
+| Daneshjoo Dictionary | [0xdolan/Daneshjoo](https://github.com/0xdolan/Daneshjoo) | Repository states MIT (see caveat below) | Persian → English definitions |
+| Wiktionary | [en.wiktionary.org](https://en.wiktionary.org) | CC BY-SA 3.0 | Persian/Urdu/Arabic → English definitions, IPA, form→lemma index |
+| Urdu Wiktionary | [ur.wiktionary.org](https://ur.wiktionary.org) | CC BY-SA 3.0 | The only Urdu → Urdu definitions, plus vowelled spelling and syllable split |
+| wiktextract / kaikki.org | [tatuylonen/wiktextract](https://github.com/tatuylonen/wiktextract) | See repository | Produces the machine-readable Wiktionary exports the build consumes |
+| readmdict | [readmdict](https://pypi.org/project/readmdict/) | See project | Build-time only — reads Daneshjoo's `.mdx` |
+
+Because four of the five dictionary sources are CC BY-SA 3.0, **the generated `dictionary.db` is
+CC BY-SA 3.0**. The Daneshjoo caveat: the repository states MIT, but the underlying lexicon is a
+published Iranian dictionary, so that relicensing is worth verifying before relying on it.
+
+### Fonts
+
+| Project | Repository | Terms |
+|---|---|---|
+| Noto Naskh Arabic | [notofonts/arabic](https://github.com/notofonts/arabic) | SIL OFL 1.1 |
+| Noto Nastaliq Urdu | [notofonts/nastaliq](https://github.com/notofonts/nastaliq) | SIL OFL 1.1 |
+| Libron | [nicoverbruggen/libron](https://github.com/nicoverbruggen/libron) | SIL OFL 1.1 |
+
+### Libraries and icons
+
+All Apache-2.0.
+
+| Project | Repository |
+|---|---|
+| Jetpack Compose, AndroidX (core, activity, lifecycle, navigation) | [androidx/androidx](https://github.com/androidx/androidx) |
+| Kotlin standard library | [JetBrains/kotlin](https://github.com/JetBrains/kotlin) |
+| kotlinx.serialization | [Kotlin/kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization) |
+| kotlinx.coroutines | [Kotlin/kotlinx.coroutines](https://github.com/Kotlin/kotlinx.coroutines) |
+| OkHttp | [square/okhttp](https://github.com/square/okhttp) |
+| Okio | [square/okio](https://github.com/square/okio) |
+| Coil 3 | [coil-kt/coil](https://github.com/coil-kt/coil) |
+| Accompanist (drawablepainter, via Coil) | [google/accompanist](https://github.com/google/accompanist) |
+| Material Symbols (share, lookup, assistant glyphs, copied as vector paths) | [google/material-design-icons](https://github.com/google/material-design-icons) |
+
+No Google Play Services, Firebase, analytics or trackers. The only permission requested is
+`INTERNET`.
+
 ## Licensing
 
 The app code is MIT (see [`LICENSE`](LICENSE)). Every other component — the poems, the three
@@ -175,4 +238,7 @@ The two things worth knowing up front: the **data set** carries no licence file,
 **GanjoorService** is GPL-3.0 but none of its code is used here — only data over HTTPS — so this
 app is not a derivative work of it.
 
-Not affiliated with or endorsed by Ganjoor.
+This app is an **unofficial, independent** client, maintained by **Anas Rashid**. It is not
+affiliated with, endorsed by, or managed by ganjoor.net or its maintainers, and it is a wholly
+separate project from the Ganjoor GitHub repositories. The same statement is shown in the app
+itself, at **Reading settings → About & licences**.

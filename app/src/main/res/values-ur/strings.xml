@@ -59,6 +59,7 @@
     <string name="load_more">مزید</string>
     <string name="done">مکمل</string>
     <string name="about">تعارف اور لائسنس</string>
+    <string name="about_unofficial">غیر سرکاری۔ ”گنجور فار اینڈرائیڈ“ ganjoor.net کا ایک خودمختار اور غیر سرکاری اینڈرائیڈ کلائنٹ ہے۔ یہ ganjoor.net اور اس کی گِٹ ہب ریپازٹریز سے بالکل الگ منصوبہ ہے، جسے انس رشید نے بنایا اور وہی اسے سنبھالتے ہیں۔ اسے ganjoor.net کے مالکان کی نہ تائید حاصل ہے، نہ وہ اسے چلاتے ہیں، اور نہ ہی اس کے ذمہ دار ہیں۔</string>
     <string name="about_intro">گنجور فار اینڈرائیڈ آزاد سافٹ ویئر ہے۔ کلام، فونٹس اور تمام لائبریریاں ذیل میں درج ہیں؛ مکمل لائسنس پڑھنے کے لیے کسی اندراج پر ٹیپ کریں۔</string>
     <string name="no_definition">اس لفظ کا کوئی اندراج نہیں ملا۔</string>
     <string name="source_wiktionary">ویکی لغت — فارسی سے انگریزی (CC BY-SA 3.0)</string>
@@ -107,4 +108,11 @@
     <string name="assistant_translate_prompt">اس کا ترجمہ کریں:</string>
     <string name="this_couplet">یہ شعر</string>
     <string name="couplet_options">اس شعر کے اختیارات</string>
+    <string name="sort_pinned">منتخب</string>
+    <string name="pin_poet">اوپر رکھیں</string>
+    <string name="unpin_poet">ہٹا دیں</string>
+    <string name="pin_hint">کسی شاعر کو یہاں رکھنے کے لیے اُس پر دبا کر رکھیں</string>
+    <string name="view_grid">کارڈ کی صورت</string>
+    <string name="view_list">فہرست کی صورت</string>
+    <string name="downloaded_poet">پہلے سے محفوظ ہے</string>
 </resources>

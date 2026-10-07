@@ -181,6 +181,14 @@ fun AboutScreen(onUp: () -> Unit, onHome: () -> Unit) {
     ) { insets ->
         LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = insets) {
             item {
+                // Stated before anything else: readers arriving from ganjoor.net should not have
+                // to infer from the credits below that this is someone else's app.
+                Text(
+                    text = stringResource(R.string.about_unofficial),
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp),
+                )
                 Text(
                     text = stringResource(R.string.about_intro),
                     style = MaterialTheme.typography.bodyMedium,
