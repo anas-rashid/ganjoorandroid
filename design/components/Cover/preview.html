@@ -1,0 +1,31 @@
+<!-- @dsCard height=288 -->
+<!doctype html><html><head><meta charset="utf-8"><style>
+html,body{margin:0;background:var(--surface)}
+.c{position:relative;width:960px;height:288px;overflow:hidden;background:var(--surface)}
+svg{position:absolute;inset:0}
+.p{fill:var(--primary)}.pc{fill:var(--primary-container)}.s{fill:var(--secondary)}.sc{fill:var(--secondary-container)}.ink{fill:var(--on-background)}.cut{fill:var(--surface)}
+.b{rx:var(--radius-md)}
+.t{position:absolute;left:var(--space-32);bottom:var(--space-24);max-width:440px}
+.n{font:400 110px/.95 var(--font-libron);color:var(--on-surface);margin:0;letter-spacing:-1px}
+.g{font:400 14px/20px var(--font-libron);color:var(--on-surface-variant);margin:var(--space-12) 0 0}
+</style></head><body><div class="c">
+<svg width="960" height="288" viewBox="0 0 960 288" aria-hidden="true">
+<!-- blocks: primary 240×288 slab (bleeds top and bottom), secondary 160×120, secondary-container 160×96, on-background 160×72, primary-container 80×120; corners radius-md
+     arrangement: one tall turquoise slab with satellites stacked flush on its far side, like a tile panel
+     pattern: literal motif, the khatam eight-point star from the launcher mark and the "Persian tilework" note in Theme.kt, cut in surface out of the slab, 12 stars at an 80px pitch (space-20×4)
+     scales: pitch 80 = 4×space-20, gaps space-8, star 48 = 2×space-24 -->
+<defs><path id="k" d="M0,-24 L7.03,-16.97 L16.97,-16.97 L16.97,-7.03 L24,0 L16.97,7.03 L16.97,16.97 L7.03,16.97 L0,24 L-7.03,16.97 L-16.97,16.97 L-16.97,7.03 L-24,0 L-16.97,-7.03 L-16.97,-16.97 L-7.03,-16.97 Z"/></defs>
+<rect class="pc b" x="480" y="160" width="72" height="128"/>
+<rect class="p b" x="560" y="-12" width="240" height="312"/>
+<g class="cut">
+<use href="#k" x="600" y="40"/><use href="#k" x="680" y="40"/><use href="#k" x="760" y="40"/>
+<use href="#k" x="600" y="120"/><use href="#k" x="680" y="120"/><use href="#k" x="760" y="120"/>
+<use href="#k" x="600" y="200"/><use href="#k" x="680" y="200"/><use href="#k" x="760" y="200"/>
+<use href="#k" x="600" y="280"/><use href="#k" x="680" y="280"/><use href="#k" x="760" y="280"/>
+</g>
+<rect class="s b" x="808" y="-12" width="164" height="124"/>
+<rect class="sc b" x="808" y="120" width="164" height="88"/>
+<rect class="ink b" x="808" y="216" width="164" height="84"/>
+</svg>
+<div class="t"><p class="n">Ganjoor</p><p class="g">Persian poetry, set for long reading: tilework turquoise, saffron and paper.</p></div>
+</div></body></html>
