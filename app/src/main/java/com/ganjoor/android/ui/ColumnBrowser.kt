@@ -61,6 +61,7 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
@@ -157,6 +158,12 @@ private val CatEntry.url
     }
 
 /**
+ * True while a side panel (the reading settings) is open beside the page on a large screen.
+ * The columns step aside for it, so the page keeps its room, and come back when it closes.
+ */
+val LocalSidePanelOpen = compositionLocalOf { false }
+
+/**
  * The columns beside [content]. [expanded] (840dp and up) shows up to three list columns;
  * narrower, only the newest one, with a way back up in its header.
  *
@@ -174,7 +181,11 @@ fun ColumnBrowser(
     content: @Composable (toggle: @Composable () -> Unit) -> Unit,
 ) {
     val settings = LocalSettings.current
-    val hidden = settings.value.columnsHidden
+    // Hidden by the reader (reader view, remembered) or only while the settings panel is open.
+    // The second never touches the saved choice, so closing the panel puts back exactly what
+    // was there: the columns if they were showing, reader view if it was on.
+    val makingRoom = LocalSidePanelOpen.current
+    val hidden = settings.value.columnsHidden || makingRoom
     val columns = remember(url, isPoem) { columnUrls(url, isPoem) }
     // What is selected in each column: the next step of the path, down to the open poem.
     val path = if (isPoem) columns + url else columns
@@ -219,13 +230,14 @@ fun ColumnBrowser(
         Box(Modifier.weight(1f).fillMaxHeight()) {
             content {
                 // Hiding is in the top bar; bringing them back is the floating button below,
-                // which is there whenever they are hidden.
+                // which is there whenever the reader has hidden them.
                 if (!hidden) ColumnsToggle { settings.update { it.copy(columnsHidden = true) } }
             }
             // Reader view: the page has the whole screen, and one button, at the edge the
             // columns went to, brings them back as they were.
+            // Not while the settings panel is open: the columns would stay away for it anyway.
             ShowColumnsButton(
-                visible = hidden,
+                visible = hidden && !makingRoom,
                 onShow = { settings.update { it.copy(columnsHidden = false) } },
                 modifier = Modifier
                     .align(Alignment.BottomStart)

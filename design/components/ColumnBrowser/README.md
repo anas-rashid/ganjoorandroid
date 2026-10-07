@@ -51,6 +51,7 @@ On large screens, tapping a word opens **WordPanel** on the left instead of the 
 On large screens the gear opens **ReadingSettingsPanel** on the left, where the dictionary opens, instead of the bottom sheet:
 - It has the same width and surface as the dictionary panel, with a "Reading settings" header and a ✕ button. The settings and their order are the same as in the sheet.
 - The page stays in view beside the panel, so a change of theme, font, weight or size shows on the poem as it's made.
+- While the panel is open, the poets and list columns fold away so the page keeps its room. When it closes they come back, but only if they were showing before: this never changes the saved reader-view choice, and the floating "show the list" button stays hidden while the panel is open.
 - ✕ or Back closes it. Phones keep the bottom sheet.
 
 ## Loading

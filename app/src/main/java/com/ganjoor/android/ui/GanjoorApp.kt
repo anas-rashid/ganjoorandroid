@@ -112,7 +112,10 @@ fun GanjoorApp() {
         // On a large screen reading settings open in a panel on the left, where the dictionary
         // opens, so the page stays in view and shows each change as it is made.
         Row(Modifier.fillMaxSize()) {
+        // The columns fold away while the settings panel is open, so the page doesn't end up
+        // squeezed between them and the panel.
         Box(Modifier.weight(1f)) {
+        CompositionLocalProvider(LocalSidePanelOpen provides (wide && settingsOpen)) {
         NavHost(
             navController = nav,
             startDestination = PoetsRoute,
@@ -235,6 +238,7 @@ fun GanjoorApp() {
             composable<AboutRoute> {
                 AboutScreen(onUp = { nav.navigateUp() }, onHome = { nav.goHome() })
             }
+        }
         }
         }
         if (wide) {
