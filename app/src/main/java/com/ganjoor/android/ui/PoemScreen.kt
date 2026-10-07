@@ -96,8 +96,9 @@ fun PoemScreen(
     Load(
         key = fullUrl,
         block = { Ganjoor.poem(fullUrl) },
-        // The bar stays up with Back already working; only the text waits.
-        placeholder = { LoadingPoem(wide, onUp, navigationToggle) },
+        // The bar stays up with Back, Home and the reading settings already working; only
+        // the text waits. Sharing and bookmarking need a poem, so they arrive with it.
+        placeholder = { LoadingPoem(wide, onUp, onHome, navigationToggle) },
     ) { poem ->
         val prefs = LocalSettings.current.value
         val style = readingStyle(prefs.font, prefs.fontSize, prefs.fontWeight.weight)
@@ -256,7 +257,12 @@ private data class WordTap(val word: String, val passage: Bookmark, val verse: I
 /** The poem screen while its poem is on the way: the real top bar, and the text as a skeleton. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun LoadingPoem(wide: Boolean, onUp: () -> Unit, navigationToggle: (@Composable () -> Unit)?) {
+private fun LoadingPoem(
+    wide: Boolean,
+    onUp: () -> Unit,
+    onHome: () -> Unit,
+    navigationToggle: (@Composable () -> Unit)?,
+) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -268,6 +274,12 @@ private fun LoadingPoem(wide: Boolean, onUp: () -> Unit, navigationToggle: (@Com
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.back))
                         }
                     }
+                },
+                // Going home and changing the reading settings do not depend on this poem, so
+                // they do not wait for it. Share and bookmark do, and appear when it lands.
+                actions = {
+                    HomeAction(onHome)
+                    ReadingSettingsAction()
                 },
             )
         }

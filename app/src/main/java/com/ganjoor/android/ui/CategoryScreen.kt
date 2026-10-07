@@ -60,7 +60,7 @@ fun CategoryScreen(
         key = fullUrl,
         block = { Ganjoor.category(fullUrl) },
         // The bar stays up with Back already working; only the list waits.
-        placeholder = { LoadingCategory(onUp) },
+        placeholder = { LoadingCategory(onUp, onHome) },
     ) { cat ->
         // First lines are a separate, optional call; the list shows up without waiting for it.
         var excerpts by remember(cat.id) { mutableStateOf(emptyMap<Int, String>()) }
@@ -132,7 +132,7 @@ fun CategoryScreen(
 /** The category screen while its list is on the way: the real top bar over a skeleton list. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun LoadingCategory(onUp: () -> Unit) {
+private fun LoadingCategory(onUp: () -> Unit, onHome: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -141,6 +141,12 @@ private fun LoadingCategory(onUp: () -> Unit) {
                     IconButton(onClick = onUp) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.back))
                     }
+                },
+                // Home and the reading settings belong to the app, not to this page, so they are
+                // there from the first frame. Downloading needs to know which poet this is.
+                actions = {
+                    HomeAction(onHome)
+                    ReadingSettingsAction()
                 },
             )
         }
