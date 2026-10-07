@@ -5,9 +5,8 @@
 > **Unofficial.** This is an independent, unofficial Android client for
 > [ganjoor.net](https://ganjoor.net). It is a **separate project** from ganjoor.net and its
 > GitHub repositories ([`ganjoor/ganjoor`](https://github.com/ganjoor),
-> `GanjoorService`, and the rest), built and maintained by **Anas Rashid**. It is not
-> affiliated with, endorsed by, or managed by the owners of ganjoor.net, and they bear no
-> responsibility for it. Please direct any issue with this app
+> `GanjoorService`, and the rest), built and maintained by **Muhammad Anas Rashid**. The owners of
+> ganjoor.net do not run or manage it. Please direct any issue with this app
 > [here](https://github.com/anas-rashid/ganjoorandroid/issues) — never to the Ganjoor project.
 
 An Android reader for [Ganjoor](https://ganjoor.net), the open archive of Persian poetry —
@@ -238,7 +237,7 @@ The two things worth knowing up front: the **data set** carries no licence file,
 **GanjoorService** is GPL-3.0 but none of its code is used here — only data over HTTPS — so this
 app is not a derivative work of it.
 
-This app is an **unofficial, independent** client, maintained by **Anas Rashid**. It is not
-affiliated with, endorsed by, or managed by ganjoor.net or its maintainers, and it is a wholly
-separate project from the Ganjoor GitHub repositories. The same statement is shown in the app
-itself, at **Reading settings → About & licences**.
+This app is an **unofficial, independent** client, built and maintained by **Muhammad Anas Rashid**. It is
+a wholly separate project from ganjoor.net and the Ganjoor GitHub repositories, and the owners of
+ganjoor.net do not run or manage it. The same statement is shown in the app itself, at **Reading
+settings → About & licences**.
