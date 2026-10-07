@@ -48,6 +48,15 @@ import com.ganjoor.android.data.LocalAssistant
 import com.ganjoor.android.data.Pronunciation
 import com.ganjoor.android.ui.theme.readingStyle
 
+/**
+ * How wide the dictionary sits beside the poem.
+ *
+ * Narrower than the reading settings, deliberately: the settings fold the columns away and take
+ * the room that frees, while the dictionary is read *against* the line it came from, so the verse
+ * keeps the width instead. A definition is short; a hemistich is not.
+ */
+val DictionaryPanelWidth = 216.dp
+
 /** English prose inside an otherwise right-to-left sheet. */
 @Composable
 private fun LeftToRight(content: @Composable () -> Unit) {
@@ -102,7 +111,7 @@ fun WordPanel(word: String, onDismiss: () -> Unit, passage: Bookmark? = null) {
     BackHandler(onBack = onDismiss)
     Surface(
         color = MaterialTheme.colorScheme.surfaceContainerLow,
-        modifier = Modifier.width(360.dp).fillMaxHeight(),
+        modifier = Modifier.width(DictionaryPanelWidth).fillMaxHeight(),
     ) {
         Column(Modifier.statusBarsPadding()) {
             Row(

@@ -97,6 +97,14 @@ fun PoemScreen(
     // finds, so the couplet's own actions live at its foot rather than behind a tap between words.
     var tapped by remember { mutableStateOf<WordTap?>(null) }
 
+    // One side panel at a time. The dictionary and the reading settings both want the left of the
+    // screen, and opening the second put two panels there at once — or, where there was no longer
+    // room for two, left the dictionary as a sheet in the middle of the page while the settings
+    // sat beside it. Either way the reader is asked to look in two places. The settings replace
+    // the dictionary instead; closing them leaves the poem, which is where the reader was.
+    val sidePanelOpen = LocalSidePanelOpen.current
+    LaunchedEffect(sidePanelOpen) { if (sidePanelOpen) tapped = null }
+
     Load(
         key = fullUrl,
         block = { Ganjoor.poem(fullUrl) },
