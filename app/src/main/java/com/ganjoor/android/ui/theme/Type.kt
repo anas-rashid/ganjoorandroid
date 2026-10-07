@@ -1,12 +1,12 @@
 package com.ganjoor.android.ui.theme
 
+import android.os.Build
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontVariation
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
@@ -15,24 +15,40 @@ import com.ganjoor.android.R
 import com.ganjoor.android.ui.ReadingFont
 
 /**
- * Both files are variable fonts with a `wght` axis, registered at four weights so a reader can
- * thicken the text — thin naskh strokes wash out on a lit screen, especially in the dark themes.
+ * Both files are variable fonts, registered at four weights so a reader can thicken the text —
+ * thin naskh strokes wash out on a lit screen, especially in the dark themes.
  *
- * Real axis interpolation needs API 26+; on 24 and 25 the variation settings are ignored and
- * Android falls back to synthesising the heavier weights, which still darkens the text.
+ * Only `wght` is asked for, and deliberately: both files carry that one axis and nothing else.
+ * `FontVariation.Settings(weight, style)` would also send `ital`, and a font with no italic axis
+ * is entitled to refuse the whole request rather than the part it cannot honour. A platform that
+ * does so leaves every weight drawing at 400 — and silently, because each entry here declares the
+ * weight it was asked for, so the text is never a candidate for synthetic bolding either.
  */
 @OptIn(ExperimentalTextApi::class)
 private fun variable(resId: Int, weight: FontWeight) = Font(
     resId = resId,
     weight = weight,
-    variationSettings = FontVariation.Settings(weight, FontStyle.Normal),
+    variationSettings = FontVariation.Settings(FontVariation.weight(weight.weight)),
 )
 
 private val weights =
     listOf(FontWeight.Normal, FontWeight.Medium, FontWeight.SemiBold, FontWeight.Bold)
 
-val Naskh = FontFamily(weights.map { variable(R.font.noto_naskh_arabic, it) })
-val Nastaliq = FontFamily(weights.map { variable(R.font.noto_nastaliq_urdu, it) })
+/**
+ * Variable axes need API 26. Below that the settings above are dropped, and declaring four
+ * weights of the same file would make the heavier ones unreachable: Android would match the
+ * entry claiming 700, draw it at 400, and skip synthetic bolding because the entry said it was
+ * already bold. One entry at its real weight instead, so asking for bold actually synthesises it.
+ */
+private fun scriptFamily(resId: Int): FontFamily =
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        FontFamily(weights.map { variable(resId, it) })
+    } else {
+        FontFamily(Font(resId, FontWeight.Normal))
+    }
+
+val Naskh = scriptFamily(R.font.noto_naskh_arabic)
+val Nastaliq = scriptFamily(R.font.noto_nastaliq_urdu)
 
 /**
  * The English UI only. Libron is a reading serif (OFL, github.com/nicoverbruggen/libron) and
