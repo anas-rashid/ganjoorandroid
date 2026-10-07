@@ -57,6 +57,13 @@ import com.ganjoor.android.ui.theme.readingStyle
  */
 val DictionaryPanelWidth = 216.dp
 
+/**
+ * The narrowest the page may be left once the dictionary opens beside it. Below this the panel is
+ * not worth its room: on a book-style foldable held open in portrait the columns have already
+ * taken theirs, and a panel there left the verse a couple of characters a line.
+ */
+val MinPageMeasure = 400.dp
+
 /** English prose inside an otherwise right-to-left sheet. */
 @Composable
 private fun LeftToRight(content: @Composable () -> Unit) {

@@ -45,6 +45,10 @@ On large screens, tapping a word opens **WordPanel** on the left instead of the 
 - The poem moves over to make room, so nothing being read is covered.
 - The tapped word stays highlighted in the verse (`secondary-container` / `on-secondary-container`), on phones too.
 - ✕ or Back closes the panel.
+- The panel only opens where the page keeps at least **400dp** beside it. On a book-style
+  foldable held open in portrait the columns have already taken their room, and a panel
+  there left the verse a couple of characters a line. Below that the sheet is used instead:
+  it covers the foot of the poem but leaves the lines whole.
 
 ## Reading settings
 
