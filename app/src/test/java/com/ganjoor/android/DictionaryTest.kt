@@ -134,4 +134,35 @@ class LetterOverlapTest {
     fun `an empty word never matches`() {
         assertEquals(0f, letterOverlap("", "عشق"), 0.001f)
     }
+
+    @Test
+    fun `an arabic comma is not part of the word before it`() {
+        val line = "دل می‌رود ز دستم، صاحب‌دلان خدا را"
+        assertEquals("دستم", wordAt(line, line.indexOf("دستم") + 1))
+    }
+
+    @Test
+    fun `a question mark is not part of the word before it`() {
+        val line = "صلاح کار کجا و من خراب کجا؟"
+        assertEquals("کجا", wordAt(line, line.lastIndexOf("کجا") + 1))
+    }
+
+    @Test
+    fun `a full stop and a semicolon do not join the word`() {
+        assertEquals("یافت", wordAt("نخواهی یافت۔", 8))
+        assertEquals("برخیز", wordAt("شرطه برخیز؛ باد", 7))
+    }
+
+    @Test
+    fun `digits are not part of a word`() {
+        assertEquals("غزل", wordAt("غزل۳", 1))
+        assertEquals("غزل", wordAt("غزل١٢", 1))
+    }
+
+    @Test
+    fun `harakat keep a word whole`() {
+        // منِ is one word: the kasra sits inside it, and normalise strips it before the lookup.
+        val line = "و منِ خراب"
+        assertEquals("منِ", wordAt(line, line.indexOf("من") + 1))
+    }
 }

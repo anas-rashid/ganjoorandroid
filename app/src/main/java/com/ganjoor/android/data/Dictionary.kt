@@ -279,4 +279,23 @@ internal fun wordRangeAt(text: String, index: Int): IntRange? {
     return (start..end).takeIf { end - start + 1 > 1 }
 }
 
-private fun Char.isWordChar() = this in '؀'..'ۿ' || this == ZWNJ
+/**
+ * Letters, the marks that sit on them, and the joiner — but not the punctuation a line of verse
+ * is pointed with, nor its digits.
+ *
+ * The Arabic block holds far more than letters: the comma ، the semicolon ؛ the question mark ؟
+ * the full stop ۔ and both sets of Indic digits all live inside it. Spanning the whole block swept
+ * them into the word, so tapping دستم in «ز دستم، صاحب‌دلان» looked up «دستم،», which no dictionary
+ * carries and no near-word search rescues.
+ *
+ * Harakat stay in: they sit *inside* a word — منِ is one word — and normalise() strips them before
+ * the lookup anyway. Tatweel stays for the same reason, stretching a letter without breaking it.
+ */
+private fun Char.isWordChar() =
+    this == ZWNJ || (this in '؀'..'ۿ' && category in WORD_CATEGORIES)
+
+private val WORD_CATEGORIES = setOf(
+    CharCategory.OTHER_LETTER,      // the letters themselves
+    CharCategory.NON_SPACING_MARK,  // harakat, which sit on a letter
+    CharCategory.MODIFIER_LETTER,   // tatweel, which stretches one
+)
