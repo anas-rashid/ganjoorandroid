@@ -7,6 +7,10 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.clickable
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -251,6 +255,9 @@ fun PoemScreen(
     }
 }
 
+/** The positions that make a line of verse; anything else (Single, Paragraph, Comment) is prose. */
+private val VERSE_POSITIONS = setOf(Verse.RIGHT, Verse.LEFT, Verse.CENTERED_1, Verse.CENTERED_2)
+
 /** A word someone tapped: what to look up, the couplet it came from, and where it sits in its verse. */
 private data class WordTap(val word: String, val passage: Bookmark, val verse: Int, val range: IntRange)
 
@@ -379,7 +386,26 @@ private fun Couplet(
     val oneLine = sideBySide && couplet.size == 2 &&
         couplet[0].position == Verse.RIGHT && couplet[1].position == Verse.LEFT
 
-    Column(modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp)) {
+    // Each line of verse sits in its own soft card, so the eye finds where one couplet ends and
+    // the next begins, and the couplet's actions visibly belong to it. Prose (Golestan,
+    // Nowruznameh) stays bare: a paragraph in a box reads as a quotation, not as the text.
+    val isVerse = couplet.all { it.position in VERSE_POSITIONS }
+    val colors = MaterialTheme.colorScheme
+    // A step lighter than the page. On OLED black the usual step is all but black itself, so
+    // the card takes the next one up: still dim, but there.
+    val cardColor =
+        if (colors.surface == Color.Black) colors.surfaceContainerHighest else colors.surfaceContainerHigh
+    val card = if (isVerse) {
+        Modifier
+            .padding(vertical = 4.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(cardColor)
+            .padding(horizontal = 12.dp, vertical = 8.dp)
+    } else {
+        Modifier.padding(vertical = 6.dp)
+    }
+
+    Column(modifier = Modifier.fillMaxWidth().then(card)) {
         if (oneLine) {
             Row(modifier = Modifier.fillMaxWidth()) {
                 couplet.forEachIndexed { index, verse ->
