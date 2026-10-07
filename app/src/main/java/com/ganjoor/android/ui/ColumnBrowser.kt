@@ -224,21 +224,35 @@ fun ColumnBrowser(
             }
             // Reader view: the page has the whole screen, and one button, at the edge the
             // columns went to, brings them back as they were.
-            AnimatedVisibility(
+            ShowColumnsButton(
                 visible = hidden,
-                enter = scaleIn() + fadeIn(),
-                exit = scaleOut() + fadeOut(),
+                onShow = { settings.update { it.copy(columnsHidden = false) } },
                 modifier = Modifier
                     .align(Alignment.BottomStart)
                     .navigationBarsPadding()
                     .padding(16.dp),
-            ) {
-                SmallFloatingActionButton(
-                    onClick = { settings.update { it.copy(columnsHidden = false) } },
-                ) {
-                    Icon(Icons.Default.Menu, stringResource(R.string.show_columns))
-                }
-            }
+            )
+        }
+    }
+}
+
+/**
+ * Brings the columns back from reader view.
+ *
+ * In its own composable because the Box it is placed in sits inside the browser's Row: with
+ * RowScope still an implicit receiver there, `AnimatedVisibility` resolves to the row overload,
+ * which takes no alignment and does not compile. A function of its own has only its own scope.
+ */
+@Composable
+private fun ShowColumnsButton(visible: Boolean, onShow: () -> Unit, modifier: Modifier = Modifier) {
+    AnimatedVisibility(
+        visible = visible,
+        enter = scaleIn() + fadeIn(),
+        exit = scaleOut() + fadeOut(),
+        modifier = modifier,
+    ) {
+        SmallFloatingActionButton(onClick = onShow) {
+            Icon(Icons.Default.Menu, stringResource(R.string.show_columns))
         }
     }
 }
