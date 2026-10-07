@@ -65,6 +65,8 @@ data class Prefs(
     val oled: Boolean = false,
     val poetSort: PoetSort = PoetSort.Pinned,
     val poetGrid: Boolean = true,
+    /** On a large screen, whether the poet and book columns are folded away to leave the poem. */
+    val columnsHidden: Boolean = false,
 )
 
 /** Reading preferences, kept in SharedPreferences and read once at startup. */
@@ -84,6 +86,7 @@ class Settings(context: Context) {
             oled = prefs.getBoolean("oled", prefs.getString("theme", null) == "Black"),
             poetSort = enumOrDefault(prefs.getString("poetSort", null), PoetSort.Pinned),
             poetGrid = prefs.getBoolean("poetGrid", true),
+            columnsHidden = prefs.getBoolean("columnsHidden", false),
         )
     )
         private set
@@ -103,6 +106,7 @@ class Settings(context: Context) {
                 putBoolean("oled", p.oled)
                 putString("poetSort", p.poetSort.name)
                 putBoolean("poetGrid", p.poetGrid)
+                putBoolean("columnsHidden", p.columnsHidden)
             }
         }
     }

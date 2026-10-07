@@ -1,0 +1,158 @@
+/* Ganjoor — static renditions of the app's Compose components. Values come from tokens.css. */
+.gj { font-family: var(--font-naskh); color: var(--on-surface); background: var(--surface); }
+.gj[lang="en"] { font-family: var(--font-libron); }
+.gj *, .gj *::before, .gj *::after { box-sizing: border-box; }
+.gj-icon { width: var(--icon); height: var(--icon); fill: currentColor; flex: none; display: block; }
+.gj-icon-btn { width: var(--touch); height: var(--touch); border: 0; background: none; color: var(--on-surface-variant); border-radius: var(--radius-full); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; }
+.gj-icon-btn:hover { background: color-mix(in srgb, var(--on-surface-variant) 8%, transparent); }
+.gj-icon-btn:focus-visible, .gj-text-btn:focus-visible, .gj-chip:focus-visible, .gj-card:focus-visible, .gj-row:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+/* Top app bar: 64px, surface, title-large; nav icon on-surface, actions on-surface-variant. */
+.gj-topbar { height: 64px; display: flex; align-items: center; gap: var(--space-4); padding: 0 var(--space-4); background: var(--surface); }
+.gj-topbar .gj-nav { color: var(--on-surface); }
+.gj-topbar-title { flex: 1; min-width: 0; font-size: 22px; line-height: 28px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-inline-start: var(--space-4); }
+.gj-topbar-actions { display: flex; }
+.gj-topbar .gj-on { color: var(--primary); }
+
+/* Text button: primary label-large, pill, 40px. */
+.gj-text-btn { height: 40px; padding: 0 12px; border: 0; background: none; border-radius: var(--radius-full); color: var(--primary); font: 500 14px/20px var(--font-naskh); letter-spacing: 0.1px; display: inline-flex; align-items: center; gap: var(--space-4); cursor: pointer; }
+.gj[lang="en"] .gj-text-btn { font-family: var(--font-libron); }
+.gj-text-btn .gj-icon { width: var(--icon-inline); height: var(--icon-inline); }
+.gj-text-btn.is-neutral { color: var(--on-surface); }
+
+/* Breadcrumbs: title-medium; ancestors primary and tappable, current on-surface, » separators muted. */
+.gj-crumbs { display: flex; flex-wrap: wrap; align-items: center; font-size: 16px; line-height: 24px; font-weight: 500; }
+.gj-crumbs a { color: var(--primary); text-decoration: none; cursor: pointer; }
+.gj-crumbs .gj-sep { color: var(--on-surface-variant); white-space: pre; }
+.gj-crumbs .gj-here { color: var(--on-surface); }
+.gj-metre { font-size: 12px; line-height: 16px; letter-spacing: .4px; color: var(--on-surface-variant); }
+
+/* Couplet: two hemistichs stacked; first to the start, second to the end. */
+.gj-couplet { padding: var(--space-6) 0; }
+.gj-verse { font-family: var(--font-naskh); font-size: 22px; line-height: 1.8; color: var(--on-surface); margin: 0; }
+.gj-couplet.is-nastaliq .gj-verse { font-family: var(--font-nastaliq); line-height: 2.4; }
+.gj-verse.is-first { text-align: start; }
+.gj-verse.is-second { text-align: end; }
+.gj-verse.is-centered { text-align: center; }
+.gj-verse.is-prose { text-align: justify; }
+.gj-couplet-summary { font-size: 12px; line-height: 16px; letter-spacing: .4px; color: var(--on-surface-variant); padding-top: var(--space-4); }
+.gj-couplet-toggle { display: flex; justify-content: flex-end; }
+.gj-couplet-toggle .gj-icon-btn { width: var(--touch-compact); height: var(--touch-compact); }
+.gj-couplet-toggle .gj-icon { width: var(--icon-small); height: var(--icon-small); }
+.gj-actions { display: flex; flex-wrap: wrap; gap: var(--space-8); }
+
+/* Filter chips: 32px, radius-sm; selected = secondary-container with a check. */
+.gj-chips { display: flex; flex-wrap: wrap; gap: var(--space-8); }
+.gj-chip { height: 32px; padding: 0 16px; border-radius: var(--radius-sm); border: 1px solid var(--outline); background: transparent; color: var(--on-surface-variant); font: 500 14px/20px var(--font-naskh); letter-spacing: .1px; display: inline-flex; align-items: center; gap: var(--space-8); cursor: pointer; }
+.gj[lang="en"] .gj-chip { font-family: var(--font-libron); }
+.gj-chip[aria-pressed="true"] { background: var(--secondary-container); color: var(--on-secondary-container); border-color: transparent; padding-inline-start: 8px; }
+.gj-chip .gj-icon { width: var(--icon-inline); height: var(--icon-inline); }
+
+/* Poet portrait disc: secondary-container with the initial underneath the photo. */
+.gj-portrait { border-radius: var(--radius-full); background: var(--secondary-container); color: var(--on-secondary-container); display: flex; align-items: center; justify-content: center; overflow: hidden; flex: none; position: relative; }
+.gj-portrait img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.gj-portrait.is-row { width: var(--avatar-row); height: var(--avatar-row); font-size: 16px; }
+.gj-portrait.is-card { width: var(--avatar-card); height: var(--avatar-card); font-size: 28px; line-height: 36px; }
+
+/* Poet card: filled Card, radius-md, surface-container-highest, 12 padding, 8 gap. */
+.gj-poet-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(var(--poet-grid-min), 1fr)); gap: var(--space-12); }
+.gj-card { background: var(--surface-container-highest); color: var(--on-surface); border-radius: var(--radius-md); padding: var(--space-12); display: flex; flex-direction: column; align-items: center; gap: var(--space-8); cursor: pointer; }
+.gj-name { font-size: 16px; line-height: 24px; font-weight: 500; letter-spacing: .15px; text-align: center; display: flex; align-items: center; gap: var(--space-4); }
+.gj-pin { width: var(--icon-pin); height: var(--icon-pin); color: var(--primary); fill: currentColor; flex: none; }
+
+/* List row: Material ListItem, 16 side padding, 56–72 tall. */
+.gj-row { display: flex; align-items: center; gap: var(--space-16); min-height: 72px; padding: var(--space-8) var(--space-16); background: var(--surface); cursor: pointer; }
+.gj-row-text { flex: 1; min-width: 0; }
+.gj-row-trailing { display: flex; align-items: center; gap: var(--space-4); }
+.gj-row-support { font-size: 14px; line-height: 20px; letter-spacing: .25px; color: var(--on-surface-variant); }
+
+/* Download state, all in a 48px box so ticks and arrows line up. */
+.gj-dl { width: var(--touch); height: var(--touch); display: inline-flex; align-items: center; justify-content: center; }
+.gj-dl.is-saved { color: var(--downloaded); }
+.gj-dl.is-idle { color: var(--on-surface-variant); }
+.gj-ring { width: var(--icon-inline); height: var(--icon-inline); border-radius: 50%; border: var(--space-2) solid var(--surface-container-highest); border-top-color: var(--primary); }
+
+/* Settings sheet pieces. */
+.gj-sheet { background: var(--surface-container-low); border-radius: var(--radius-xl) var(--radius-xl) 0 0; padding: var(--space-8) var(--space-20) var(--space-32); display: flex; flex-direction: column; gap: var(--space-8); }
+.gj-handle { width: 32px; height: 4px; border-radius: var(--radius-full); background: var(--on-surface-variant); opacity: .4; margin: var(--space-8) auto var(--space-8); }
+.gj-label { font-size: 14px; line-height: 20px; font-weight: 500; letter-spacing: .1px; color: var(--primary); padding-top: var(--space-12); }
+.gj-toggle { display: flex; align-items: center; gap: var(--space-16); padding-top: var(--space-12); }
+.gj-toggle-text { flex: 1; }
+.gj-toggle-title { font-size: 16px; line-height: 24px; color: var(--on-surface); }
+.gj-toggle-note { font-size: 12px; line-height: 16px; letter-spacing: .4px; color: var(--on-surface-variant); }
+.gj-switch { width: 52px; height: 32px; border-radius: var(--radius-full); border: 2px solid var(--outline); background: var(--surface-container-highest); position: relative; flex: none; cursor: pointer; padding: 0; }
+.gj-switch::after { content: ""; position: absolute; top: 50%; inset-inline-start: 6px; width: 16px; height: 16px; margin-top: -8px; border-radius: 50%; background: var(--outline); }
+.gj-switch[aria-checked="true"] { background: var(--primary); border-color: var(--primary); }
+.gj-switch[aria-checked="true"]::after { inset-inline-start: auto; inset-inline-end: 2px; width: 24px; height: 24px; margin-top: -12px; background: var(--on-primary); }
+
+/* Bottom search bar: tonal surface, outlined field. */
+.gj-searchbar { background: var(--surface-tonal-3); padding: var(--space-8) var(--space-12); }
+.gj-field { height: 56px; border: 1px solid var(--outline); border-radius: var(--radius-xs); display: flex; align-items: center; gap: var(--space-16); padding: 0 var(--space-12); color: var(--on-surface-variant); font-size: 16px; line-height: 24px; letter-spacing: .5px; }
+.gj-search-poems { display: flex; align-items: center; gap: var(--space-16); min-height: 56px; padding: 0 var(--space-16); color: var(--on-surface); }
+.gj-search-poems .gj-icon { color: var(--primary); }
+
+.gj-divider { height: 1px; background: var(--outline-variant); border: 0; margin: 0; }
+.gj-ai-note { font-size: 11px; line-height: 16px; font-weight: 500; letter-spacing: .5px; color: var(--primary); padding-top: var(--space-12); }
+.gj-summary { font-size: 14px; line-height: 20px; letter-spacing: .25px; color: var(--on-surface-variant); }
+
+/* ── Large screens: ColumnBrowser (tablets, unfolded foldables; width ≥ 600) ──
+   Column browser in RTL: poets rail on the far right, then books, then chapters / poems,
+   and the open poem fills what is left on the left. */
+.gj-ts { display: flex; height: 100%; overflow: hidden; background: var(--surface); }
+.gj-ts-home { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.gj-ts.is-split .gj-ts-home { display: none; }
+.gj-ts-scroll { overflow-y: auto; min-height: 0; overscroll-behavior: contain; }
+.gj-ts-cols { display: none; flex: none; height: 100%; }
+.gj-ts.is-split .gj-ts-cols { display: flex; }
+.gj-ts-col { flex: none; width: 224px; display: flex; flex-direction: column; min-height: 0; border-inline-end: 1px solid var(--outline-variant); background: var(--surface-container-low); transition: width 300ms cubic-bezier(.2,0,0,1); }
+.gj-ts-col.is-new { animation: gj-ts-in 400ms cubic-bezier(.05,.7,.1,1) both; }
+/* Columns narrow as you go deeper: the newest list is widest, older ones give their room to the poem. */
+.gj-ts-col[data-dist="1"] { width: 168px; }
+.gj-ts-col[data-dist="2"] { width: 132px; }
+.gj-ts-col[data-dist="1"] .gj-ts-item, .gj-ts-col[data-dist="2"] .gj-ts-item { font-size: 14px; line-height: 20px; padding: var(--space-8); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.gj-ts-col[data-dist="1"] .gj-ts-item small, .gj-ts-col[data-dist="2"] .gj-ts-item small, .gj-ts-col[data-dist="1"] .gj-ts-item::after, .gj-ts-col[data-dist="2"] .gj-ts-item::after { display: none; }
+.gj-ts-col[data-dist="1"] .gj-ts-colhead, .gj-ts-col[data-dist="2"] .gj-ts-colhead { padding: 0 var(--space-8); }
+.gj-ts-col[data-dist="1"] .gj-ts-colhead b, .gj-ts-col[data-dist="2"] .gj-ts-colhead b { font-size: 14px; line-height: 20px; }
+.gj-ts-col.is-rail { width: 96px; background: var(--surface-container); }
+.gj-ts.is-deep .gj-ts-col.is-rail { width: 80px; }
+.gj-ts.is-deep .gj-ts-poet .gj-portrait { width: 44px; height: 44px; font-size: 18px; }
+.gj-ts-poet { overflow-wrap: anywhere; }
+@keyframes gj-ts-in { from { opacity: 0; transform: translateX(-32px); } }
+.gj-ts-col.is-rail.is-arriving { animation-name: gj-ts-rail; }
+@keyframes gj-ts-rail { from { width: 100vw; } }
+.gj-ts-colhead { flex: none; min-height: 56px; display: flex; flex-direction: column; justify-content: center; padding: 0 var(--space-16); border-bottom: 1px solid var(--outline-variant); }
+.gj-ts-colhead small { color: var(--on-surface-variant); font: 500 11px/16px var(--font-naskh); letter-spacing: .5px; }
+.gj-ts-colhead b { color: var(--on-surface); font: 500 16px/24px var(--font-naskh); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.gj-ts-list { padding: var(--space-8); flex: 1; }
+
+/* Poets rail: portrait with the name under it. */
+.gj-ts-poet { display: flex; flex-direction: column; align-items: center; gap: var(--space-4); width: 100%; padding: var(--space-8) var(--space-4); border: 0; background: none; border-radius: var(--radius-md); color: var(--on-surface); font: 500 12px/16px var(--font-naskh); letter-spacing: .5px; text-align: center; cursor: pointer; }
+.gj-ts-poet .gj-portrait { width: 56px; height: 56px; font-size: 22px; }
+.gj-ts-poet[aria-current="true"] { background: var(--secondary-container); color: var(--on-secondary-container); }
+.gj-ts-poet[aria-current="true"] .gj-portrait { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+/* Book / chapter / poem rows. */
+.gj-ts-item { display: block; width: 100%; min-height: 48px; padding: var(--space-8) var(--space-12); border: 0; background: none; color: var(--on-surface); font: 400 16px/24px var(--font-naskh); text-align: start; cursor: pointer; border-radius: var(--radius-md); }
+.gj-ts-item small { display: block; color: var(--on-surface-variant); font-size: 12px; line-height: 16px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.gj-ts-item:hover, .gj-ts-poet:hover { background: color-mix(in srgb, var(--on-surface) 6%, transparent); }
+.gj-ts-item[aria-current="true"] { background: var(--secondary-container); color: var(--on-secondary-container); }
+.gj-ts-item[aria-current="true"] small { color: var(--on-secondary-container); }
+.gj-ts-item.has-kids::after { content: "‹"; float: inline-end; color: var(--on-surface-variant); }
+
+/* Focus mode: the columns fold away and the poem takes the whole width, still centred. */
+.gj-ts.is-focus .gj-ts-cols { display: none; }
+.gj-ts-toggle[aria-pressed="false"] { color: var(--primary); }
+
+/* The open work. */
+.gj-ts-main { flex: 1; min-width: 0; display: flex; flex-direction: column; animation: gj-ts-in 400ms cubic-bezier(.05,.7,.1,1) both; }
+.gj-ts-content { flex: 1; padding: var(--space-8) var(--space-32) var(--space-32); }
+.gj-ts-measure { max-width: 680px; margin-inline: auto; }
+.gj-ts-main { container-type: inline-size; }
+/* Hemistichs side by side only when the poem column has room; otherwise they stack as on a phone. */
+.gj-ts .gj-couplet.is-wide .gj-verse.is-first { text-align: start; }
+.gj-ts .gj-couplet.is-wide .gj-verse.is-second { text-align: end; }
+@container (min-width: 640px) {
+  .gj-ts .gj-couplet.is-wide { display: grid; grid-template-columns: 1fr 1fr; column-gap: var(--space-32); align-items: baseline; }
+}
+.gj-ts-books { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: var(--space-12); margin-top: var(--space-16); }
+.gj-ts-books .gj-card { align-items: flex-start; text-align: start; }

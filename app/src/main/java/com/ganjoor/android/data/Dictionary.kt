@@ -261,7 +261,11 @@ internal fun letterOverlap(a: String, b: String): Float {
 }
 
 /** The whole word surrounding [index], for turning a tap into something to look up. */
-internal fun wordAt(text: String, index: Int): String? {
+internal fun wordAt(text: String, index: Int): String? =
+    wordRangeAt(text, index)?.let { text.substring(it) }
+
+/** Where in [text] the word [wordAt] finds lies, so the reader can see which word was looked up. */
+internal fun wordRangeAt(text: String, index: Int): IntRange? {
     if (text.isEmpty()) return null
     val at = index.coerceIn(0, text.length - 1)
     if (!text[at].isWordChar()) return null
@@ -269,7 +273,10 @@ internal fun wordAt(text: String, index: Int): String? {
     while (start > 0 && text[start - 1].isWordChar()) start--
     var end = at
     while (end < text.length - 1 && text[end + 1].isWordChar()) end++
-    return text.substring(start, end + 1).trim(ZWNJ).takeIf { it.length > 1 }
+    // A joiner at either edge belongs to the neighbour, not to the word.
+    while (start <= end && text[start] == ZWNJ) start++
+    while (end >= start && text[end] == ZWNJ) end--
+    return (start..end).takeIf { end - start + 1 > 1 }
 }
 
 private fun Char.isWordChar() = this in '؀'..'ۿ' || this == ZWNJ

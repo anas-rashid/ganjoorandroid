@@ -56,7 +56,12 @@ fun CategoryScreen(
     // System Back climbs the tree too, not the visit history.
     BackHandler(onBack = onUp)
 
-    Load(key = fullUrl, block = { Ganjoor.category(fullUrl) }) { cat ->
+    Load(
+        key = fullUrl,
+        block = { Ganjoor.category(fullUrl) },
+        // The bar stays up with Back already working; only the list waits.
+        placeholder = { LoadingCategory(onUp) },
+    ) { cat ->
         // First lines are a separate, optional call; the list shows up without waiting for it.
         var excerpts by remember(cat.id) { mutableStateOf(emptyMap<Int, String>()) }
         LaunchedEffect(cat.id) {
@@ -124,12 +129,32 @@ fun CategoryScreen(
     }
 }
 
+/** The category screen while its list is on the way: the real top bar over a skeleton list. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun LoadingCategory(onUp: () -> Unit) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {},
+                navigationIcon = {
+                    IconButton(onClick = onUp) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.back))
+                    }
+                },
+            )
+        }
+    ) { insets ->
+        SkeletonList(Modifier.padding(insets))
+    }
+}
+
 /** A poet's root URL is a single segment (`/hafez`); anything deeper is one of their books. */
-private fun poetSlug(fullUrl: String): String? =
+internal fun poetSlug(fullUrl: String): String? =
     fullUrl.trim('/').takeIf { it.isNotEmpty() && !it.contains('/') }
 
 @Composable
-private fun PoetDownloadAction(slug: String) {
+internal fun PoetDownloadAction(slug: String) {
     val progress = Downloads.running[slug]
     val saved = remember(slug, Downloads.revision) { Offline.isSaved(slug) }
 

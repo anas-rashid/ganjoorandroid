@@ -1,12 +1,17 @@
 package com.ganjoor.android.ui
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -27,15 +32,36 @@ import com.ganjoor.android.data.NotDownloaded
 /**
  * Fetches [block] whenever [key] changes and renders loading / error / content.
  *
+ * While loading it shows [placeholder]: a skeleton shaped like what is coming, never a spinner
+ * over the whole page, so only the part that is actually waiting looks like it. The content
+ * fades in over it when it arrives.
+ *
  * ponytail: no ViewModel, so going back re-fetches — which the disk cache makes nearly free.
  * Promote to a ViewModel when a screen gains state worth surviving rotation.
  */
 @Composable
-fun <T> Load(key: Any?, block: suspend () -> T, content: @Composable (T) -> Unit) {
+fun <T> Load(
+    key: Any?,
+    block: suspend () -> T,
+    placeholder: @Composable () -> Unit = { SkeletonList(Modifier.statusBarsPadding()) },
+    content: @Composable (T) -> Unit,
+) {
     var attempt by remember(key) { mutableIntStateOf(0) }
     val result by produceState<Result<T>?>(null, key, attempt) { value = runCatching { block() } }
 
-    result.let { outcome ->
+    AnimatedContent(
+        targetState = result,
+        transitionSpec = { fadeIn(tween(220)) togetherWith fadeOut(tween(120)) },
+        // Fade between loading, failed and loaded, not on every new value of the same state.
+        contentKey = { outcome ->
+            when {
+                outcome == null -> 0
+                outcome.isFailure -> 1
+                else -> 2
+            }
+        },
+        label = "load",
+    ) { outcome ->
         when {
             // Painted explicitly: on the category and poem screens Load sits outside the
             // Scaffold, so while loading nothing else fills the window and the bare window
@@ -44,9 +70,8 @@ fun <T> Load(key: Any?, block: suspend () -> T, content: @Composable (T) -> Unit
                 modifier = Modifier
                     .fillMaxSize()
                     .background(MaterialTheme.colorScheme.background),
-                contentAlignment = Alignment.Center,
             ) {
-                CircularProgressIndicator()
+                placeholder()
             }
 
             outcome.isFailure -> Column(

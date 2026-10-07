@@ -4,6 +4,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -13,10 +17,16 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
+import androidx.activity.compose.BackHandler
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -78,24 +88,64 @@ fun WordSheet(word: String, onDismiss: () -> Unit, passage: Bookmark? = null) {
     ModalBottomSheet(onDismissRequest = onDismiss) {
         // Inside the lookup's own scroll, not after it: the lookup scrolls, so anything placed
         // below it is pushed past the bottom of the sheet with no way to reach it.
-        WordLookup(word) {
-            if (passage == null) return@WordLookup
-            HorizontalDivider(modifier = Modifier.padding(top = 8.dp))
-            Text(
-                text = stringResource(R.string.this_couplet),
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.primary,
-            )
-            PassageActions(passage)
-            if (LocalAssistant.current.serverReady) {
-                AssistantInline(
-                    prompt = "explain",
-                    text = passage.excerpt.orEmpty(),
-                    label = R.string.assistant_explain,
-                    instruction = R.string.assistant_ask_prompt,
+        WordLookup(word) { CoupletFooter(passage) }
+    }
+}
+
+/**
+ * The same lookup as [WordSheet], as a panel beside the poem on a large screen. It sits on the
+ * left, away from where the lines start, and the poem moves over for it rather than being
+ * covered; the cross, or Back, closes it.
+ */
+@Composable
+fun WordPanel(word: String, onDismiss: () -> Unit, passage: Bookmark? = null) {
+    BackHandler(onBack = onDismiss)
+    Surface(
+        color = MaterialTheme.colorScheme.surfaceContainerLow,
+        modifier = Modifier.width(360.dp).fillMaxHeight(),
+    ) {
+        Column(Modifier.statusBarsPadding()) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 56.dp)
+                    .padding(start = 20.dp, end = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = stringResource(R.string.dictionary),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.weight(1f),
                 )
+                IconButton(onClick = onDismiss) {
+                    Icon(Icons.Default.Close, stringResource(R.string.close))
+                }
             }
+            HorizontalDivider(modifier = Modifier.padding(bottom = 12.dp))
+            WordLookup(word) { CoupletFooter(passage) }
         }
+    }
+}
+
+/** The couplet's own actions, under the definitions, when the word came from a couplet. */
+@Composable
+private fun CoupletFooter(passage: Bookmark?) {
+    if (passage == null) return
+    HorizontalDivider(modifier = Modifier.padding(top = 8.dp))
+    Text(
+        text = stringResource(R.string.this_couplet),
+        style = MaterialTheme.typography.labelMedium,
+        color = MaterialTheme.colorScheme.primary,
+    )
+    PassageActions(passage)
+    if (LocalAssistant.current.serverReady) {
+        AssistantInline(
+            prompt = "explain",
+            text = passage.excerpt.orEmpty(),
+            label = R.string.assistant_explain,
+            instruction = R.string.assistant_ask_prompt,
+        )
     }
 }
 

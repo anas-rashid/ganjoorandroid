@@ -28,6 +28,11 @@ bar, and any span of text can be selected and copied the usual way.
 
 The whole interface lays out and navigates right-to-left, whichever UI language is chosen.
 
+On a tablet or an unfolded foldable (600dp and wider) the poets become a narrow column on the right,
+with the open poet's books, chapters and poems in columns beside it and the page in the rest of the
+screen. The columns narrow while a poem is open and can be hidden for a reader view. The dictionary
+opens in a panel to the left of the poem instead of over it. Phones are unchanged.
+
 ## Fonts
 
 | Font | Used for | Licence |

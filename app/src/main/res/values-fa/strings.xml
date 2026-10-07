@@ -115,4 +115,8 @@
     <string name="view_grid">نمایش کارتی</string>
     <string name="view_list">نمایش فهرستی</string>
     <string name="downloaded_poet">پیش‌تر دریافت شده</string>
+    <!-- Large screens: folds the poet and book columns away to leave the poem. -->
+    <string name="hide_columns">پنهان کردن فهرست</string>
+    <string name="show_columns">نمایش فهرست</string>
+    <string name="close">بستن</string>
 </resources>
