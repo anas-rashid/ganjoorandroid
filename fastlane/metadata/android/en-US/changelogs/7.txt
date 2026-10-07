@@ -1,0 +1,10 @@
+The font weight control now works on every device.
+
+Both bundled faces carry one variable axis, wght, and nothing else — but the app
+asked for two, sending an italic axis alongside it. A font with no italic axis
+may refuse the whole request rather than the part it cannot honour, and on a
+platform that does, every weight drew at Regular with nothing to show for it.
+Reported on Android 16.
+
+On Android 7.0 and 7.1, where variable fonts do not exist at all, the heavier
+weights were unreachable for a related reason. They now work there too.

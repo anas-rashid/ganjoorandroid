@@ -14,6 +14,7 @@ from source and signs with its own key, so these are for direct installation onl
 | 0.2.2 | 4 | `d7568d1` | Credits Material Symbols for the glyphs, and states the terms around the optional assistant. |
 | 0.3.0 | 5 | `5d12a1c` | Pin poets to the home screen: three views (pinned, Ganjoor's order, alphabetical), as cards or a list, with a download control on each row. |
 | 0.4.0 | 6 | `270c28c` | Columns on tablets and unfolded foldables; the dictionary and reading settings beside the poem rather than over it; couplets in cards, two hemistichs to a line where there is room; skeletons while pages load; a seek bar on recitations. |
+| 0.4.1 | 7 | `HEAD` | The font weight control works on every device: the app was asking the bundled faces for an italic axis they do not have, and a font may refuse the whole request rather than the part it cannot honour. |
 
 ## Checksums
 
@@ -24,6 +25,7 @@ from source and signs with its own key, so these are for direct installation onl
 e473269044710813d2cf4119de663fe180f887239df7bdb1ccee0239ef84fd3e  ganjoor-0.2.2.apk
 9c38d5cacf9e809c2189ba581f8aa6eb4072d4fa0316f00d66434461cf4b1459  ganjoor-0.3.0.apk
 1c64cefa0fb2b51bf73386460ec1b88bda3e20832fa6926c2f7f1fb863ab9fc7  ganjoor-0.4.0.apk
+6c85da41bf1416e34d6cb9c9eda9b4867e01b6793f21e476a6e3ece357615daa  ganjoor-0.4.1.apk
 ```
 
 Installing: `adb install -r releases/ganjoor-<version>.apk`. A phone holding a *debug* build has
