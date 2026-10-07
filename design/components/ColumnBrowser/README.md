@@ -1,6 +1,6 @@
 # ColumnBrowser
 
-The layout for tablets and unfolded foldables. A narrow column of poets sits on the right. Beside it is a column for each level of the open book (books › chapters › poems), and the open page fills the rest of the screen on the left. Phones keep today's navigation. Built in `app/src/main/java/com/ganjoor/android/ui/ColumnBrowser.kt`; wireframes are in `design/wireframes/` (1–8).
+The layout for tablets and unfolded foldables. A narrow column of poets sits on the right. Beside it is a column for each level of the open book (books › chapters › poems), and the open page fills the rest of the screen on the left. Phones keep today's navigation. Built in `app/src/main/java/com/ganjoor/android/ui/ColumnBrowser.kt`; wireframes are in `design/wireframes/` (1–9).
 
 ## Window sizes
 
@@ -45,18 +45,18 @@ On large screens, tapping a word opens **WordPanel** on the left instead of the 
 - The poem moves over to make room, so nothing being read is covered.
 - The tapped word stays highlighted in the verse (`secondary-container` / `on-secondary-container`), on phones too.
 - ✕ or Back closes the panel.
-- A panel is only opened where the page keeps at least **400dp** beside it. On a book-style
+- The panel only opens where the page keeps at least **400dp** beside it. On a book-style
   foldable held open in portrait the columns have already taken their room, and a panel
-  there left the verse about 75dp wide — one or two characters a line. Below that the sheet
-  is used instead: it covers the foot of the poem but leaves the lines whole.
+  there left the verse a couple of characters a line. Below that the sheet is used instead:
+  it covers the foot of the poem but leaves the lines whole.
 
 ## Reading settings
 
 On large screens the gear opens **ReadingSettingsPanel** on the left, where the dictionary opens, instead of the bottom sheet:
 - It has the same width and surface as the dictionary panel, with a "Reading settings" header and a ✕ button. The settings and their order are the same as in the sheet.
 - The page stays in view beside the panel, so a change of theme, font, weight or size shows on the poem as it's made.
-- ✕ or Back closes it. Phones keep the bottom sheet, and so does any window too narrow to
-  leave the browser its own 600dp beside the panel.
+- While the panel is open, the poets and list columns fold away so the page keeps its room. When it closes they come back, but only if they were showing before: this never changes the saved reader-view choice, and the floating "show the list" button stays hidden while the panel is open.
+- ✕ or Back closes it. Phones keep the bottom sheet.
 
 ## Loading
 

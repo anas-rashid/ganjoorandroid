@@ -28,7 +28,8 @@
 .gj-metre { font-size: 12px; line-height: 16px; letter-spacing: .4px; color: var(--on-surface-variant); }
 
 /* Couplet: two hemistichs stacked; first to the start, second to the end. */
-.gj-couplet { padding: var(--space-6) 0; }
+.gj-couplet { margin: var(--space-4) 0; padding: var(--space-8) var(--space-12); border-radius: var(--radius-md); background: var(--surface-container-high); }
+.gj-couplet.is-prose { margin: 0; padding: var(--space-6) 0; background: none; }
 .gj-verse { font-family: var(--font-naskh); font-size: 22px; line-height: 1.8; color: var(--on-surface); margin: 0; }
 .gj-couplet.is-nastaliq .gj-verse { font-family: var(--font-nastaliq); line-height: 2.4; }
 .gj-verse.is-first { text-align: start; }

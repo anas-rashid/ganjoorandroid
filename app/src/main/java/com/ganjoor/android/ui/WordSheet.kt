@@ -48,13 +48,19 @@ import com.ganjoor.android.data.LocalAssistant
 import com.ganjoor.android.data.Pronunciation
 import com.ganjoor.android.ui.theme.readingStyle
 
-/** The width of a side panel — the dictionary and the reading settings share it. */
-val SidePanelWidth = 360.dp
+/**
+ * How wide the dictionary sits beside the poem.
+ *
+ * Narrower than the reading settings, deliberately: the settings fold the columns away and take
+ * the room that frees, while the dictionary is read *against* the line it came from, so the verse
+ * keeps the width instead. A definition is short; a hemistich is not.
+ */
+val DictionaryPanelWidth = 216.dp
 
 /**
- * The narrowest the page may be left once a side panel opens beside it. Below this the panel is
- * not worth its room: on a book-style foldable the columns had already taken theirs, and a 360dp
- * panel left the verse about 75dp wide, breaking it to one or two characters a line.
+ * The narrowest the page may be left once the dictionary opens beside it. Below this the panel is
+ * not worth its room: on a book-style foldable held open in portrait the columns have already
+ * taken theirs, and a panel there left the verse a couple of characters a line.
  */
 val MinPageMeasure = 400.dp
 
@@ -112,7 +118,7 @@ fun WordPanel(word: String, onDismiss: () -> Unit, passage: Bookmark? = null) {
     BackHandler(onBack = onDismiss)
     Surface(
         color = MaterialTheme.colorScheme.surfaceContainerLow,
-        modifier = Modifier.width(SidePanelWidth).fillMaxHeight(),
+        modifier = Modifier.width(DictionaryPanelWidth).fillMaxHeight(),
     ) {
         Column(Modifier.statusBarsPadding()) {
             Row(

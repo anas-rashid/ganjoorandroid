@@ -110,13 +110,12 @@ fun GanjoorApp() {
         // Up to three list columns beside the poets; below this, only the newest one.
         val expanded by rememberUpdatedState(maxWidth >= 840.dp)
         // On a large screen reading settings open in a panel on the left, where the dictionary
-        // opens, so the page stays in view and shows each change as it is made — but only where
-        // the browser still has its own room beside the panel. Below that the panel would squeeze
-        // the columns and the poem into less than the layout is built for, so the sheet is used
-        // instead, exactly as on a phone.
-        val settingsPanel by rememberUpdatedState(maxWidth - SidePanelWidth >= 600.dp)
+        // opens, so the page stays in view and shows each change as it is made.
         Row(Modifier.fillMaxSize()) {
+        // The columns fold away while the settings panel is open, so the page doesn't end up
+        // squeezed between them and the panel.
         Box(Modifier.weight(1f)) {
+        CompositionLocalProvider(LocalSidePanelOpen provides (wide && settingsOpen)) {
         NavHost(
             navController = nav,
             startDestination = PoetsRoute,
@@ -241,7 +240,8 @@ fun GanjoorApp() {
             }
         }
         }
-        if (settingsPanel) {
+        }
+        if (wide) {
             AnimatedVisibility(
                 visible = settingsOpen,
                 enter = expandHorizontally() + fadeIn(),
@@ -253,7 +253,7 @@ fun GanjoorApp() {
         }
 
         // Inside the provider: the sheet reads LocalOpenAbout, so it has to be in scope.
-        if (settingsOpen && !settingsPanel) ReadingSettingsSheet(onDismiss = { settingsOpen = false })
+        if (settingsOpen && !wide) ReadingSettingsSheet(onDismiss = { settingsOpen = false })
         }
     }
 }

@@ -7,6 +7,10 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.clickable
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -93,13 +97,21 @@ fun PoemScreen(
     // finds, so the couplet's own actions live at its foot rather than behind a tap between words.
     var tapped by remember { mutableStateOf<WordTap?>(null) }
 
+    // One side panel at a time. The dictionary and the reading settings both want the left of the
+    // screen, and opening the second put two panels there at once — or, where there was no longer
+    // room for two, left the dictionary as a sheet in the middle of the page while the settings
+    // sat beside it. Either way the reader is asked to look in two places. The settings replace
+    // the dictionary instead; closing them leaves the poem, which is where the reader was.
+    val sidePanelOpen = LocalSidePanelOpen.current
+    LaunchedEffect(sidePanelOpen) { if (sidePanelOpen) tapped = null }
+
     BoxWithConstraints(Modifier.fillMaxSize()) {
     // Whether the dictionary gets a column of its own is not a question about the window but
     // about what is left of this page once the columns have taken theirs. On a book-style
     // foldable held open in portrait the page is already down to ~450dp, and a panel beside it
-    // left the verse about 75dp wide — one or two characters a line. Where it does not fit, the
-    // sheet is the better answer: it covers the foot of the poem but leaves the lines whole.
-    val roomForPanel = wide && maxWidth - SidePanelWidth >= MinPageMeasure
+    // left the verse a couple of characters a line. Where it does not fit, the sheet is the
+    // better answer: it covers the foot of the poem but leaves the lines whole.
+    val roomForPanel = wide && maxWidth - DictionaryPanelWidth >= MinPageMeasure
 
     Load(
         key = fullUrl,
@@ -165,20 +177,24 @@ fun PoemScreen(
             // couplet share a line, as ganjoor.net sets them on a desktop.
             val side = if (wide) maxOf(20.dp, (maxWidth - 680.dp) / 2) else 20.dp
             val sideBySide = wide && maxWidth - side * 2 >= 640.dp
-            SelectionContainer {
+            Column(Modifier.fillMaxSize().padding(top = insets.calculateTopPadding())) {
+            // Above the text, not in it: as an item of the list the player was disposed the
+            // moment it scrolled off, which released the MediaPlayer and cut the reading off
+            // mid-line. Here it keeps playing, and stays in reach while you read further down.
+            RecitationPlayer(poem.id, Modifier.padding(start = side, end = side, top = 8.dp))
+            SelectionContainer(Modifier.weight(1f)) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(
                     start = side,
                     end = side,
-                    top = insets.calculateTopPadding() + 8.dp,
+                    top = 8.dp,
                     bottom = insets.calculateBottomPadding() + 32.dp,
                 ),
             ) {
                 item {
                     Column(Modifier.padding(bottom = 12.dp)) {
                         Breadcrumbs(poem.fullTitle, poem.fullUrl.ifBlank { fullUrl }, onCategory)
-                        RecitationPlayer(poem.id)
                         poem.metre?.rhythm?.let { rhythm ->
                             Text(
                                 text = rhythm,
@@ -228,6 +244,7 @@ fun PoemScreen(
             }
             }
             }
+            }
         }
         }
         if (roomForPanel) {
@@ -259,6 +276,9 @@ fun PoemScreen(
     }
     }
 }
+
+/** The positions that make a line of verse; anything else (Single, Paragraph, Comment) is prose. */
+private val VERSE_POSITIONS = setOf(Verse.RIGHT, Verse.LEFT, Verse.CENTERED_1, Verse.CENTERED_2)
 
 /** A word someone tapped: what to look up, the couplet it came from, and where it sits in its verse. */
 private data class WordTap(val word: String, val passage: Bookmark, val verse: Int, val range: IntRange)
@@ -388,7 +408,26 @@ private fun Couplet(
     val oneLine = sideBySide && couplet.size == 2 &&
         couplet[0].position == Verse.RIGHT && couplet[1].position == Verse.LEFT
 
-    Column(modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp)) {
+    // Each line of verse sits in its own soft card, so the eye finds where one couplet ends and
+    // the next begins, and the couplet's actions visibly belong to it. Prose (Golestan,
+    // Nowruznameh) stays bare: a paragraph in a box reads as a quotation, not as the text.
+    val isVerse = couplet.all { it.position in VERSE_POSITIONS }
+    val colors = MaterialTheme.colorScheme
+    // A step lighter than the page. On OLED black the usual step is all but black itself, so
+    // the card takes the next one up: still dim, but there.
+    val cardColor =
+        if (colors.surface == Color.Black) colors.surfaceContainerHighest else colors.surfaceContainerHigh
+    val card = if (isVerse) {
+        Modifier
+            .padding(vertical = 4.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(cardColor)
+            .padding(horizontal = 12.dp, vertical = 8.dp)
+    } else {
+        Modifier.padding(vertical = 6.dp)
+    }
+
+    Column(modifier = Modifier.fillMaxWidth().then(card)) {
         if (oneLine) {
             Row(modifier = Modifier.fillMaxWidth()) {
                 couplet.forEachIndexed { index, verse ->

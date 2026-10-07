@@ -81,7 +81,7 @@ fun ReadingSettingsPanel(onDismiss: () -> Unit) {
     BackHandler(onBack = onDismiss)
     Surface(
         color = MaterialTheme.colorScheme.surfaceContainerLow,
-        modifier = Modifier.width(SidePanelWidth).fillMaxHeight(),
+        modifier = Modifier.width(360.dp).fillMaxHeight(),
     ) {
         Column(Modifier.statusBarsPadding()) {
             Row(
