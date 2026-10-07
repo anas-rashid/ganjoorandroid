@@ -39,6 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.ganjoor.android.R
 import com.ganjoor.android.data.Definition
@@ -63,6 +64,21 @@ val DictionaryPanelWidth = 216.dp
  * taken theirs, and a panel there left the verse a couple of characters a line.
  */
 val MinPageMeasure = 400.dp
+
+/**
+ * Whether the dictionary earns a column of its own beside a page [pageWidth] wide.
+ *
+ * Not a question about the window but about the page: by the time a poem is open the columns have
+ * already taken their room, and on a book-style foldable held open in portrait what is left is
+ * about 450dp. A panel beside that leaves the verse a couple of characters a line, so below
+ * [MinPageMeasure] the bottom sheet is used instead — it covers the foot of the poem but leaves
+ * every line whole.
+ *
+ * A pure function so the rule can be tested: the gesture that reaches it cannot be driven
+ * reliably, but the arithmetic behind it can.
+ */
+internal fun dictionaryFitsBeside(pageWidth: Dp, wide: Boolean): Boolean =
+    wide && pageWidth - DictionaryPanelWidth >= MinPageMeasure
 
 /** English prose inside an otherwise right-to-left sheet. */
 @Composable
