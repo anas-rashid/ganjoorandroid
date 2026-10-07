@@ -1,6 +1,6 @@
 # ColumnBrowser
 
-The layout for tablets and unfolded foldables. A narrow column of poets sits on the right. Beside it is a column for each level of the open book (books › chapters › poems), and the open page fills the rest of the screen on the left. Phones keep today's navigation. Built in `app/src/main/java/com/ganjoor/android/ui/ColumnBrowser.kt`; wireframes are in `design/wireframes/` (1–8).
+The layout for tablets and unfolded foldables. A narrow column of poets sits on the right. Beside it is a column for each level of the open book (books › chapters › poems), and the open page fills the rest of the screen on the left. Phones keep today's navigation. Built in `app/src/main/java/com/ganjoor/android/ui/ColumnBrowser.kt`; wireframes are in `design/wireframes/` (1–9).
 
 ## Window sizes
 
