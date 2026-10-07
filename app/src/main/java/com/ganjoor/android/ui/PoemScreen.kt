@@ -111,7 +111,7 @@ fun PoemScreen(
     // foldable held open in portrait the page is already down to ~450dp, and a panel beside it
     // left the verse a couple of characters a line. Where it does not fit, the sheet is the
     // better answer: it covers the foot of the poem but leaves the lines whole.
-    val roomForPanel = wide && maxWidth - DictionaryPanelWidth >= MinPageMeasure
+    val roomForPanel = dictionaryFitsBeside(maxWidth, wide)
 
     Load(
         key = fullUrl,
