@@ -1,24 +1,32 @@
 package com.ganjoor.android.ui
 
 import android.app.Activity
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Slider
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.Text
@@ -58,11 +66,53 @@ fun ReadingSettingsAction() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReadingSettingsSheet(onDismiss: () -> Unit) {
+    ModalBottomSheet(onDismissRequest = onDismiss) {
+        ReadingSettingsContent()
+    }
+}
+
+/**
+ * The same settings as [ReadingSettingsSheet], as a panel on the left of a large screen — the
+ * place the dictionary opens too. The page stays in view beside it, so a change of theme, font
+ * or size shows on the poem itself as it is made. The cross, or Back, closes it.
+ */
+@Composable
+fun ReadingSettingsPanel(onDismiss: () -> Unit) {
+    BackHandler(onBack = onDismiss)
+    Surface(
+        color = MaterialTheme.colorScheme.surfaceContainerLow,
+        modifier = Modifier.width(360.dp).fillMaxHeight(),
+    ) {
+        Column(Modifier.statusBarsPadding()) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 56.dp)
+                    .padding(start = 20.dp, end = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = stringResource(R.string.reading_settings),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.weight(1f),
+                )
+                IconButton(onClick = onDismiss) {
+                    Icon(Icons.Default.Close, stringResource(R.string.close))
+                }
+            }
+            HorizontalDivider(modifier = Modifier.padding(bottom = 8.dp))
+            ReadingSettingsContent()
+        }
+    }
+}
+
+@Composable
+private fun ReadingSettingsContent() {
     val settings = LocalSettings.current
     val prefs = settings.value
     val context = LocalContext.current
 
-    ModalBottomSheet(onDismissRequest = onDismiss) {
         Column(
             modifier = Modifier
                 // Inset first, then scroll: the viewport has to stop above the nav bar,
@@ -148,7 +198,6 @@ fun ReadingSettingsSheet(onDismiss: () -> Unit) {
                 Text(stringResource(R.string.about))
             }
         }
-    }
 }
 
 @Composable

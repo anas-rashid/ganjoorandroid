@@ -7,3 +7,4 @@ The Material bottom sheet behind the gear icon: theme, OLED, font, weight, text 
 - Order: Theme chips → OLED toggle → Font chips → Weight chips → Text size slider (14–40, steps of 2) → **live preview** of a hemistich in the chosen reading style → Language chips → Offline mode → Show summaries → AI assistant, About & licences as TextButtons.
 - Every group has a **SectionLabel**. Changes apply immediately; there is no Save.
 - Changing language recreates the activity.
+- On tablets and unfolded foldables the same settings open as a panel on the left instead (`ReadingSettingsPanel`, see ColumnBrowser), so the poem stays in view while they change.
