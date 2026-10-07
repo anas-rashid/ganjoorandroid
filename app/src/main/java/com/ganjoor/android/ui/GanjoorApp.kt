@@ -1,9 +1,16 @@
 package com.ganjoor.android.ui
 
 import androidx.compose.animation.AnimatedContentTransitionScope.SlideDirection
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -102,6 +109,10 @@ fun GanjoorApp() {
         val wide by rememberUpdatedState(maxWidth >= 600.dp)
         // Up to three list columns beside the poets; below this, only the newest one.
         val expanded by rememberUpdatedState(maxWidth >= 840.dp)
+        // On a large screen reading settings open in a panel on the left, where the dictionary
+        // opens, so the page stays in view and shows each change as it is made.
+        Row(Modifier.fillMaxSize()) {
+        Box(Modifier.weight(1f)) {
         NavHost(
             navController = nav,
             startDestination = PoetsRoute,
@@ -226,8 +237,19 @@ fun GanjoorApp() {
             }
         }
         }
+        if (wide) {
+            AnimatedVisibility(
+                visible = settingsOpen,
+                enter = expandHorizontally() + fadeIn(),
+                exit = shrinkHorizontally() + fadeOut(),
+            ) {
+                ReadingSettingsPanel(onDismiss = { settingsOpen = false })
+            }
+        }
+        }
 
         // Inside the provider: the sheet reads LocalOpenAbout, so it has to be in scope.
-        if (settingsOpen) ReadingSettingsSheet(onDismiss = { settingsOpen = false })
+        if (settingsOpen && !wide) ReadingSettingsSheet(onDismiss = { settingsOpen = false })
+        }
     }
 }
