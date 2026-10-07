@@ -1,0 +1,19 @@
+Tablets and unfolded foldables now read in columns: the poets on the right, then
+a column for each level of the open book, and the poem in whatever room is left.
+Each column scrolls on its own and narrows as you read, so the poem keeps the
+middle. A button in the top bar folds them away.
+
+Where there is room, a couplet's two hemistichs sit on one line, as Ganjoor sets
+them on a desktop. Each couplet now sits in a soft card.
+
+The dictionary and the reading settings open beside the poem rather than over
+it, so nothing you are reading is covered.
+
+Pages fill in where they load instead of blanking the screen, and Home and the
+reading settings stay reachable while they do.
+
+Tapping a word no longer carries the comma or question mark after it into the
+lookup.
+
+A reading keeps playing when you scroll down the poem, and a seek bar moves it
+back and forth.
