@@ -161,20 +161,24 @@ fun PoemScreen(
             // couplet share a line, as ganjoor.net sets them on a desktop.
             val side = if (wide) maxOf(20.dp, (maxWidth - 680.dp) / 2) else 20.dp
             val sideBySide = wide && maxWidth - side * 2 >= 640.dp
-            SelectionContainer {
+            Column(Modifier.fillMaxSize().padding(top = insets.calculateTopPadding())) {
+            // Above the text, not in it: as an item of the list the player was disposed the
+            // moment it scrolled off, which released the MediaPlayer and cut the reading off
+            // mid-line. Here it keeps playing, and stays in reach while you read further down.
+            RecitationPlayer(poem.id, Modifier.padding(start = side, end = side, top = 8.dp))
+            SelectionContainer(Modifier.weight(1f)) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(
                     start = side,
                     end = side,
-                    top = insets.calculateTopPadding() + 8.dp,
+                    top = 8.dp,
                     bottom = insets.calculateBottomPadding() + 32.dp,
                 ),
             ) {
                 item {
                     Column(Modifier.padding(bottom = 12.dp)) {
                         Breadcrumbs(poem.fullTitle, poem.fullUrl.ifBlank { fullUrl }, onCategory)
-                        RecitationPlayer(poem.id)
                         poem.metre?.rhythm?.let { rhythm ->
                             Text(
                                 text = rhythm,
@@ -221,6 +225,7 @@ fun PoemScreen(
                         )
                     }
                 }
+            }
             }
             }
             }
