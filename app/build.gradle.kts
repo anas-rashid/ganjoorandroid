@@ -1,3 +1,4 @@
+import org.gradle.api.tasks.PathSensitivity
 import java.util.Properties
 
 plugins {
@@ -73,6 +74,14 @@ android {
     buildFeatures {
         compose = true
     }
+}
+
+// ReleaseDocsTest reads these, so a change to either has to re-run the tests. Without this
+// Gradle sees only Kotlin sources, calls the task up to date, and a README that has fallen
+// behind the build sails through green.
+tasks.withType<Test>().configureEach {
+    inputs.file(rootProject.file("README.md")).withPathSensitivity(PathSensitivity.RELATIVE)
+    inputs.file(rootProject.file("releases/README.md")).withPathSensitivity(PathSensitivity.RELATIVE)
 }
 
 dependencies {
