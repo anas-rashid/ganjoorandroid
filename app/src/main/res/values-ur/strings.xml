@@ -115,4 +115,8 @@
     <string name="view_grid">کارڈ کی صورت</string>
     <string name="view_list">فہرست کی صورت</string>
     <string name="downloaded_poet">پہلے سے محفوظ ہے</string>
+    <!-- Large screens: folds the poet and book columns away to leave the poem. -->
+    <string name="hide_columns">فہرست چھپائیں</string>
+    <string name="show_columns">فہرست دکھائیں</string>
+    <string name="close">بند کریں</string>
 </resources>

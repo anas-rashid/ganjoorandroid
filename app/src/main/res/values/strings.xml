@@ -120,4 +120,8 @@
     <string name="view_grid">Show as cards</string>
     <string name="view_list">Show as a list</string>
     <string name="downloaded_poet">Already downloaded</string>
+    <!-- Large screens: folds the poet and book columns away to leave the poem. -->
+    <string name="hide_columns">Hide the list</string>
+    <string name="show_columns">Show the list</string>
+    <string name="close">Close</string>
 </resources>

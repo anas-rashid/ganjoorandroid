@@ -1,12 +1,20 @@
 package com.ganjoor.android.ui
 
 import androidx.compose.animation.AnimatedContentTransitionScope.SlideDirection
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -71,6 +79,8 @@ private fun NavController.goUp(fromUrl: String) {
 fun GanjoorApp() {
     val nav = rememberNavController()
     var settingsOpen by rememberSaveable { mutableStateOf(false) }
+    // Above the NavHost, so the large-screen columns survive moving between destinations.
+    val browser = remember { BrowserState() }
 
     CompositionLocalProvider(
         LocalOpenReadingSettings provides { settingsOpen = true },
@@ -83,15 +93,33 @@ fun GanjoorApp() {
             nav.navigate(AssistantRoute)
         },
     ) {
+        // Tablets and unfolded foldables browse in columns (ColumnBrowser); phones, and a
+        // foldable when folded, keep one screen at a time. Same routes either way, so unfolding
+        // in the middle of a poem keeps the poem.
+        BoxWithConstraints(Modifier.fillMaxSize()) {
+        // Read through state everywhere below: the transition and destination lambdas belong to
+        // the nav graph, which outlives this composition, and folding or unfolding must reach them.
+        val wide by rememberUpdatedState(maxWidth >= 600.dp)
+        // Up to three list columns beside the poets; below this, only the newest one.
+        val expanded by rememberUpdatedState(maxWidth >= 840.dp)
         NavHost(
             navController = nav,
             startDestination = PoetsRoute,
             // Start/End rather than Left/Right, so going deeper always moves against the reading
-            // direction — leftwards here, since the app lays out right-to-left.
-            enterTransition = { slideIntoContainer(SlideDirection.Start) },
-            exitTransition = { slideOutOfContainer(SlideDirection.Start) },
-            popEnterTransition = { slideIntoContainer(SlideDirection.End) },
-            popExitTransition = { slideOutOfContainer(SlideDirection.End) },
+            // direction — leftwards here, since the app lays out right-to-left. In columns the
+            // page changes in place: sliding the whole screen would drag the columns with it.
+            enterTransition = {
+                if (wide) EnterTransition.None else slideIntoContainer(SlideDirection.Start)
+            },
+            exitTransition = {
+                if (wide) ExitTransition.None else slideOutOfContainer(SlideDirection.Start)
+            },
+            popEnterTransition = {
+                if (wide) EnterTransition.None else slideIntoContainer(SlideDirection.End)
+            },
+            popExitTransition = {
+                if (wide) ExitTransition.None else slideOutOfContainer(SlideDirection.End)
+            },
         ) {
             composable<PoetsRoute> {
                 PoetsScreen(
@@ -103,34 +131,73 @@ fun GanjoorApp() {
             }
             composable<CategoryRoute> { entry ->
                 val url = entry.toRoute<CategoryRoute>().url
-                CategoryScreen(
-                    fullUrl = url,
-                    onUp = { nav.goUp(url) },
-                    onHome = { nav.goHome() },
-                    onCategory = { nav.open(CategoryRoute(it)) },
-                    onPoem = { nav.open(PoemRoute(it)) },
-                )
+                if (wide) {
+                    ColumnBrowser(
+                        state = browser,
+                        url = url,
+                        isPoem = false,
+                        expanded = expanded,
+                        onPoet = { nav.open(CategoryRoute(it)) },
+                        onCategory = { nav.open(CategoryRoute(it)) },
+                        onPoem = { nav.open(PoemRoute(it)) },
+                    ) { toggle ->
+                        CategoryOverview(
+                            state = browser,
+                            fullUrl = url,
+                            toggle = toggle,
+                            onUp = { nav.goUp(url) },
+                            onHome = { nav.goHome() },
+                            onCategory = { nav.open(CategoryRoute(it)) },
+                            onPoem = { nav.open(PoemRoute(it)) },
+                        )
+                    }
+                } else {
+                    CategoryScreen(
+                        fullUrl = url,
+                        onUp = { nav.goUp(url) },
+                        onHome = { nav.goHome() },
+                        onCategory = { nav.open(CategoryRoute(it)) },
+                        onPoem = { nav.open(PoemRoute(it)) },
+                    )
+                }
             }
             composable<PoemRoute> { entry ->
                 val route = entry.toRoute<PoemRoute>()
-                PoemScreen(
-                    fullUrl = route.url,
-                    // Reading on through a divan keeps the origin, so Back still lands where
-                    // you started rather than in whichever section you drifted into.
-                    onUp = { if (route.fromBookmarks) nav.navigateUp() else nav.goUp(route.url) },
-                    onHome = { nav.goHome() },
-                    onPoem = { url ->
-                        if (route.fromBookmarks) {
-                            nav.navigate(PoemRoute(url, fromBookmarks = true)) {
-                                popUpTo<PoemRoute> { inclusive = true }
+                val poem: @Composable (Boolean, (@Composable () -> Unit)?) -> Unit = { wideText, toggle ->
+                    PoemScreen(
+                        fullUrl = route.url,
+                        // Reading on through a divan keeps the origin, so Back still lands where
+                        // you started rather than in whichever section you drifted into.
+                        onUp = { if (route.fromBookmarks) nav.navigateUp() else nav.goUp(route.url) },
+                        onHome = { nav.goHome() },
+                        onPoem = { url ->
+                            if (route.fromBookmarks) {
+                                nav.navigate(PoemRoute(url, fromBookmarks = true)) {
+                                    popUpTo<PoemRoute> { inclusive = true }
+                                }
+                            } else {
+                                nav.open(PoemRoute(url))
                             }
-                        } else {
-                            nav.open(PoemRoute(url))
-                        }
-                    },
-                    // Tapping a breadcrumb leaves the saved list behind and starts browsing.
-                    onCategory = { nav.open(CategoryRoute(it)) },
-                )
+                        },
+                        // Tapping a breadcrumb leaves the saved list behind and starts browsing.
+                        onCategory = { nav.open(CategoryRoute(it)) },
+                        wide = wideText,
+                        navigationToggle = toggle,
+                    )
+                }
+                if (wide) {
+                    ColumnBrowser(
+                        state = browser,
+                        url = route.url,
+                        isPoem = true,
+                        expanded = expanded,
+                        onPoet = { nav.open(CategoryRoute(it)) },
+                        onCategory = { nav.open(CategoryRoute(it)) },
+                        onPoem = { nav.open(PoemRoute(it)) },
+                    ) { toggle -> poem(true, toggle) }
+                } else {
+                    poem(false, null)
+                }
             }
             composable<SearchRoute> { entry ->
                 SearchScreen(
@@ -157,6 +224,7 @@ fun GanjoorApp() {
             composable<AboutRoute> {
                 AboutScreen(onUp = { nav.navigateUp() }, onHome = { nav.goHome() })
             }
+        }
         }
 
         // Inside the provider: the sheet reads LocalOpenAbout, so it has to be in scope.

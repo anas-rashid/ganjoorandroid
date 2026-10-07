@@ -99,7 +99,16 @@ fun PoetsScreen(
             )
         },
     ) { insets ->
-        Load(key = Unit, block = { Ganjoor.manifest() }) { manifest ->
+        Load(
+            key = Unit,
+            block = { Ganjoor.manifest() },
+            // Cards or rows, whichever the reader chose, while the poets arrive.
+            placeholder = {
+                val top = Modifier.padding(top = insets.calculateTopPadding())
+                if (LocalSettings.current.value.poetGrid) SkeletonCards(top, cards = 8, circle = true)
+                else SkeletonList(top, twoLines = false, leadingCircle = 44.dp)
+            },
+        ) { manifest ->
             val settings = LocalSettings.current
             val sort = settings.value.poetSort
             val pinned = LocalPinnedPoets.current
@@ -109,20 +118,7 @@ fun PoetsScreen(
                     else manifest.poets.filter {
                         it.nickname.contains(query.trim(), ignoreCase = true)
                     }
-                when (sort) {
-                    // Persian letters don't sort correctly by code point (آ vs ا, ی vs ي), so hand
-                    // the ordering to a collator rather than String.compareTo.
-                    PoetSort.Name -> {
-                        val collator = Collator.getInstance(Locale.forLanguageTag("fa"))
-                        matches.sortedWith { a, b -> collator.compare(a.nickname, b.nickname) }
-                    }
-
-                    // Pinned first, in the order they were pinned, then the rest untouched. With
-                    // nothing pinned this is Ganjoor's order, which is why it can be the default.
-                    PoetSort.Pinned -> pinnedFirst(matches, pinned.items)
-
-                    PoetSort.Default -> matches
-                }
+                orderPoets(matches, sort, pinned.items)
             }
 
             val padding = PaddingValues(
@@ -376,6 +372,23 @@ private fun PoetCard(poet: PoetRef, pinned: Boolean, onClick: () -> Unit, onPin:
         }
     }
 }
+
+/** The poets in the order [sort] asks for. Shared by the home screen and the large-screen column. */
+internal fun orderPoets(poets: List<PoetRef>, sort: PoetSort, pins: List<String>): List<PoetRef> =
+    when (sort) {
+        // Persian letters don't sort correctly by code point (آ vs ا, ی vs ي), so hand
+        // the ordering to a collator rather than String.compareTo.
+        PoetSort.Name -> {
+            val collator = Collator.getInstance(Locale.forLanguageTag("fa"))
+            poets.sortedWith { a, b -> collator.compare(a.nickname, b.nickname) }
+        }
+
+        // Pinned first, in the order they were pinned, then the rest untouched. With
+        // nothing pinned this is Ganjoor's order, which is why it can be the default.
+        PoetSort.Pinned -> pinnedFirst(poets, pins)
+
+        PoetSort.Default -> poets
+    }
 
 /**
  * Pinned poets first, in the order they were pinned, then everyone else as Ganjoor has them.

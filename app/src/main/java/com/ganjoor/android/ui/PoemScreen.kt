@@ -1,9 +1,18 @@
 package com.ganjoor.android.ui
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -47,13 +56,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ganjoor.android.R
 import com.ganjoor.android.data.Bookmark
 import com.ganjoor.android.data.breadcrumbs
-import com.ganjoor.android.data.wordAt
+import com.ganjoor.android.data.wordRangeAt
 import com.ganjoor.android.data.Ganjoor
 import com.ganjoor.android.data.LocalAssistant
 import com.ganjoor.android.data.LocalBookmarks
@@ -71,14 +82,23 @@ fun PoemScreen(
     onHome: () -> Unit,
     onPoem: (String) -> Unit,
     onCategory: (String) -> Unit,
+    /** Large screens: the text keeps a centred reading measure and couplets may sit on one line. */
+    wide: Boolean = false,
+    /** Large screens: the button that hides or shows the columns, placed before the back arrow. */
+    navigationToggle: (@Composable () -> Unit)? = null,
 ) {
     BackHandler(onBack = onUp)
 
     // The couplet travels with the word: the dictionary sheet is the one gesture every reader
     // finds, so the couplet's own actions live at its foot rather than behind a tap between words.
-    var tapped by remember { mutableStateOf<Pair<String, Bookmark>?>(null) }
+    var tapped by remember { mutableStateOf<WordTap?>(null) }
 
-    Load(key = fullUrl, block = { Ganjoor.poem(fullUrl) }) { poem ->
+    Load(
+        key = fullUrl,
+        block = { Ganjoor.poem(fullUrl) },
+        // The bar stays up with Back already working; only the text waits.
+        placeholder = { LoadingPoem(wide, onUp, navigationToggle) },
+    ) { poem ->
         val prefs = LocalSettings.current.value
         val style = readingStyle(prefs.font, prefs.fontSize, prefs.fontWeight.weight)
         val couplets = remember(poem) { poem.verses.couplets() }
@@ -93,13 +113,20 @@ fun PoemScreen(
         }
         val here = siblings.indexOfFirst { it.fullUrl == fullUrl }
 
+        // On a large screen the dictionary opens beside the poem, on the left, instead of as a
+        // sheet over it: the text moves over to make room and nothing of it is covered.
+        Row(Modifier.fillMaxSize()) {
+        Box(Modifier.weight(1f)) {
         Scaffold(
             topBar = {
                 TopAppBar(
                     title = { Text(poem.title, maxLines = 1, overflow = TextOverflow.Ellipsis) },
                     navigationIcon = {
-                        IconButton(onClick = onUp) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.back))
+                        Row {
+                            navigationToggle?.invoke()
+                            IconButton(onClick = onUp) {
+                                Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.back))
+                            }
                         }
                     },
                     actions = {
@@ -123,12 +150,18 @@ fun PoemScreen(
             // here: Compose 1.10 stopped routing SelectionContainer through LocalTextToolbar, so
             // a custom TextToolbar is never asked to show. ACTION_PROCESS_TEXT goes round that,
             // and reaches every other app's selection menu as a side effect.
+            BoxWithConstraints {
+            // On a large screen the text keeps a reading measure in the middle of whatever room
+            // the columns leave it, and once that measure is wide enough the two hemistichs of a
+            // couplet share a line, as ganjoor.net sets them on a desktop.
+            val side = if (wide) maxOf(20.dp, (maxWidth - 680.dp) / 2) else 20.dp
+            val sideBySide = wide && maxWidth - side * 2 >= 640.dp
             SelectionContainer {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(
-                    start = 20.dp,
-                    end = 20.dp,
+                    start = side,
+                    end = side,
                     top = insets.calculateTopPadding() + 8.dp,
                     bottom = insets.calculateBottomPadding() + 32.dp,
                 ),
@@ -151,9 +184,11 @@ fun PoemScreen(
                     Couplet(
                         couplet = couplet,
                         style = style,
+                        sideBySide = sideBySide,
                         showSummaries = prefs.showSummaries,
                         source = Bookmark(fullUrl, poem.title, poem.fullTitle),
-                        onWord = { word, passage -> tapped = word to passage },
+                        onWord = { tapped = it },
+                        tapped = tapped,
                     )
                 }
 
@@ -183,15 +218,64 @@ fun PoemScreen(
                 }
             }
             }
+            }
+        }
+        }
+        if (wide) {
+            AnimatedVisibility(
+                visible = tapped != null,
+                enter = expandHorizontally() + fadeIn(),
+                exit = shrinkHorizontally() + fadeOut(),
+            ) {
+                tapped?.let { tap ->
+                    WordPanel(
+                        word = tap.word,
+                        passage = tap.passage,
+                        onDismiss = { tapped = null },
+                    )
+                }
+            }
+        }
         }
     }
 
-    tapped?.let { (word, passage) ->
-        WordSheet(
-            word = word,
-            passage = passage,
-            onDismiss = { tapped = null },
-        )
+    if (!wide) {
+        tapped?.let { tap ->
+            WordSheet(
+                word = tap.word,
+                passage = tap.passage,
+                onDismiss = { tapped = null },
+            )
+        }
+    }
+}
+
+/** A word someone tapped: what to look up, the couplet it came from, and where it sits in its verse. */
+private data class WordTap(val word: String, val passage: Bookmark, val verse: Int, val range: IntRange)
+
+/** The poem screen while its poem is on the way: the real top bar, and the text as a skeleton. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun LoadingPoem(wide: Boolean, onUp: () -> Unit, navigationToggle: (@Composable () -> Unit)?) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {},
+                navigationIcon = {
+                    Row {
+                        navigationToggle?.invoke()
+                        IconButton(onClick = onUp) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.back))
+                        }
+                    }
+                },
+            )
+        }
+    ) { insets ->
+        BoxWithConstraints(Modifier.fillMaxSize().padding(insets)) {
+            val side = if (wide) maxOf(20.dp, (maxWidth - 680.dp) / 2) else 20.dp
+            SkeletonPoem(Modifier.padding(start = side, end = side, top = 16.dp))
+        }
     }
 }
 
@@ -271,21 +355,44 @@ private fun Couplet(
     style: androidx.compose.ui.text.TextStyle,
     showSummaries: Boolean,
     source: Bookmark,
-    onWord: (String, Bookmark) -> Unit,
+    onWord: (WordTap) -> Unit,
+    tapped: WordTap?,
+    sideBySide: Boolean = false,
 ) {
     // Tap, not long-press: long-press belongs to the text selection this sits inside.
     var actionsOpen by remember(couplet) { mutableStateOf(false) }
     val passage = source.copy(excerpt = couplet.joinToString("\n") { it.text })
 
+    // Only a true Right+Left pair shares a line; centred verses and prose keep their own.
+    val oneLine = sideBySide && couplet.size == 2 &&
+        couplet[0].position == Verse.RIGHT && couplet[1].position == Verse.LEFT
+
     Column(modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp)) {
-        couplet.forEach { verse ->
-            VerseText(
-                verse = verse,
-                style = style,
-                onWord = { onWord(it, passage) },
-                // A tap that lands between words still opens the couplet's own actions.
-                onElsewhere = { actionsOpen = !actionsOpen },
-            )
+        if (oneLine) {
+            Row(modifier = Modifier.fillMaxWidth()) {
+                couplet.forEachIndexed { index, verse ->
+                    if (index > 0) Spacer(Modifier.width(32.dp))
+                    VerseText(
+                        verse = verse,
+                        style = style,
+                        onWord = { range -> onWord(tapOf(verse, range, passage)) },
+                        onElsewhere = { actionsOpen = !actionsOpen },
+                        highlight = tapped?.takeIf { it.verse == verse.vOrder }?.range,
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+            }
+        } else {
+            couplet.forEach { verse ->
+                VerseText(
+                    verse = verse,
+                    style = style,
+                    onWord = { range -> onWord(tapOf(verse, range, passage)) },
+                    // A tap that lands between words still opens the couplet's own actions.
+                    onElsewhere = { actionsOpen = !actionsOpen },
+                    highlight = tapped?.takeIf { it.verse == verse.vOrder }?.range,
+                )
+            }
         }
         if (showSummaries) {
             couplet.firstNotNullOfOrNull { it.coupletSummary }
@@ -346,18 +453,36 @@ private fun Couplet(
  * One hemistich. Tapping a word looks it up; tapping between words falls through to the
  * couplet's save and copy actions, so both live on the same gesture without fighting.
  */
+private fun tapOf(verse: Verse, range: IntRange, passage: Bookmark) =
+    WordTap(verse.text.substring(range), passage, verse.vOrder, range)
+
 @Composable
 private fun VerseText(
     verse: Verse,
     style: androidx.compose.ui.text.TextStyle,
-    onWord: (String) -> Unit,
+    onWord: (IntRange) -> Unit,
     onElsewhere: () -> Unit,
+    /** The word being looked up, marked so the reader can see which one it was. */
+    highlight: IntRange? = null,
+    modifier: Modifier = Modifier,
 ) {
     var layout by remember(verse.text) { mutableStateOf<TextLayoutResult?>(null) }
     val fontSizePx = with(LocalDensity.current) { style.fontSize.toPx() }
+    val mark = SpanStyle(
+        background = MaterialTheme.colorScheme.secondaryContainer,
+        color = MaterialTheme.colorScheme.onSecondaryContainer,
+    )
+    val text = remember(verse.text, highlight, mark) {
+        buildAnnotatedString {
+            append(verse.text)
+            if (highlight != null && highlight.last < verse.text.length) {
+                addStyle(mark, highlight.first, highlight.last + 1)
+            }
+        }
+    }
 
     Text(
-        text = verse.text,
+        text = text,
         style = style,
         textAlign = when (verse.position) {
             Verse.RIGHT -> TextAlign.Start
@@ -367,7 +492,7 @@ private fun VerseText(
             else -> TextAlign.Justify
         },
         onTextLayout = { layout = it },
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .pointerInput(verse.text) {
                 detectTapGestures { position ->
@@ -379,7 +504,7 @@ private fun VerseText(
 }
 
 /**
- * The word actually under [position], or null if the tap missed the glyphs.
+ * Where the word actually under [position] lies, or null if the tap missed the glyphs.
  *
  * getOffsetForPosition alone isn't enough: nastaliq is set with 2.4x leading, so most of a line
  * box is empty space above the glyphs, and a tap there clamps to the line's first character —
@@ -391,7 +516,7 @@ internal fun wordTappedAt(
     text: String,
     position: Offset,
     fontSizePx: Float,
-): String? {
+): IntRange? {
     if (text.isEmpty() || fontSizePx <= 0f) return null
     val offset = layout.getOffsetForPosition(position).coerceIn(0, text.length - 1)
     val baseline = layout.getLineBaseline(layout.getLineForOffset(offset))
@@ -400,7 +525,7 @@ internal fun wordTappedAt(
     // swapped and taps start feeling off.
     if (position.y < baseline - fontSizePx * 1.4f) return null
     if (position.y > baseline + fontSizePx * 0.6f) return null
-    return wordAt(text, offset)
+    return wordRangeAt(text, offset)
 }
 
 /** Save this passage, or copy it. Saving keeps the link back to the poem; copying doesn't. */
