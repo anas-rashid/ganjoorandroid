@@ -48,6 +48,16 @@ import com.ganjoor.android.data.LocalAssistant
 import com.ganjoor.android.data.Pronunciation
 import com.ganjoor.android.ui.theme.readingStyle
 
+/** The width of a side panel — the dictionary and the reading settings share it. */
+val SidePanelWidth = 360.dp
+
+/**
+ * The narrowest the page may be left once a side panel opens beside it. Below this the panel is
+ * not worth its room: on a book-style foldable the columns had already taken theirs, and a 360dp
+ * panel left the verse about 75dp wide, breaking it to one or two characters a line.
+ */
+val MinPageMeasure = 400.dp
+
 /** English prose inside an otherwise right-to-left sheet. */
 @Composable
 private fun LeftToRight(content: @Composable () -> Unit) {
@@ -102,7 +112,7 @@ fun WordPanel(word: String, onDismiss: () -> Unit, passage: Bookmark? = null) {
     BackHandler(onBack = onDismiss)
     Surface(
         color = MaterialTheme.colorScheme.surfaceContainerLow,
-        modifier = Modifier.width(360.dp).fillMaxHeight(),
+        modifier = Modifier.width(SidePanelWidth).fillMaxHeight(),
     ) {
         Column(Modifier.statusBarsPadding()) {
             Row(

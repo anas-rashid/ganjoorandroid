@@ -110,7 +110,11 @@ fun GanjoorApp() {
         // Up to three list columns beside the poets; below this, only the newest one.
         val expanded by rememberUpdatedState(maxWidth >= 840.dp)
         // On a large screen reading settings open in a panel on the left, where the dictionary
-        // opens, so the page stays in view and shows each change as it is made.
+        // opens, so the page stays in view and shows each change as it is made — but only where
+        // the browser still has its own room beside the panel. Below that the panel would squeeze
+        // the columns and the poem into less than the layout is built for, so the sheet is used
+        // instead, exactly as on a phone.
+        val settingsPanel by rememberUpdatedState(maxWidth - SidePanelWidth >= 600.dp)
         Row(Modifier.fillMaxSize()) {
         Box(Modifier.weight(1f)) {
         NavHost(
@@ -237,7 +241,7 @@ fun GanjoorApp() {
             }
         }
         }
-        if (wide) {
+        if (settingsPanel) {
             AnimatedVisibility(
                 visible = settingsOpen,
                 enter = expandHorizontally() + fadeIn(),
@@ -249,7 +253,7 @@ fun GanjoorApp() {
         }
 
         // Inside the provider: the sheet reads LocalOpenAbout, so it has to be in scope.
-        if (settingsOpen && !wide) ReadingSettingsSheet(onDismiss = { settingsOpen = false })
+        if (settingsOpen && !settingsPanel) ReadingSettingsSheet(onDismiss = { settingsOpen = false })
         }
     }
 }

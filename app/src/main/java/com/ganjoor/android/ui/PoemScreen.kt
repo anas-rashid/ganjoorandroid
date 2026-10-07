@@ -93,6 +93,14 @@ fun PoemScreen(
     // finds, so the couplet's own actions live at its foot rather than behind a tap between words.
     var tapped by remember { mutableStateOf<WordTap?>(null) }
 
+    BoxWithConstraints(Modifier.fillMaxSize()) {
+    // Whether the dictionary gets a column of its own is not a question about the window but
+    // about what is left of this page once the columns have taken theirs. On a book-style
+    // foldable held open in portrait the page is already down to ~450dp, and a panel beside it
+    // left the verse about 75dp wide — one or two characters a line. Where it does not fit, the
+    // sheet is the better answer: it covers the foot of the poem but leaves the lines whole.
+    val roomForPanel = wide && maxWidth - SidePanelWidth >= MinPageMeasure
+
     Load(
         key = fullUrl,
         block = { Ganjoor.poem(fullUrl) },
@@ -222,7 +230,7 @@ fun PoemScreen(
             }
         }
         }
-        if (wide) {
+        if (roomForPanel) {
             AnimatedVisibility(
                 visible = tapped != null,
                 enter = expandHorizontally() + fadeIn(),
@@ -240,7 +248,7 @@ fun PoemScreen(
         }
     }
 
-    if (!wide) {
+    if (!roomForPanel) {
         tapped?.let { tap ->
             WordSheet(
                 word = tap.word,
@@ -248,6 +256,7 @@ fun PoemScreen(
                 onDismiss = { tapped = null },
             )
         }
+    }
     }
 }
 
