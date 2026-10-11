@@ -458,22 +458,22 @@ private fun Couplet(
             couplet.firstNotNullOfOrNull { it.coupletSummary }
                 ?.takeIf { it.isNotBlank() }
                 ?.let { summary ->
-                    Text(
-                        text = summary,
+                    GanjoorDescription(
+                        summary = summary,
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(top = 4.dp),
-                    )
-                    // Ganjoor writes these in Persian. Offered only once an assistant is set up:
-                    // a button under every couplet earns its space only if it can answer, and the
-                    // couplet's own actions are behind a tap between words that few will find.
-                    if (LocalAssistant.current.serverReady) {
-                        AssistantInline(
-                            prompt = "summary",
-                            text = summary,
-                            label = R.string.assistant_translate,
-                            instruction = R.string.assistant_translate_prompt,
-                        )
+                    ) {
+                        // Ganjoor writes these in Persian. Offered only once an assistant is set
+                        // up: a button under every couplet earns its space only if it can answer,
+                        // and the couplet's own actions are behind a tap few will find.
+                        if (LocalAssistant.current.serverReady) {
+                            AssistantInline(
+                                prompt = "summary",
+                                text = summary,
+                                label = R.string.assistant_translate,
+                                instruction = R.string.assistant_translate_prompt,
+                            )
+                        }
                     }
                 }
         }
@@ -640,17 +640,14 @@ private fun PoemSummary(summary: String) {
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.padding(top = 12.dp),
         )
-        Text(
-            text = summary,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        AssistantInline(
-            prompt = "summary",
-            text = summary,
-            label = R.string.assistant_translate,
-            instruction = R.string.assistant_translate_prompt,
-        )
+        GanjoorDescription(summary, MaterialTheme.typography.bodyMedium) {
+            AssistantInline(
+                prompt = "summary",
+                text = summary,
+                label = R.string.assistant_translate,
+                instruction = R.string.assistant_translate_prompt,
+            )
+        }
     }
 }
 

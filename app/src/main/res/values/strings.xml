@@ -124,4 +124,19 @@
     <string name="hide_columns">Hide the list</string>
     <string name="show_columns">Show the list</string>
     <string name="close">Close</string>
+    <!-- Ganjoor's descriptions, translated for Urdu and English readers. -->
+    <string name="description_by_google">Ganjoor&#8217;s description, translated by Google Translate</string>
+    <string name="description_by_ai">Ganjoor&#8217;s description, translated by AI (%1$s)</string>
+    <string name="description_show_original">Show the original</string>
+    <string name="description_show_translation">Show the translation</string>
+    <string name="description_translating">Translating…</string>
+    <string name="descriptions_section">Ganjoor&#8217;s descriptions</string>
+    <string name="descriptions_note">Ganjoor writes its AI descriptions in Persian. With the app in Urdu or English they are shown translated, saying who translated them; in Persian, as Ganjoor wrote them.</string>
+    <string name="translator_google">Google Translate</string>
+    <string name="translator_assistant">AI assistant</string>
+    <string name="translator_off">Persian only</string>
+    <string name="translator_google_note_key">Google Cloud Translation, with your own API key from console.cloud.google.com. The first 500,000 characters each month are free. Only the description is sent.</string>
+    <string name="translator_google_note_device">Translated on this phone by Google&#8217;s ML Kit. The language pack (about 30 MB) downloads once; after that it works offline.</string>
+    <string name="translator_assistant_note">Uses the assistant set up below. Set one up first.</string>
+    <string name="google_key">Google Cloud API key</string>
 </resources>

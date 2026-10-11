@@ -119,4 +119,19 @@
     <string name="hide_columns">پنهان کردن فهرست</string>
     <string name="show_columns">نمایش فهرست</string>
     <string name="close">بستن</string>
+    <!-- Ganjoor's descriptions, translated for Urdu and English readers. -->
+    <string name="description_by_google">ترجمهٔ توضیح گنجور با گوگل ترنسلیت</string>
+    <string name="description_by_ai">ترجمهٔ توضیح گنجور با هوش مصنوعی (%1$s)</string>
+    <string name="description_show_original">دیدن متن اصلی</string>
+    <string name="description_show_translation">دیدن ترجمه</string>
+    <string name="description_translating">در حال ترجمه…</string>
+    <string name="descriptions_section">توضیحات گنجور</string>
+    <string name="descriptions_note">گنجور توضیحات هوش مصنوعی خود را به فارسی می‌نویسد. اگر زبان برنامه اردو یا انگلیسی باشد، ترجمه‌شده نشان داده می‌شوند و مترجم ذکر می‌شود؛ در فارسی همان متن گنجور.</string>
+    <string name="translator_google">گوگل ترنسلیت</string>
+    <string name="translator_assistant">دستیار هوش مصنوعی</string>
+    <string name="translator_off">فقط فارسی</string>
+    <string name="translator_google_note_key">ترجمهٔ ابری گوگل با کلید API خودتان (console.cloud.google.com). ماهانه ۵۰۰ هزار نویسهٔ نخست رایگان است. فقط همان توضیح فرستاده می‌شود.</string>
+    <string name="translator_google_note_device">ترجمه روی همین گوشی با ML Kit گوگل انجام می‌شود. بستهٔ زبان (حدود ۳۰ مگابایت) یک بار بارگیری می‌شود و پس از آن بدون اینترنت هم کار می‌کند.</string>
+    <string name="translator_assistant_note">از دستیاری که پایین تنظیم شده استفاده می‌کند. ابتدا آن را تنظیم کنید.</string>
+    <string name="google_key">کلید API گوگل کلاود</string>
 </resources>

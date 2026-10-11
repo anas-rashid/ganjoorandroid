@@ -34,8 +34,10 @@ enum class AssistantLanguage(val code: String, val englishName: String) {
 }
 
 /**
- * A server the reader runs or subscribes to. Only the free, self-hosted ones are offered as
- * presets; anything else is typed in, so the app never steers anyone towards a paid service.
+ * A server the reader runs or subscribes to: the self-hosted ones first, then the hosted APIs a
+ * reader can sign up for with their own key. None is chosen for them, and no key ships with the
+ * app. A consumer chat subscription (ChatGPT Plus, Claude Pro) has no sign-in another app can use,
+ * which is what "Send to an app" is for.
  */
 data class AssistantPreset(val name: String, val baseUrl: String, val model: String)
 
@@ -44,6 +46,12 @@ val ASSISTANT_PRESETS = listOf(
     AssistantPreset("LM Studio", "http://127.0.0.1:1234/v1", "local-model"),
     AssistantPreset("llama.cpp", "http://127.0.0.1:8080/v1", "local-model"),
     AssistantPreset("LocalAI", "http://127.0.0.1:8080/v1", "local-model"),
+    // Gemini first among the hosted ones: a Google account gets a free-tier key.
+    AssistantPreset("Gemini", "https://generativelanguage.googleapis.com/v1beta/openai", "gemini-2.5-flash"),
+    AssistantPreset("OpenAI", "https://api.openai.com/v1", "gpt-5-mini"),
+    AssistantPreset("Claude", "https://api.anthropic.com/v1", "claude-haiku-4-5"),
+    AssistantPreset("DeepSeek", "https://api.deepseek.com/v1", "deepseek-chat"),
+    AssistantPreset("OpenRouter", "https://openrouter.ai/api/v1", "openrouter/auto"),
 )
 
 /** Reader-supplied configuration, kept on the device and never sent anywhere but the endpoint. */
@@ -76,24 +84,41 @@ class AssistantSettings(context: Context) {
     )
         private set
 
+    /** Who translates Ganjoor's Persian descriptions for a reader whose app is in Urdu or English. */
+    var descriptionTranslator by mutableStateOf(
+        runCatching { DescriptionTranslator.valueOf(prefs.getString(TRANSLATOR, null)!!) }
+            .getOrDefault(DescriptionTranslator.Google)
+    )
+        private set
+
+    /** The FOSS build's Cloud Translation key. Kept like [apiKey]: private, unencrypted. */
+    var googleKey by mutableStateOf(prefs.getString(GOOGLE_KEY, "").orEmpty())
+        private set
+
     fun update(
         mode: AssistantMode = this.mode,
         baseUrl: String = this.baseUrl,
         model: String = this.model,
         apiKey: String = this.apiKey,
         language: AssistantLanguage = this.language,
+        descriptionTranslator: DescriptionTranslator = this.descriptionTranslator,
+        googleKey: String = this.googleKey,
     ) {
         this.mode = mode
         this.baseUrl = baseUrl.trim()
         this.model = model.trim()
         this.apiKey = apiKey.trim()
         this.language = language
+        this.descriptionTranslator = descriptionTranslator
+        this.googleKey = googleKey.trim()
         prefs.edit(commit = true) {
             putString(MODE, mode.name)
             putString(BASE_URL, this@AssistantSettings.baseUrl)
             putString(MODEL, this@AssistantSettings.model)
             putString(API_KEY, this@AssistantSettings.apiKey)
             putString(LANGUAGE, language.name)
+            putString(TRANSLATOR, descriptionTranslator.name)
+            putString(GOOGLE_KEY, this@AssistantSettings.googleKey)
         }
     }
 
@@ -108,6 +133,8 @@ class AssistantSettings(context: Context) {
         const val MODEL = "assistantModel"
         const val API_KEY = "assistantApiKey"
         const val LANGUAGE = "assistantLanguage"
+        const val TRANSLATOR = "descriptionTranslator"
+        const val GOOGLE_KEY = "googleTranslateKey"
     }
 }
 
