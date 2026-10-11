@@ -13,9 +13,12 @@ An Android reader for [Ganjoor](https://ganjoor.net), the open archive of Persia
 240 poets and ~135,000 poems, laid out for comfortable long-form reading in Persian, Urdu
 and Arabic script, online or fully offline.
 
-### ⬇ [Download ganjoor-0.4.1.apk](releases/ganjoor-0.4.1.apk)
+### ⬇ Download ganjoor 0.5.0
 
-Android 7.0 and up · 31.7 MB · [older releases](releases/) · `sha256 6c85da41…ce357615daa`
+- [**ganjoor-0.5.0-foss.apk**](releases/ganjoor-0.5.0-foss.apk) · 31.7 MB · `sha256 843b01c2…1bba8671aa0` · no Google code; Google Translate with your own Cloud key
+- [**ganjoor-0.5.0-play.apk**](releases/ganjoor-0.5.0-play.apk) · 95.0 MB · `sha256 3cd9dd81…bc3c927e79d` · translates on the phone with Google's ML Kit; needs Google Play Services
+
+Android 7.0 and up · [older releases](releases/)
 
 Android will call the developer unknown and offer to install anyway — it says that about every
 app installed outside a store. Allow installs from your browser once and it will go through.
@@ -25,7 +28,7 @@ bookmarks. [Build it yourself](#build) instead if you would rather.
 Jetpack Compose, Material 3, `minSdk 24`. No account, no tracking, no server of its own.
 
 Two builds come from this source, the same app apart from how Google Translate is reached:
-**foss** (the APK above, and F-Droid) has no Google code in it and uses your own Cloud
+**foss** (F-Droid, and the first download above) has no Google code in it and uses your own Cloud
 Translation key; **play** (Google Play) translates on the phone with Google's ML Kit, no key.
 
 ## Reading
@@ -250,7 +253,7 @@ All Apache-2.0.
 | Okio | [square/okio](https://github.com/square/okio) |
 | Coil 3 | [coil-kt/coil](https://github.com/coil-kt/coil) |
 | Accompanist (drawablepainter, via Coil) | [google/accompanist](https://github.com/google/accompanist) |
-| Material Symbols (share, lookup, assistant glyphs, copied as vector paths) | [google/material-design-icons](https://github.com/google/material-design-icons) |
+| Material Symbols (share, lookup, assistant, copy, translate and bookmark glyphs, copied as vector paths) | [google/material-design-icons](https://github.com/google/material-design-icons) |
 
 No Firebase, analytics or trackers, and the `foss` build has no Google Play Services. The
 `play` build adds Google's [ML Kit Translation](https://developers.google.com/ml-kit/language/translation)

@@ -1,0 +1,5 @@
+Ganjoor's AI descriptions can now be read in Urdu or English. With the app in either language they are translated in the page, labelled with who translated them (Google Translate or your AI assistant), with a tap back to the Persian.
+
+The AI assistant has presets for Gemini, OpenAI, Claude, DeepSeek and OpenRouter, with your own key.
+
+A couplet's actions are icons now, and bookmarks use the bookmark glyph everywhere. A saved couplet shows it without opening anything.

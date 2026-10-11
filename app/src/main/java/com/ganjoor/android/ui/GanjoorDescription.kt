@@ -8,7 +8,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -17,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
@@ -123,13 +125,16 @@ fun GanjoorDescription(
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.weight(1f),
                     )
-                    TextButton(onClick = { showOriginal = !showOriginal }) {
-                        Text(
-                            text = stringResource(
+                    // The attribution beside it stays in words: who translated is never an icon.
+                    IconButton(onClick = { showOriginal = !showOriginal }) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_translate),
+                            contentDescription = stringResource(
                                 if (showOriginal) R.string.description_show_translation
                                 else R.string.description_show_original
                             ),
-                            style = MaterialTheme.typography.labelSmall,
+                            tint = if (showOriginal) MaterialTheme.colorScheme.onSurfaceVariant
+                            else MaterialTheme.colorScheme.primary,
                         )
                     }
                 }

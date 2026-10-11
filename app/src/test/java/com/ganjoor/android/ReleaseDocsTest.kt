@@ -31,9 +31,14 @@ class ReleaseDocsTest {
             .groupValues[1]
     }
 
+    /** Every release ships as one APK per flavour; see tools/update_release_docs.py. */
+    private val flavours = listOf("foss", "play")
+
+    private fun apk(flavour: String) = File(root, "releases/ganjoor-$declaredVersion-$flavour.apk")
+
     @Test
     fun `the README offers the version the build declares`() {
-        val offered = Regex("### . \\[Download ganjoor-([^\\]]+)\\.apk]")
+        val offered = Regex("### . Download ganjoor (\\S+)")
             .find(read("README.md"))
             ?.groupValues?.get(1)
         assertEquals(
@@ -45,21 +50,30 @@ class ReleaseDocsTest {
     }
 
     @Test
-    fun `the APK the README links to is archived`() {
-        val apk = File(root, "releases/ganjoor-" + declaredVersion + ".apk")
-        assertTrue(apk.name + " is linked from README.md but not in releases/", apk.exists())
+    fun `every APK the README links to is archived`() {
+        flavours.forEach { flavour ->
+            val apk = apk(flavour)
+            assertTrue(
+                apk.name + " is not linked from README.md",
+                read("README.md").contains("(releases/" + apk.name + ")"),
+            )
+            assertTrue(apk.name + " is linked from README.md but not in releases/", apk.exists())
+        }
     }
 
     @Test
-    fun `the README short checksum matches the archived APK`() {
-        val short = Regex("`sha256 ([0-9a-f]+)…([0-9a-f]+)`")
-            .find(read("README.md"))!!
-            .groupValues
-        val full = sha256(File(root, "releases/ganjoor-" + declaredVersion + ".apk"))
-        assertTrue(
-            "README.md's checksum does not match releases/ganjoor-" + declaredVersion + ".apk",
-            full.startsWith(short[1]) && full.endsWith(short[2]),
-        )
+    fun `the README short checksums match the archived APKs`() {
+        flavours.forEach { flavour ->
+            val apk = apk(flavour)
+            val short = Regex(Regex.escape("(releases/" + apk.name + ")") + "[^`]*`sha256 ([0-9a-f]+)…([0-9a-f]+)`")
+                .find(read("README.md"))!!
+                .groupValues
+            val full = sha256(apk)
+            assertTrue(
+                "README.md's checksum does not match releases/" + apk.name,
+                full.startsWith(short[1]) && full.endsWith(short[2]),
+            )
+        }
     }
 
     @Test

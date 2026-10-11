@@ -23,7 +23,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.FilterChip
@@ -82,7 +81,7 @@ fun PoetsScreen(
                     ViewAction()
                     LanguageAction()
                     IconButton(onClick = onBookmarks) {
-                        Icon(Icons.Default.Favorite, stringResource(R.string.bookmarks))
+                        Icon(painterResource(R.drawable.ic_bookmark_border), stringResource(R.string.bookmarks))
                     }
                     IconButton(onClick = onDownloads) {
                         Icon(painterResource(R.drawable.ic_download), stringResource(R.string.downloads))

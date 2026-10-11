@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
@@ -62,15 +63,18 @@ fun AssistantInline(prompt: String, text: String, label: Int, instruction: Int) 
 
     Column(modifier = Modifier.fillMaxWidth()) {
         if (!asked) {
-            TextButton(onClick = {
+            IconButton(onClick = {
                 if (assistant.serverReady) asked = true else context.shareText("$ask\n\n$text")
             }) {
+                // Translating gets the translate glyph; anything else asked of the assistant, its own.
                 Icon(
-                    painter = painterResource(R.drawable.ic_ask),
-                    contentDescription = null,
-                    modifier = Modifier.size(18.dp).padding(end = 4.dp),
+                    painter = painterResource(
+                        if (prompt == "summary" || prompt == "translate") R.drawable.ic_translate
+                        else R.drawable.ic_ask
+                    ),
+                    contentDescription = stringResource(label),
+                    tint = MaterialTheme.colorScheme.primary,
                 )
-                Text(stringResource(label))
             }
         }
         AnimatedVisibility(visible = asked) {
@@ -129,13 +133,8 @@ fun AssistantReply(prompt: String, text: String, modifier: Modifier = Modifier) 
                         modifier = Modifier.fillMaxWidth(),
                     )
                 }
-                TextButton(onClick = { context.shareText(reply) }) {
-                    Icon(
-                        imageVector = Icons.Default.Share,
-                        contentDescription = null,
-                        modifier = Modifier.size(18.dp).padding(end = 4.dp),
-                    )
-                    Text(stringResource(R.string.share))
+                IconButton(onClick = { context.shareText(reply) }) {
+                    Icon(Icons.Default.Share, stringResource(R.string.share))
                 }
             } else {
                 Text(
