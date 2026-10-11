@@ -7,6 +7,14 @@
 #
 # F-Droid builds from source and signs with their own key, which is why the
 # release build must succeed with no keystore present — see app/build.gradle.kts.
+#
+# From 0.5.0 the app has two flavours, foss and play. Build entries from then on
+# take the foss one and drop the play-only ML Kit line first, so the scanner
+# never meets a proprietary library:
+#
+#     gradle:
+#       - foss
+#     prebuild: sed -i -e '/playImplementation/d' build.gradle.kts
 
 Categories:
   - Reading

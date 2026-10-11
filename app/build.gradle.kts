@@ -60,6 +60,16 @@ android {
         }
     }
 
+    // Two builds from one source, differing only in how Google Translate is reached. The FOSS
+    // one, for F-Droid and direct download, carries no Google library, so it calls the Cloud
+    // Translation API with the reader's own key; Play's translates on the device with ML Kit, which needs no key. Same application id: they
+    // are one app, published in two places.
+    flavorDimensions += "store"
+    productFlavors {
+        create("foss") { dimension = "store" }
+        create("play") { dimension = "store" }
+    }
+
     // The dependency metadata block is signed with a Google key and is not reproducible, so
     // F-Droid rejects APKs that carry it.
     dependenciesInfo {
@@ -99,6 +109,9 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
+    // Play build only. F-Droid's recipe deletes this line before building, so its scanner never
+    // sees a proprietary library even in a flavour it does not build.
+    "playImplementation"(libs.mlkit.translate)
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)

@@ -119,4 +119,19 @@
     <string name="hide_columns">فہرست چھپائیں</string>
     <string name="show_columns">فہرست دکھائیں</string>
     <string name="close">بند کریں</string>
+    <!-- Ganjoor's descriptions, translated for Urdu and English readers. -->
+    <string name="description_by_google">گنجور کی تفصیل کا ترجمہ: گوگل ٹرانسلیٹ</string>
+    <string name="description_by_ai">گنجور کی تفصیل کا ترجمہ: مصنوعی ذہانت (%1$s)</string>
+    <string name="description_show_original">اصل فارسی دیکھیں</string>
+    <string name="description_show_translation">ترجمہ دیکھیں</string>
+    <string name="description_translating">ترجمہ ہو رہا ہے…</string>
+    <string name="descriptions_section">گنجور کی تفصیلات</string>
+    <string name="descriptions_note">گنجور اپنی مصنوعی ذہانت سے بنی تفصیلات فارسی میں لکھتا ہے۔ ایپ اردو یا انگریزی میں ہو تو یہ ترجمہ کر کے دکھائی جاتی ہیں، اور بتایا جاتا ہے کہ ترجمہ کس نے کیا؛ فارسی میں ویسی ہی جیسی گنجور نے لکھیں۔</string>
+    <string name="translator_google">گوگل ٹرانسلیٹ</string>
+    <string name="translator_assistant">مصنوعی ذہانت کا معاون</string>
+    <string name="translator_off">صرف فارسی</string>
+    <string name="translator_google_note_key">گوگل کلاؤڈ ٹرانسلیشن، آپ کی اپنی API کلید کے ساتھ (console.cloud.google.com)۔ ہر ماہ پہلے پانچ لاکھ حروف مفت ہیں۔ صرف تفصیل بھیجی جاتی ہے۔</string>
+    <string name="translator_google_note_device">گوگل کے ML Kit سے اسی فون پر ترجمہ ہوتا ہے۔ زبان کا پیکج (تقریباً 30 MB) ایک بار ڈاؤن لوڈ ہوتا ہے، پھر انٹرنیٹ کے بغیر بھی کام کرتا ہے۔</string>
+    <string name="translator_assistant_note">نیچے ترتیب دیا گیا معاون استعمال ہوتا ہے۔ پہلے اسے ترتیب دیں۔</string>
+    <string name="google_key">گوگل کلاؤڈ API کلید</string>
 </resources>

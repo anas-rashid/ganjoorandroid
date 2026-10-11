@@ -37,6 +37,8 @@ import com.ganjoor.android.data.ASSISTANT_PRESETS
 import com.ganjoor.android.data.Assistant
 import com.ganjoor.android.data.AssistantLanguage
 import com.ganjoor.android.data.AssistantMode
+import com.ganjoor.android.data.DescriptionTranslator
+import com.ganjoor.android.data.GoogleTranslate
 import com.ganjoor.android.data.LocalAssistant
 import com.ganjoor.android.data.Prompts
 import kotlinx.coroutines.launch
@@ -53,6 +55,7 @@ fun AssistantScreen(onUp: () -> Unit, onHome: () -> Unit) {
     var baseUrl by remember { mutableStateOf(settings.baseUrl) }
     var model by remember { mutableStateOf(settings.model) }
     var apiKey by remember { mutableStateOf(settings.apiKey) }
+    var googleKey by remember { mutableStateOf(settings.googleKey) }
     var testing by remember { mutableStateOf(false) }
     var result by remember { mutableStateOf<String?>(null) }
 
@@ -85,6 +88,55 @@ fun AssistantScreen(onUp: () -> Unit, onHome: () -> Unit) {
                 modifier = Modifier.padding(top = 12.dp),
             )
 
+            // Ganjoor's descriptions first: for a reader in Urdu or English it is what this page
+            // changes most, and Google Translate needs no assistant at all.
+            SectionLabel(R.string.descriptions_section)
+            Text(
+                text = stringResource(R.string.descriptions_note),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                DescriptionTranslator.entries.forEach { option ->
+                    FilterChip(
+                        selected = settings.descriptionTranslator == option,
+                        onClick = { settings.update(descriptionTranslator = option) },
+                        label = { Text(stringResource(translatorLabel(option))) },
+                    )
+                }
+            }
+            when (settings.descriptionTranslator) {
+                DescriptionTranslator.Google -> {
+                    Text(
+                        text = stringResource(
+                            if (GoogleTranslate.NEEDS_KEY) R.string.translator_google_note_key
+                            else R.string.translator_google_note_device
+                        ),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    if (GoogleTranslate.NEEDS_KEY) {
+                        OutlinedTextField(
+                            value = googleKey,
+                            onValueChange = { googleKey = it; settings.update(googleKey = it) },
+                            label = { Text(stringResource(R.string.google_key)) },
+                            singleLine = true,
+                            visualTransformation = PasswordVisualTransformation(),
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
+                }
+
+                DescriptionTranslator.Assistant -> Text(
+                    text = stringResource(R.string.translator_assistant_note),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+
+                DescriptionTranslator.Off -> Unit
+            }
+
+            HorizontalDivider(Modifier.padding(vertical = 8.dp))
             SectionLabel(R.string.assistant_mode)
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 AssistantMode.entries.forEach { option ->
@@ -194,6 +246,12 @@ private fun modeLabel(mode: AssistantMode) = when (mode) {
     AssistantMode.Off -> R.string.assistant_off
     AssistantMode.Server -> R.string.assistant_server
     AssistantMode.ShareToApp -> R.string.assistant_share
+}
+
+private fun translatorLabel(translator: DescriptionTranslator) = when (translator) {
+    DescriptionTranslator.Google -> R.string.translator_google
+    DescriptionTranslator.Assistant -> R.string.translator_assistant
+    DescriptionTranslator.Off -> R.string.translator_off
 }
 
 private fun modeNote(mode: AssistantMode) = when (mode) {

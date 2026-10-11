@@ -6,7 +6,10 @@ into step with whatever version app/build.gradle.kts declares.
 Run it after building and copying the signed APK into releases/:
 
     ./gradlew :app:assembleRelease
-    cp app/build/outputs/apk/release/ganjoor-<v>-release.apk releases/ganjoor-<v>.apk
+    cp app/build/outputs/apk/foss/release/ganjoor-<v>-foss-release.apk releases/ganjoor-<v>.apk
+
+The APK kept in releases/ is the foss flavour: it needs nothing from Google on the phone.
+The play flavour goes to Google Play as a bundle (./gradlew :app:bundlePlayRelease).
     python3 tools/update_release_docs.py
 
 It reads the version from the build file rather than taking an argument, so the

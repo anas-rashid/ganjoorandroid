@@ -24,6 +24,10 @@ bookmarks. [Build it yourself](#build) instead if you would rather.
 
 Jetpack Compose, Material 3, `minSdk 24`. No account, no tracking, no server of its own.
 
+Two builds come from this source, the same app apart from how Google Translate is reached:
+**foss** (the APK above, and F-Droid) has no Google code in it and uses your own Cloud
+Translation key; **play** (Google Play) translates on the phone with Google's ML Kit, no key.
+
 ## Reading
 
 Poems are set as couplets: the two hemistichs of each line stack on a phone, the first aligned
@@ -109,6 +113,17 @@ part of the app that needs a connection, and it simply doesn't appear without on
 
 See [`tools/README.md`](tools/README.md) to rebuild it, and for the licensing of each source.
 
+## Ganjoor's descriptions in Urdu and English
+
+Ganjoor writes an AI description for many couplets and poems, in Persian (switch them on in
+reading settings). With the app in Urdu or English they are translated in the page, each with a
+line saying who translated it — *گنجور کی تفصیل کا ترجمہ: گوگل ٹرانسلیٹ* or *…: مصنوعی ذہانت* —
+and a tap back to the Persian. In Persian they are shown as Ganjoor wrote them.
+
+The translator is chosen on the AI page: Google Translate (default), your connected AI assistant,
+or Persian only. The assistant can be a server of your own or a hosted API with your own key;
+Gemini, OpenAI, Claude, DeepSeek and OpenRouter have presets.
+
 ## Where the poems come from
 
 There is no backend. Every "endpoint" is a JSON file in
@@ -172,8 +187,8 @@ The build already meets the [quick start
 guide](https://f-droid.org/en/docs/Submitting_to_F-Droid_Quick_Start_Guide/):
 
 - MIT licensed, with a `LICENSE` file.
-- Every dependency is FOSS (AndroidX, Kotlin, OkHttp, Coil, Accompanist). No Play Services, no
-  Firebase, no analytics, no trackers. Only the `INTERNET` permission, and cleartext disabled.
+- Every dependency of the `foss` flavour is FOSS (AndroidX, Kotlin, OkHttp, Coil, Accompanist).
+  No Play Services, no Firebase, no analytics, no trackers. ML Kit is a `playImplementation` only. Only the `INTERNET` permission, and cleartext disabled.
 - `versionCode`/`versionName` are literals in `app/build.gradle.kts`, not derived from git.
 - Dependency versions are all pinned; no version ranges.
 - `dependenciesInfo` is switched off — that blob is signed with a Google key and isn't
@@ -237,8 +252,9 @@ All Apache-2.0.
 | Accompanist (drawablepainter, via Coil) | [google/accompanist](https://github.com/google/accompanist) |
 | Material Symbols (share, lookup, assistant glyphs, copied as vector paths) | [google/material-design-icons](https://github.com/google/material-design-icons) |
 
-No Google Play Services, Firebase, analytics or trackers. The only permission requested is
-`INTERNET`.
+No Firebase, analytics or trackers, and the `foss` build has no Google Play Services. The
+`play` build adds Google's [ML Kit Translation](https://developers.google.com/ml-kit/language/translation)
+(Google's ML Kit terms) for on-device translation. The only permission requested is `INTERNET`.
 
 ## Licensing
 
