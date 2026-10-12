@@ -56,13 +56,15 @@ Builds:
 
   - versionName: 0.5.0
     versionCode: 8
-    commit: v0.5.0
+    commit: v0.5.0-fdroid
     subdir: app
     gradle:
       - foss
     prebuild: sed -i -e '/playImplementation/d' build.gradle.kts
 
-AutoUpdateMode: Version
-UpdateCheckMode: Tags
+# Tags on the fdroid branch carry a -fdroid suffix, because main's v0.5.0 names a different
+# tree — the one that still archives the APKs. The pattern keeps the two apart.
+AutoUpdateMode: Version v%v-fdroid
+UpdateCheckMode: Tags ^v[0-9.]+-fdroid$
 CurrentVersion: 0.5.0
 CurrentVersionCode: 8
