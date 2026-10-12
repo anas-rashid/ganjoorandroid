@@ -197,6 +197,15 @@ cache. `ponytail:` comments mark the deliberate shortcuts and what would replace
 - **Reading position.** Bookmarks are saved, but not where you stopped reading.
 - **Recitations.** Ganjoor has audio for many poems; it isn't in this data set.
 
+## Privacy
+
+[`PRIVACY_GANJOOR_UNOFC_Android.md`](PRIVACY_GANJOOR_UNOFC_Android.md) — what stays on the
+phone, what leaves it and where to, and what Google Play is told. The same file is bundled in
+the app, so it can be read offline; `PrivacyPolicyTest` fails the build if the two drift apart.
+
+The short of it: no account, no analytics, no advertising, no crash reporting, and no server
+belonging to this project for anything to be sent to.
+
 ## Where to install from
 
 The same app is published in three places, and the one you choose is the one to keep:

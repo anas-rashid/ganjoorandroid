@@ -93,6 +93,7 @@ android {
 tasks.withType<Test>().configureEach {
     inputs.file(rootProject.file("README.md")).withPathSensitivity(PathSensitivity.RELATIVE)
     inputs.file(rootProject.file("releases/README.md")).withPathSensitivity(PathSensitivity.RELATIVE)
+    inputs.file(rootProject.file("PRIVACY_GANJOOR_UNOFC_Android.md")).withPathSensitivity(PathSensitivity.RELATIVE)
 }
 
 dependencies {
