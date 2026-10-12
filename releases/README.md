@@ -34,6 +34,8 @@ e473269044710813d2cf4119de663fe180f887239df7bdb1ccee0239ef84fd3e  ganjoor-0.2.2.
 6c85da41bf1416e34d6cb9c9eda9b4867e01b6793f21e476a6e3ece357615daa  ganjoor-0.4.1.apk
 843b01c2c6192e1d0fd667200b06b2a3e59e42e6b388646f6bca41bba8671aa0  ganjoor-0.5.0-foss.apk
 3cd9dd814c9b4fc1699e0b44c864a148e9430e13d98b601e65091bc3c927e79d  ganjoor-0.5.0-play.apk
+54a77ad94a85672f19f040607466d2ead15560590e5cdcefda512104319e80a4  ganjoor-0.5.1-foss.apk
+8617c63bf2e2427d3a29d7f826a7d2603f14695cf13b629946815692826ab6f4  ganjoor-0.5.1-play.apk
 ```
 
 Installing: `adb install -r releases/ganjoor-<version>.apk`. A phone holding a *debug* build has
