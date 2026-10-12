@@ -34,10 +34,19 @@ enum class ReadingWeight(@StringRes val label: Int, val weight: FontWeight) {
 }
 
 /** Each language is named in its own script, so the labels are the same whatever the UI locale. */
-enum class Language(val tag: String, val label: String) {
-    Fa("fa", "فارسی"),
-    Ur("ur", "اردو"),
-    En("en", "English"),
+/**
+ * A language the interface speaks, named in its own script so it can be recognised by someone
+ * who cannot yet read the language the app is currently in.
+ *
+ * [rtl] decides which way the interface lays out, and with it which face the interface is set
+ * in: the Arabic-script languages in naskh, the Latin ones in Libron. The poems are unaffected —
+ * they are Persian whatever the interface speaks, so they stay naskh or nastaliq and stay
+ * right-to-left even inside a left-to-right app.
+ */
+enum class Language(val tag: String, val label: String, val rtl: Boolean) {
+    Fa("fa", "فارسی", rtl = true),
+    Ur("ur", "اردو", rtl = true),
+    En("en", "English", rtl = false),
 }
 
 /** How the poet grid is ordered. */

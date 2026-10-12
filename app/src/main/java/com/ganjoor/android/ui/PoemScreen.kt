@@ -51,6 +51,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.pointerInput
@@ -185,6 +188,11 @@ fun PoemScreen(
             // mid-line. Here it keeps playing, and stays in reach while you read further down.
             RecitationPlayer(poem.id, Modifier.padding(start = side, end = side, top = 8.dp))
             SelectionContainer(Modifier.weight(1f)) {
+            // The poem is Persian whatever language the interface speaks, so it keeps its own
+            // direction here. Without this the hemistichs invert under a left-to-right interface:
+            // a Right verse is aligned with TextAlign.Start, and Start means left in a left-to-right
+            // layout. The breadcrumbs and the metre line read backwards for the same reason.
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(
@@ -243,6 +251,7 @@ fun PoemScreen(
                         )
                     }
                 }
+            }
             }
             }
             }

@@ -198,8 +198,10 @@ fun GanjoorTheme(
 
     MaterialTheme(
         colorScheme = scheme,
-        // Latin interface text gets a Latin reading serif; the RTL interfaces stay on naskh.
-        typography = if (language == Language.En) LibronTypography else NaskhTypography,
+        // Latin interface text gets a Latin reading serif; the Arabic-script ones stay on naskh.
+        // Asked of the script rather than of one named language, so a language added later is
+        // set correctly by saying which way it reads.
+        typography = if (language.rtl) NaskhTypography else LibronTypography,
         content = content,
     )
 }

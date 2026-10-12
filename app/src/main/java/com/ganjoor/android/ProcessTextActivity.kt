@@ -103,7 +103,11 @@ class ProcessTextActivity : ComponentActivity() {
             CompositionLocalProvider(
                 LocalSettings provides settings,
                 LocalAssistant provides assistant,
-                LocalLayoutDirection provides LayoutDirection.Rtl,
+                // Whichever way the chosen language reads. The poems are Persian regardless and
+                // keep their own direction where they are drawn, so a left-to-right interface
+                // does not turn a couplet around.
+                LocalLayoutDirection provides
+                    if (settings.value.language.rtl) LayoutDirection.Rtl else LayoutDirection.Ltr,
             ) {
                 GanjoorTheme(settings.value.theme, settings.value.language, settings.value.oled) {
                     SelectionScreen(selected, sharing, onClose = ::finish)

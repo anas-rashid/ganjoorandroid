@@ -66,9 +66,11 @@ class MainActivity : ComponentActivity() {
                 LocalBookmarks provides bookmarks,
                 LocalAssistant provides assistant,
                 LocalPinnedPoets provides pinned,
-                // The poetry is Persian, Urdu and Arabic throughout, so the whole app reads and
-                // navigates right-to-left whichever UI language is selected.
-                LocalLayoutDirection provides LayoutDirection.Rtl,
+                // Whichever way the chosen language reads. The poems are Persian regardless and
+                // keep their own direction where they are drawn, so a left-to-right interface
+                // does not turn a couplet around.
+                LocalLayoutDirection provides
+                    if (settings.value.language.rtl) LayoutDirection.Rtl else LayoutDirection.Ltr,
             ) {
                 GanjoorTheme(settings.value.theme, settings.value.language, settings.value.oled) {
                     GanjoorApp()
