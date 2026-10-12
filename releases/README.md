@@ -1,5 +1,11 @@
 # Builds
 
+> **On this branch the APKs are not here.** `fdroid` is the lineage F-Droid builds from, and
+> its scanner reads the checked-out tree — a pile of APKs sitting in it invites exactly the
+> question their policy asks, whether the app is really built from the source beside them. The
+> builds live on [GitHub Releases](https://github.com/anas-rashid/ganjoorandroid/releases); the
+> checksums below still describe them, and `main` still archives them.
+
 Every release, kept so a version can be reinstalled without rebuilding it. All are signed with
 the same release key, so any of them upgrades any other in place without losing bookmarks.
 

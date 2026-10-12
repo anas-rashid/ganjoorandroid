@@ -15,10 +15,12 @@ and Arabic script, online or fully offline.
 
 ### ⬇ Download ganjoor 0.5.0
 
-- [**ganjoor-0.5.0-foss.apk**](releases/ganjoor-0.5.0-foss.apk) · 31.7 MB · `sha256 843b01c2…1bba8671aa0` · no Google code; Google Translate with your own Cloud key
-- [**ganjoor-0.5.0-play.apk**](releases/ganjoor-0.5.0-play.apk) · 95.0 MB · `sha256 3cd9dd81…bc3c927e79d` · translates on the phone with Google's ML Kit; needs Google Play Services
+From **[GitHub Releases](https://github.com/anas-rashid/ganjoorandroid/releases/tag/v0.5.0)** —
+`ganjoor-0.5.0-foss.apk` (no Google code; Google Translate with your own Cloud key) or
+`ganjoor-0.5.0-play.apk` (translates on the phone with ML Kit; needs Play Services). Checksums
+for every release are in [`releases/README.md`](releases/README.md).
 
-Android 7.0 and up · [older releases](releases/)
+Android 7.0 and up.
 
 Android will call the developer unknown and offer to install anyway — it says that about every
 app installed outside a store. Allow installs from your browser once and it will go through.

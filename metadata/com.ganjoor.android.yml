@@ -35,6 +35,17 @@ AutoName: گنجور
 RepoType: git
 Repo: https://github.com/anas-rashid/ganjoorandroid.git
 
+# Tags for F-Droid are cut from the `fdroid` branch, not from main. The two carry the same app;
+# the branch differs only in what would trip a build or a scanner:
+#
+#   - no gradle/gradle-daemon-jvm.properties. It pinned the daemon to JDK 25 and gave a foojay
+#     URL to fetch one, and the build server has no network. The build runs on 21.
+#   - no releases/*.apk in the tree. The scanner reads the checkout, and archived builds sitting
+#     beside the source invite the question this policy asks. They are on GitHub Releases, and
+#     main still archives them.
+#
+# Merge main into fdroid before tagging; never the other way, or those two removals come back.
+
 Builds:
   - versionName: 0.4.0
     versionCode: 6
