@@ -71,10 +71,11 @@ android {
     }
 
     // The dependency metadata block is signed with a Google key and is not reproducible, so
-    // F-Droid rejects APKs that carry it.
+    // F-Droid rejects APKs that carry it. Only APKs, though — F-Droid never sees a bundle, and
+    // Play reads this blob for its SDK report, so the bundle keeps it.
     dependenciesInfo {
         includeInApk = false
-        includeInBundle = false
+        includeInBundle = true
     }
 
     compileOptions {

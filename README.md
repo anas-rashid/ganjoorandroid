@@ -149,9 +149,19 @@ that dependency — see the `ponytail:` note in `Ganjoor.kt`.
 ## Build
 
 ```sh
-./gradlew :app:assembleDebug      # APK
-./gradlew :app:testDebugUnitTest  # couplet grouping tests
+./gradlew :app:assembleDebug             # debug APKs, both flavours
+./gradlew :app:testFossDebugUnitTest     # unit tests
+./gradlew :app:assembleFossRelease       # the APK published here and to F-Droid
+./gradlew :app:assemblePlayRelease       # the same app with ML Kit
+./gradlew :app:bundlePlayRelease         # the .aab uploaded to Google Play
 ```
+
+There is no `testDebugUnitTest`: the flavours give each variant its own task.
+
+Play takes a bundle rather than an APK, and the difference is worth the extra task. ML Kit's
+on-device models make the play APK 95 MB, but the bundle is 62 MB and Play splits it per
+device: **about 38 MB** to download, whatever the phone. `bundletool get-size total` says so
+if you would rather not take it on trust.
 
 Release signing is optional. Drop a `keystore.properties` next to `settings.gradle.kts` with
 `storeFile`, `storePassword`, `keyAlias` and `keyPassword` to sign locally; without it the
