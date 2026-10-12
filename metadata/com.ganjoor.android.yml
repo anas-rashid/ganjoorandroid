@@ -22,8 +22,12 @@
 #       - foss
 #     prebuild: sed -i -e '/playImplementation/d' build.gradle.kts
 
+# Both are in fdroiddata's config/categories.yml. Reading is what the app is for; the
+# dictionary is not a side note — it ships 91 MB of offline entries from four sources
+# and is reached by tapping any word in a poem.
 Categories:
   - Reading
+  - Translation & Dictionary
 License: MIT
 AuthorName: Muhammad Anas Rashid
 SourceCode: https://github.com/anas-rashid/ganjoorandroid
