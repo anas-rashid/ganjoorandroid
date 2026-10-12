@@ -13,10 +13,12 @@ app version 0.5.0. Reusable anywhere — the store listing, the site, a README.
 | `06-settings-language.png` | reading settings — weight, size with a live preview, language |
 | `07-language-menu.png` | the globe in the top bar: Persian, Urdu, English |
 
-The store listing for `fa` keeps its own older set under
-`fastlane/metadata/android/fa/images/phoneScreenshots/`, which covers nastaliq, sepia, OLED,
-offline downloads, bookmarks and licences. Those are not superseded by these; between them
-there are more than the eight Play allows, so choosing the final eight is a judgement call.
+These are also the `fa` store listing, under
+`fastlane/metadata/android/fa/images/phoneScreenshots/`. They replaced a set shot before 0.4.0,
+which still showed the reader before couplets were set in cards — so the listing now shows the
+app as it is. What went with that set was coverage of nastaliq, sepia, OLED, offline downloads,
+bookmarks and licences. Play allows eight and seven are used, so any of those can come back
+without displacing anything, once re-shot against the current app.
 
 `../assets/store/` holds the Play graphics: the 512×512 icon, and the 1024×500 feature
 graphic with the SVG it is rendered from —
