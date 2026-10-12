@@ -25,6 +25,9 @@ app installed outside a store. Allow installs from your browser once and it will
 Every release is signed with the same key, so a new one upgrades the last without losing your
 bookmarks. [Build it yourself](#build) instead if you would rather.
 
+Whichever way you install it, **stay with that one** — see [Where to install
+from](#where-to-install-from).
+
 Jetpack Compose, Material 3, `minSdk 24`. No account, no tracking, no server of its own.
 
 Two builds come from this source, the same app apart from how Google Translate is reached:
@@ -149,9 +152,19 @@ that dependency — see the `ponytail:` note in `Ganjoor.kt`.
 ## Build
 
 ```sh
-./gradlew :app:assembleDebug      # APK
-./gradlew :app:testDebugUnitTest  # couplet grouping tests
+./gradlew :app:assembleDebug             # debug APKs, both flavours
+./gradlew :app:testFossDebugUnitTest     # unit tests
+./gradlew :app:assembleFossRelease       # the APK published here and to F-Droid
+./gradlew :app:assemblePlayRelease       # the same app with ML Kit
+./gradlew :app:bundlePlayRelease         # the .aab uploaded to Google Play
 ```
+
+There is no `testDebugUnitTest`: the flavours give each variant its own task.
+
+Play takes a bundle rather than an APK, and the difference is worth the extra task. ML Kit's
+on-device models make the play APK 95 MB, but the bundle is 62 MB and Play splits it per
+device: **about 38 MB** to download, whatever the phone. `bundletool get-size total` says so
+if you would rather not take it on trust.
 
 Release signing is optional. Drop a `keystore.properties` next to `settings.gradle.kts` with
 `storeFile`, `storePassword`, `keyAlias` and `keyPassword` to sign locally; without it the
@@ -183,6 +196,38 @@ cache. `ponytail:` comments mark the deliberate shortcuts and what would replace
   index or `api.ganjoor.net`'s `/api/ganjoor/poems/search`.
 - **Reading position.** Bookmarks are saved, but not where you stopped reading.
 - **Recitations.** Ganjoor has audio for many poems; it isn't in this data set.
+
+## Privacy
+
+[`PRIVACY_GANJOOR_UNOFC_Android.md`](PRIVACY_GANJOOR_UNOFC_Android.md) — what stays on the
+phone, what leaves it and where to, and what Google Play is told. The same file is bundled in
+the app, so it can be read offline; `PrivacyPolicyTest` fails the build if the two drift apart.
+
+The short of it: no account, no analytics, no advertising, no crash reporting, and no server
+belonging to this project for anything to be sent to.
+
+## Where to install from
+
+The same app is published in three places, and the one you choose is the one to keep:
+
+| | Signed by | Upgrades from |
+|---|---|---|
+| **Here** (the download above) | this project's key | Google Play |
+| **Google Play** | this project's key | here |
+| **F-Droid** | **F-Droid's own key** | F-Droid only |
+
+Android identifies an app by its package name *and* the certificate it was signed with. The
+download here and the Play release carry the same certificate, so either upgrades the other in
+place and you can move between them freely.
+
+F-Droid cannot: it builds from this source and signs with its own key, which is the point of
+F-Droid and not something to work around. An F-Droid install is therefore a separate identity.
+Moving to or from it means uninstalling first, and uninstalling takes your bookmarks, saved
+passages and downloaded poets with it.
+
+So: **install from F-Droid and update from F-Droid**, or install from here or Play and update
+from those. Nothing warns you at the moment of switching — Android simply refuses, saying the
+app is not installed — so it is worth knowing before rather than after.
 
 ## Publishing to F-Droid
 

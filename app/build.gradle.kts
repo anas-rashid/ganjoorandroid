@@ -71,10 +71,11 @@ android {
     }
 
     // The dependency metadata block is signed with a Google key and is not reproducible, so
-    // F-Droid rejects APKs that carry it.
+    // F-Droid rejects APKs that carry it. Only APKs, though — F-Droid never sees a bundle, and
+    // Play reads this blob for its SDK report, so the bundle keeps it.
     dependenciesInfo {
         includeInApk = false
-        includeInBundle = false
+        includeInBundle = true
     }
 
     compileOptions {
@@ -92,6 +93,7 @@ android {
 tasks.withType<Test>().configureEach {
     inputs.file(rootProject.file("README.md")).withPathSensitivity(PathSensitivity.RELATIVE)
     inputs.file(rootProject.file("releases/README.md")).withPathSensitivity(PathSensitivity.RELATIVE)
+    inputs.file(rootProject.file("PRIVACY_GANJOOR_UNOFC_Android.md")).withPathSensitivity(PathSensitivity.RELATIVE)
 }
 
 dependencies {
