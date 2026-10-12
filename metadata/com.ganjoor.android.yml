@@ -8,6 +8,12 @@
 # F-Droid builds from source and signs with their own key, which is why the
 # release build must succeed with no keystore present — see app/build.gradle.kts.
 #
+# That signature is accepted rather than worked around. Reproducible builds would let
+# F-Droid ship this project's own signed binary and keep one identity across every
+# channel, and it is deliberately not pursued: an F-Droid install updates from F-Droid,
+# a download from GitHub or Play updates from those. README.md says so under
+# "Where to install from", because Android gives no warning at the moment of switching.
+#
 # From 0.5.0 the app has two flavours, foss and play. Build entries from then on
 # take the foss one and drop the play-only ML Kit line first, so the scanner
 # never meets a proprietary library:
