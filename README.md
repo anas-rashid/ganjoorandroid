@@ -13,11 +13,11 @@ An Android reader for [Ganjoor](https://ganjoor.net), the open archive of Persia
 240 poets and ~135,000 poems, laid out for comfortable long-form reading in Persian, Urdu
 and Arabic script, online or fully offline.
 
-### ⬇ Download ganjoor 0.5.0
+### ⬇ Download ganjoor 0.5.1
 
-From **[GitHub Releases](https://github.com/anas-rashid/ganjoorandroid/releases/tag/v0.5.0)** —
-`ganjoor-0.5.0-foss.apk` (no Google code; Google Translate with your own Cloud key) or
-`ganjoor-0.5.0-play.apk` (translates on the phone with ML Kit; needs Play Services). Checksums
+From **[GitHub Releases](https://github.com/anas-rashid/ganjoorandroid/releases/tag/v0.5.1)** —
+`ganjoor-0.5.1-foss.apk` (no Google code; Google Translate with your own Cloud key) or
+`ganjoor-0.5.1-play.apk` (translates on the phone with ML Kit; needs Play Services). Checksums
 for every release are in [`releases/README.md`](releases/README.md).
 
 Android 7.0 and up.

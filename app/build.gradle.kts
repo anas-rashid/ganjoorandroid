@@ -17,7 +17,7 @@ val keystoreProperties = Properties().apply {
 
 // A delivered file should say what it is without being opened.
 base {
-    archivesName = "ganjoor-0.5.0"
+    archivesName = "ganjoor-0.5.1"
 }
 
 android {
@@ -33,8 +33,8 @@ android {
         // Pre-1.0 while the app is still being shaped. versionCode only ever climbs: F-Droid
         // refuses an update that does not, and one changelog file per code lives in
         // fastlane/metadata/android/*/changelogs/.
-        versionCode = 8
-        versionName = "0.5.0"
+        versionCode = 9
+        versionName = "0.5.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -53,6 +53,13 @@ android {
     buildTypes {
         release {
             signingConfig = signingConfigs.findByName("release")
+            // AGP otherwise writes the building checkout's git revision into
+            // META-INF/version-control-info.textproto. No other checkout can reproduce that, so
+            // F-Droid could never match the binary published here and reproducible builds would
+            // be impossible. Nothing reads it, and the commit is in the release notes anyway.
+            vcsInfo {
+                include = false
+            }
             optimization {
                 enable = true
                 packageScope = setOf("androidx.**", "kotlin.**", "kotlinx.**")

@@ -1,0 +1,3 @@
+The privacy policy is now readable inside the app, under About, without opening a browser.
+
+This release is also built so that F-Droid can compile the identical APK from this source and publish it under this project's own signature. That means an F-Droid install and the downloads here and on Google Play are the same app to Android: you can move between them without uninstalling, and without losing your bookmarks or downloaded poets.

@@ -58,18 +58,33 @@ Repo: https://github.com/anas-rashid/ganjoorandroid.git
 # they pin the daemon to JDK 25 and fetch it from api.foojay.io, which a builder with no
 # network cannot do. They are on GitHub Releases for anyone who wants them.
 
+# Reproducible builds. F-Droid fetches the APK published at Binaries, builds this source, and
+# ships this project's own signed binary when the two match — so an F-Droid install is the same
+# app to Android as the GitHub and Play downloads and a reader can move between them. 0.5.1 is
+# the first release this works for: before it, AGP wrote the building checkout's git revision
+# into META-INF/version-control-info.textproto, which no second checkout can reproduce.
+Binaries: https://github.com/anas-rashid/ganjoorandroid/releases/download/v%v/ganjoor-%v-foss.apk
+
 Builds:
-  - versionName: 0.5.0
-    versionCode: 8
-    commit: v0.5.0-fdroid
+  - versionName: 0.5.1
+    versionCode: 9
+    # fdroiddata carries the full hash here; the tag is given for readability.
+    commit: v0.5.1-fdroid
     subdir: app
     gradle:
       - foss
     prebuild: sed -i -e '/playImplementation/d' build.gradle.kts
 
-# Tags on the fdroid branch carry a -fdroid suffix, because main's v0.5.0 names a different
-# tree — the one that still archives the APKs. The pattern keeps the two apart.
-AutoUpdateMode: Version v%v-fdroid
+# Tags on the fdroid branch carry a -fdroid suffix, because main's tags name a different tree —
+# the one that still archives the APKs. The UpdateCheckMode pattern keeps the two apart.
+# AutoUpdateMode takes only an optional +suffix, never a tag pattern: schemas/metadata.json in
+# fdroiddata matches it against ^(None|Version( \+.+)?)$ and rejects anything else.
+AutoUpdateMode: Version
 UpdateCheckMode: Tags ^v[0-9.]+-fdroid$
-CurrentVersion: 0.5.0
-CurrentVersionCode: 8
+CurrentVersion: 0.5.1
+CurrentVersionCode: 9
+
+# The certificate every release of this app is signed with. F-Droid refuses a binary signed
+# with anything else, which is the point: it is what makes one identity across all three
+# channels safe to rely on.
+AllowedAPKSigningKeys: d3b5a144b600dd6d9ae8236f0a1bd630767e88d7eaa1573edaadbf8e651fe494
