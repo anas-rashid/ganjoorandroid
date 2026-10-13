@@ -1,6 +1,7 @@
 <resources>
-    <!-- The app is called گنجور in every language. -->
-    <string name="app_name">گنجور</string>
+    <!-- Khazeena, خزینه: a treasury. Named in its own right, because the app is an
+         unofficial reader and not ganjoor.net's own. Each locale carries its own script. -->
+    <string name="app_name">Khazeena</string>
     <string name="search_poets">Search poets</string>
     <string name="back">Back</string>
     <string name="retry">Retry</string>
@@ -64,8 +65,8 @@
     <string name="load_more">Load more</string>
     <string name="done">Done</string>
     <string name="about">About &amp; licences</string>
-    <string name="about_unofficial">Unofficial. Ganjoor for Android is an independent, unofficial Android client for ganjoor.net. It is a separate project from ganjoor.net and its GitHub repositories, built and maintained by Muhammad Anas Rashid. The owners of ganjoor.net do not run or manage it.</string>
-    <string name="about_intro">Ganjoor for Android is free software. The poems, the fonts and every library it is built on are credited below; tap an entry to read its full licence.</string>
+    <string name="about_unofficial">Unofficial. Khazeena is an independent, unofficial Android client for ganjoor.net. It is a separate project from ganjoor.net and its GitHub repositories, built and maintained by Muhammad Anas Rashid. The owners of ganjoor.net do not run or manage it.</string>
+    <string name="about_intro">Khazeena is free software. The poems, the fonts and every library it is built on are credited below; tap an entry to read its full licence.</string>
     <string name="no_definition">No entry for this word.</string>
     <string name="source_wiktionary">Wiktionary — Persian to English (CC BY-SA 3.0)</string>
     <string name="source_daneshjoo">Daneshjoo — Persian to English</string>

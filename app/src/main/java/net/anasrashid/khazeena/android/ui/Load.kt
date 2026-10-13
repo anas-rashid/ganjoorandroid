@@ -1,0 +1,101 @@
+package net.anasrashid.khazeena.android.ui
+
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import net.anasrashid.khazeena.android.R
+import net.anasrashid.khazeena.android.data.NotDownloaded
+
+/**
+ * Fetches [block] whenever [key] changes and renders loading / error / content.
+ *
+ * While loading it shows [placeholder]: a skeleton shaped like what is coming, never a spinner
+ * over the whole page, so only the part that is actually waiting looks like it. The content
+ * fades in over it when it arrives.
+ *
+ * ponytail: no ViewModel, so going back re-fetches — which the disk cache makes nearly free.
+ * Promote to a ViewModel when a screen gains state worth surviving rotation.
+ */
+@Composable
+fun <T> Load(
+    key: Any?,
+    block: suspend () -> T,
+    placeholder: @Composable () -> Unit = { SkeletonList(Modifier.statusBarsPadding()) },
+    content: @Composable (T) -> Unit,
+) {
+    var attempt by remember(key) { mutableIntStateOf(0) }
+    val result by produceState<Result<T>?>(null, key, attempt) { value = runCatching { block() } }
+
+    AnimatedContent(
+        targetState = result,
+        transitionSpec = { fadeIn(tween(220)) togetherWith fadeOut(tween(120)) },
+        // Fade between loading, failed and loaded, not on every new value of the same state.
+        contentKey = { outcome ->
+            when {
+                outcome == null -> 0
+                outcome.isFailure -> 1
+                else -> 2
+            }
+        },
+        label = "load",
+    ) { outcome ->
+        when {
+            // Painted explicitly: on the category and poem screens Load sits outside the
+            // Scaffold, so while loading nothing else fills the window and the bare window
+            // background would show through.
+            outcome == null -> Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background),
+            ) {
+                placeholder()
+            }
+
+            outcome.isFailure -> Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(24.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(
+                    text = stringResource(
+                        // Offline mode failing on a page nobody downloaded isn't a network error,
+                        // and telling someone to check their connection would be a dead end.
+                        if (outcome.exceptionOrNull() is NotDownloaded) R.string.load_failed_offline
+                        else R.string.load_failed
+                    ),
+                    style = MaterialTheme.typography.bodyLarge,
+                    textAlign = TextAlign.Center,
+                )
+                TextButton(onClick = { attempt++ }) { Text(stringResource(R.string.retry)) }
+            }
+
+            else -> content(outcome.getOrThrow())
+        }
+    }
+}

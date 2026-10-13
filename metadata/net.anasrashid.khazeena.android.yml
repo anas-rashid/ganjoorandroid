@@ -1,0 +1,64 @@
+# Kept for reference, not currently in use. Submitting to the official F-Droid repo is
+# parked; distribution is GitHub Releases, Google Play, and a self-hosted F-Droid repo
+# that serves this project's own signed APKs. If the official route is ever revived,
+# every Builds entry below needs regenerating: the app is now Khazeena with
+# applicationId net.anasrashid.khazeena.android, so the versions, tags and the APK
+# filenames here all predate the rename.
+#
+# F-Droid metadata for Ganjoor for Android.
+#
+# This file is not read by the app or the build; it is the recipe F-Droid's build
+# server uses, kept here so it travels with the source it describes. To submit or
+# update the listing, copy it into a fork of gitlab.com/fdroid/fdroiddata as
+# metadata/com.ganjoor.android.yml and open a merge request.
+#
+# F-Droid builds from source and signs with their own key, which is why the
+# release build must succeed with no keystore present — see app/build.gradle.kts.
+#
+# That signature is accepted rather than worked around. Reproducible builds would let
+# F-Droid ship this project's own signed binary and keep one identity across every
+# channel, and it is deliberately not pursued: an F-Droid install updates from F-Droid,
+# a download from GitHub or Play updates from those. README.md says so under
+# "Where to install from", because Android gives no warning at the moment of switching.
+#
+# From 0.5.0 the app has two flavours, foss and play. Build entries from then on
+# take the foss one and drop the play-only ML Kit line first, so the scanner
+# never meets a proprietary library:
+#
+#     gradle:
+#       - foss
+#     prebuild: sed -i -e '/playImplementation/d' build.gradle.kts
+
+Categories:
+  - Reading
+License: MIT
+AuthorName: Muhammad Anas Rashid
+SourceCode: https://github.com/anas-rashid/ganjoorandroid
+IssueTracker: https://github.com/anas-rashid/ganjoorandroid/issues
+Changelog: https://github.com/anas-rashid/ganjoorandroid/releases
+
+AutoName: خزینه
+
+RepoType: git
+Repo: https://github.com/anas-rashid/ganjoorandroid.git
+
+Builds:
+  - versionName: 0.4.0
+    versionCode: 6
+    commit: v0.4.0
+    subdir: app
+    gradle:
+      - yes
+
+  - versionName: 0.5.0
+    versionCode: 8
+    commit: v0.5.0
+    subdir: app
+    gradle:
+      - foss
+    prebuild: sed -i -e '/playImplementation/d' build.gradle.kts
+
+AutoUpdateMode: Version
+UpdateCheckMode: Tags
+CurrentVersion: 0.5.0
+CurrentVersionCode: 8

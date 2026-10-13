@@ -1,4 +1,5 @@
 <resources>
+    <string name="app_name">خزینه</string>
     <string name="search_poets">جست‌وجوی شاعران</string>
     <string name="back">بازگشت</string>
     <string name="retry">تلاش دوباره</string>
@@ -59,8 +60,8 @@
     <string name="load_more">بیشتر</string>
     <string name="done">تمام</string>
     <string name="about">درباره و پروانه‌ها</string>
-    <string name="about_unofficial">غیررسمی. «گنجور برای اندروید» یک کارخواه اندرویدیِ مستقل و غیررسمی برای ganjoor.net است. این برنامه پروژه‌ای جدا از ganjoor.net و مخزن‌های گیت‌هاب آن است و به‌دست محمد انس رشید ساخته و نگهداری می‌شود. صاحبان ganjoor.net آن را اداره یا مدیریت نمی‌کنند.</string>
-    <string name="about_intro">گنجور برای اندروید نرم‌افزار آزاد است. شعرها، قلم‌ها و همهٔ کتابخانه‌هایی که این برنامه بر آن‌ها ساخته شده در زیر آمده‌اند؛ برای خواندن متن کامل پروانه روی هر مورد بزنید.</string>
+    <string name="about_unofficial">غیررسمی. «خزینه» یک کارخواه اندرویدیِ مستقل و غیررسمی برای ganjoor.net است. این برنامه پروژه‌ای جدا از ganjoor.net و مخزن‌های گیت‌هاب آن است و به‌دست محمد انس رشید ساخته و نگهداری می‌شود. صاحبان ganjoor.net آن را اداره یا مدیریت نمی‌کنند.</string>
+    <string name="about_intro">خزینه نرم‌افزار آزاد است. شعرها، قلم‌ها و همهٔ کتابخانه‌هایی که این برنامه بر آن‌ها ساخته شده در زیر آمده‌اند؛ برای خواندن متن کامل پروانه روی هر مورد بزنید.</string>
     <string name="no_definition">برای این واژه مدخلی یافت نشد.</string>
     <string name="source_wiktionary">ویکی‌واژه — فارسی به انگلیسی (CC BY-SA 3.0)</string>
     <string name="source_daneshjoo">فرهنگ دانشجو — فارسی به انگلیسی</string>
