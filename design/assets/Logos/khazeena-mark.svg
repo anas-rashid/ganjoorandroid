@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108"><defs><linearGradient id="f" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0A7E84"/><stop offset="1" stop-color="#005459"/></linearGradient><linearGradient id="band" x1="0" y1="0" x2="1" y2="1">
+ <stop offset="0" stop-color="#FFFBF2"/><stop offset=".5" stop-color="#EADDC4"/>
+ <stop offset="1" stop-color="#C9B693"/></linearGradient>
+<radialGradient id="gem" cx=".36" cy=".32" r=".78">
+ <stop offset="0" stop-color="#FFF0C4"/><stop offset=".45" stop-color="#EDC76C"/>
+ <stop offset="1" stop-color="#A9761B"/></radialGradient><filter id="raise" x="-45%" y="-45%" width="190%" height="190%">
+ <feDropShadow dx="2.0" dy="2.4" stdDeviation="1.9" flood-color="#00272A" flood-opacity="0.72"/>
+ <feDropShadow dx="-1.8" dy="-2.1" stdDeviation="1.8" flood-color="#8CECF1" flood-opacity="0.55"/>
+</filter>
+<filter id="gemlift" x="-50%" y="-50%" width="200%" height="200%">
+ <feDropShadow dx="1.2" dy="1.6" stdDeviation="1.3" flood-color="#2B1B00" flood-opacity="0.55"/>
+</filter></defs><rect width="108" height="108" fill="url(#f)"/><path d="M54.00,22.00 L63.37,31.37 L76.63,31.37 L76.63,44.63 L86.00,54.00 L76.63,63.37 L76.63,76.63 L63.37,76.63 L54.00,86.00 L44.63,76.63 L31.37,76.63 L31.37,63.37 L22.00,54.00 L31.37,44.63 L31.37,31.37 L44.63,31.37 Z M54.00,27.00 L61.91,34.91 L73.09,34.91 L73.09,46.09 L81.00,54.00 L73.09,61.91 L73.09,73.09 L61.91,73.09 L54.00,81.00 L46.09,73.09 L34.91,73.09 L34.91,61.91 L27.00,54.00 L34.91,46.09 L34.91,34.91 L46.09,34.91 Z" fill="url(#band)" fill-rule="evenodd" filter="url(#raise)"/><path d="M59.36,41.07 L61.58,46.42 L66.93,48.64 L64.72,54.00 L66.93,59.36 L61.58,61.58 L59.36,66.93 L54.00,64.72 L48.64,66.93 L46.42,61.58 L41.07,59.36 L43.28,54.00 L41.07,48.64 L46.42,46.42 L48.64,41.07 L54.00,43.28 Z" fill="url(#gem)" filter="url(#gemlift)"/></svg>
