@@ -1,11 +1,15 @@
 # Builds
 
-Only the newest release is kept here. The table below records what every earlier one added.
+Only the newest release is kept here, and it is the only supported one. Earlier builds have
+been withdrawn and receive no updates; the table below records what each of them added.
 
 Every build is signed with the same release key. Up to 0.5.1 they also shared one
-applicationId, so any of those upgrades any other in place without losing bookmarks. 0.6.0
-renamed the app and changed its applicationId, so it installs beside an earlier version
-rather than replacing it, and bookmarks and downloaded poets do not carry across.
+applicationId, so any of those upgrades any other in place without losing bookmarks.
+
+0.6.0 renamed the app and changed its applicationId. If you are on an earlier version,
+uninstall it and install 0.6.0 — Android will not replace it for you, and the old app receives
+no further updates. Bookmarks and downloaded poets do not carry across; see "If you have the
+old Ganjoor app" in the main README before you remove it.
 
 Each is reproducible: check out the commit and run `./gradlew assembleRelease` (from 0.5.0,
 `assembleFossRelease` and `assemblePlayRelease`). F-Droid builds from source and signs with its
