@@ -35,8 +35,8 @@ needs Google Play Services. Either upgrades the other.
 ## Checksums
 
 ```
-693a64ae1da974076eae625b64e9719af6e93479898e4b65de5c235f54132a49  khazeena-0.6.0-foss.apk
-04f6bfcc281fcdf34c4fdae6b4989900ffc865160dc5e97f004dc7070e7b8f3a  khazeena-0.6.0-play.apk
+b42e0c5b159396f85ce78e83dac0f5edff030e5bb834ee9b4fa8ec9e9510208c  khazeena-0.6.0-foss.apk
+6cf2e73662e8ff2d458c5033497f525a867d28ba11cf3609f5ac1a3f131e6f12  khazeena-0.6.0-play.apk
 ```
 
 Installing: `adb install -r releases/khazeena-<version>-foss.apk`. A phone holding a *debug* build has
