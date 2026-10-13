@@ -38,7 +38,7 @@ class ReleaseDocsTest {
 
     @Test
     fun `the README offers the version the build declares`() {
-        val offered = Regex("### . Download ganjoor (\\S+)")
+        val offered = Regex("### . Download Khazeena (\\S+)")
             .find(read("README.md"))
             ?.groupValues?.get(1)
         assertEquals(

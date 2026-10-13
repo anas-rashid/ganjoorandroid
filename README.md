@@ -9,11 +9,11 @@
 > ganjoor.net do not run or manage it. Please direct any issue with this app
 > [here](https://github.com/anas-rashid/ganjoorandroid/issues) — never to the Ganjoor project.
 
-An Android reader for [Ganjoor](https://ganjoor.net), the open archive of Persian poetry —
+An **unofficial** Android reader for [Ganjoor](https://ganjoor.net), the open archive of Persian poetry —
 240 poets and ~135,000 poems, laid out for comfortable long-form reading in Persian, Urdu
 and Arabic script, online or fully offline.
 
-### ⬇ Download ganjoor 0.6.0
+### ⬇ Download Khazeena 0.6.0
 
 - [**khazeena-0.6.0-foss.apk**](releases/khazeena-0.6.0-foss.apk) · 31.7 MB · `sha256 693a64ae…35f54132a49` · no Google code; Google Translate with your own Cloud key
 - [**khazeena-0.6.0-play.apk**](releases/khazeena-0.6.0-play.apk) · 95.0 MB · `sha256 04f6bfcc…7070e7b8f3a` · translates on the phone with Google's ML Kit; needs Google Play Services

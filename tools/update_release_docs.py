@@ -64,7 +64,7 @@ def main() -> None:
     readme = ROOT / "README.md"
     text = readme.read_text(encoding="utf-8")
     block = (
-        f"### ⬇ Download ganjoor {v}\n\n"
+        f"### ⬇ Download Khazeena {v}\n\n"
         + "\n".join(lines)
         + "\n\nAndroid 7.0 and up · [release history](releases/)\n"
     )
