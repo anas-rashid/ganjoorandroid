@@ -6,7 +6,7 @@
       can only follow the system's light/dark setting — not the theme chosen inside the app.
       Picking sepia or OLED on a light-mode phone still shows a light splash for one frame.
     -->
-    <style name="Theme.Ganjoorappandroid" parent="android:Theme.Material.NoActionBar">
+    <style name="Theme.Khazeena" parent="android:Theme.Material.NoActionBar">
         <item name="android:windowBackground">@color/window_background</item>
         <item name="android:windowSplashScreenBackground">@color/window_background</item>
     </style>

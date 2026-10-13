@@ -1,4 +1,5 @@
 <resources>
+    <string name="app_name">خزینہ</string>
     <string name="search_poets">شاعروں کی تلاش</string>
     <string name="back">واپس</string>
     <string name="retry">دوبارہ کوشش</string>
@@ -59,8 +60,8 @@
     <string name="load_more">مزید</string>
     <string name="done">مکمل</string>
     <string name="about">تعارف اور لائسنس</string>
-    <string name="about_unofficial">غیر سرکاری۔ ”گنجور فار اینڈرائیڈ“ ganjoor.net کا ایک خودمختار اور غیر سرکاری اینڈرائیڈ کلائنٹ ہے۔ یہ ganjoor.net اور اس کی گِٹ ہب ریپازٹریز سے الگ منصوبہ ہے، جسے محمد انس رشید نے بنایا اور وہی اسے سنبھالتے ہیں۔ ganjoor.net کے مالکان اسے نہ چلاتے ہیں اور نہ اس کا انتظام کرتے ہیں۔</string>
-    <string name="about_intro">گنجور فار اینڈرائیڈ آزاد سافٹ ویئر ہے۔ کلام، فونٹس اور تمام لائبریریاں ذیل میں درج ہیں؛ مکمل لائسنس پڑھنے کے لیے کسی اندراج پر ٹیپ کریں۔</string>
+    <string name="about_unofficial">غیر سرکاری۔ ”خزینہ“ ganjoor.net کا ایک خودمختار اور غیر سرکاری اینڈرائیڈ کلائنٹ ہے۔ یہ ganjoor.net اور اس کی گِٹ ہب ریپازٹریز سے الگ منصوبہ ہے، جسے محمد انس رشید نے بنایا اور وہی اسے سنبھالتے ہیں۔ ganjoor.net کے مالکان اسے نہ چلاتے ہیں اور نہ اس کا انتظام کرتے ہیں۔</string>
+    <string name="about_intro">خزینہ آزاد سافٹ ویئر ہے۔ کلام، فونٹس اور تمام لائبریریاں ذیل میں درج ہیں؛ مکمل لائسنس پڑھنے کے لیے کسی اندراج پر ٹیپ کریں۔</string>
     <string name="no_definition">اس لفظ کا کوئی اندراج نہیں ملا۔</string>
     <string name="source_wiktionary">ویکی لغت — فارسی سے انگریزی (CC BY-SA 3.0)</string>
     <string name="source_daneshjoo">دانشجو لغت — فارسی سے انگریزی</string>

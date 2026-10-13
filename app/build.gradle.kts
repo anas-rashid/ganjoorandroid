@@ -21,13 +21,13 @@ base {
 }
 
 android {
-    namespace = "com.ganjoor.android"
+    namespace = "net.anasrashid.khazeena.android"
     compileSdk {
         version = release(37)
     }
 
     defaultConfig {
-        applicationId = "com.ganjoor.android"
+        applicationId = "net.anasrashid.khazeena.android"
         minSdk = 24
         targetSdk = 37
         // Pre-1.0 while the app is still being shaped. versionCode only ever climbs: F-Droid
@@ -100,7 +100,7 @@ android {
 tasks.withType<Test>().configureEach {
     inputs.file(rootProject.file("README.md")).withPathSensitivity(PathSensitivity.RELATIVE)
     inputs.file(rootProject.file("releases/README.md")).withPathSensitivity(PathSensitivity.RELATIVE)
-    inputs.file(rootProject.file("PRIVACY_GANJOOR_UNOFC_Android.md")).withPathSensitivity(PathSensitivity.RELATIVE)
+    inputs.file(rootProject.file("PRIVACY_khazeena.md")).withPathSensitivity(PathSensitivity.RELATIVE)
 }
 
 dependencies {

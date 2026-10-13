@@ -1,6 +1,6 @@
-# Ganjoor for Android
+# Khazeena
 
-<div dir="rtl">گنجور — خوانندهٔ شعر پارسی برای اندروید</div>
+<div dir="rtl">خزینه — خوانندهٔ غیررسمی گنجور برای اندروید</div>
 
 > **Unofficial.** This is an independent, unofficial Android client for
 > [ganjoor.net](https://ganjoor.net). It is a **separate project** from ganjoor.net and its
@@ -199,7 +199,7 @@ cache. `ponytail:` comments mark the deliberate shortcuts and what would replace
 
 ## Privacy
 
-[`PRIVACY_GANJOOR_UNOFC_Android.md`](PRIVACY_GANJOOR_UNOFC_Android.md) — what stays on the
+[`PRIVACY_khazeena.md`](PRIVACY_khazeena.md) — what stays on the
 phone, what leaves it and where to, and what Google Play is told. The same file is bundled in
 the app, so it can be read offline; `PrivacyPolicyTest` fails the build if the two drift apart.
 

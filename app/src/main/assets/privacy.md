@@ -1,6 +1,6 @@
 # Privacy policy
 
-**Ganjoor for Android** — an unofficial, independent reader for [ganjoor.net](https://ganjoor.net),
+**Khazeena** (خزینه) — an unofficial, independent reader for [ganjoor.net](https://ganjoor.net),
 built and maintained by Muhammad Anas Rashid. Last updated 12 October 2026.
 
 ## The short version
