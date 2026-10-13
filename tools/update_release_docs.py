@@ -66,7 +66,7 @@ def main() -> None:
     block = (
         f"### ⬇ Download ganjoor {v}\n\n"
         + "\n".join(lines)
-        + "\n\nAndroid 7.0 and up · [older releases](releases/)\n"
+        + "\n\nAndroid 7.0 and up · [release history](releases/)\n"
     )
     text, n = re.subn(r"^### ⬇ .*?^Android 7\.0 and up[^\n]*\n", lambda _: block, text, count=1, flags=re.M | re.S)
     if n != 1:

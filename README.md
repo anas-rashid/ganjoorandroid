@@ -18,7 +18,7 @@ and Arabic script, online or fully offline.
 - [**khazeena-0.6.0-foss.apk**](releases/khazeena-0.6.0-foss.apk) · 31.7 MB · `sha256 693a64ae…35f54132a49` · no Google code; Google Translate with your own Cloud key
 - [**khazeena-0.6.0-play.apk**](releases/khazeena-0.6.0-play.apk) · 95.0 MB · `sha256 04f6bfcc…7070e7b8f3a` · translates on the phone with Google's ML Kit; needs Google Play Services
 
-Android 7.0 and up · [older releases](releases/)
+Android 7.0 and up · [release history](releases/)
 
 Android will call the developer unknown and offer to install anyway — it says that about every
 app installed outside a store. Allow installs from your browser once and it will go through.
@@ -208,45 +208,88 @@ belonging to this project for anything to be sent to.
 
 ## Where to install from
 
-The same app is published in three places, and the one you choose is the one to keep:
+**Install the latest release — the download at the top of this page. It is the only supported
+version.** Right now it is also the only place to get it: this project's own signed build.
 
-| | Signed by | Upgrades from |
+| | Package | Signed by |
 |---|---|---|
-| **Here** (the download above) | this project's key | Google Play |
-| **Google Play** | this project's key | here |
-| **F-Droid** | **F-Droid's own key** | F-Droid only |
+| **Here** (the download above) | `net.anasrashid.khazeena.android` | this project's key, `d3b5a144…e651fe494` |
 
-Android identifies an app by its package name *and* the certificate it was signed with. The
-download here and the Play release carry the same certificate, so either upgrades the other in
-place and you can move between them freely.
+Google Play carried the app under its old name and old package. That listing is being recreated
+for Khazeena; until it appears, Play is not a source for this version. When it does, it will
+serve the same package signed with the same key, so the two will upgrade each other in place.
 
-F-Droid cannot: it builds from this source and signs with its own key, which is the point of
-F-Droid and not something to work around. An F-Droid install is therefore a separate identity.
-Moving to or from it means uninstalling first, and uninstalling takes your bookmarks, saved
-passages and downloaded poets with it.
+### Only 0.6.0 and later are supported
 
-So: **install from F-Droid and update from F-Droid**, or install from here or Play and update
-from those. Nothing warns you at the moment of switching — Android simply refuses, saying the
-app is not installed — so it is worth knowing before rather than after.
+Everything before 0.6.0 — the app called Ganjoor — is end of life:
 
-## Publishing to F-Droid
+- **No updates, no fixes.** Nothing further will be released for it.
+- **Its APKs are no longer published.** Only the current release is offered here and in the
+  release list; the older files have been withdrawn.
+- **If you have one installed, uninstall it and install the current release.** Android will not
+  do that for you — see below.
 
-The build already meets the [quick start
-guide](https://f-droid.org/en/docs/Submitting_to_F-Droid_Quick_Start_Guide/):
+Use 0.6.0 onwards and nothing earlier.
+
+### If you have the old Ganjoor app: remove it and install this one
+
+That is the whole migration. From 0.6.0 onwards this is the app; the old one receives no
+further updates.
+
+The old name was ganjoor.net's own, and carrying it made this reader look like their official
+app. It never was one. Nothing about the reading changed — only the name, so that it no longer
+borrows theirs.
+
+**Android will not replace it for you.** The package name changed with the rename, so the two
+are different apps as far as the system is concerned: installing Khazeena leaves Ganjoor sitting
+beside it, and you would be keeping an abandoned copy for no reason. Uninstall it.
+
+**What you lose by uninstalling.** Bookmarks, saved passages and downloaded poets live inside
+the old app and cannot be carried across; there is no import. Poets download again in a moment,
+but bookmarks have to be re-made. If you have more than a few, the painless order is: install
+Khazeena first, copy your bookmarks across by hand while both are on the phone, then remove the
+old app.
+
+Among releases up to 0.5.1 nothing changed: they all shared one package name and one key, so any
+of them upgraded any other in place. The rename is the single break, and it only happens once.
+
+### F-Droid
+
+Not published there yet. The intention is a repository serving these same signed builds, which
+would make it interchangeable with the download here rather than a separate identity.
+
+Submitting to the **official** F-Droid repository is parked. F-Droid builds from source and signs
+with its own key unless a reproducible build is verified against the developer's binary, and an
+install from there would otherwise be a separate identity that only ever updates from F-Droid.
+The groundwork is done either way — see below.
+
+## F-Droid readiness
+
+Kept current because it costs little and the option is worth preserving. The build already meets
+the [quick start guide](https://f-droid.org/en/docs/Submitting_to_F-Droid_Quick_Start_Guide/):
 
 - MIT licensed, with a `LICENSE` file.
 - Every dependency of the `foss` flavour is FOSS (AndroidX, Kotlin, OkHttp, Coil, Accompanist).
-  No Play Services, no Firebase, no analytics, no trackers. ML Kit is a `playImplementation` only. Only the `INTERNET` permission, and cleartext disabled.
+  No Play Services, no Firebase, no analytics, no trackers. ML Kit is a `playImplementation`
+  only. Only the `INTERNET` permission, and cleartext disabled.
 - `versionCode`/`versionName` are literals in `app/build.gradle.kts`, not derived from git.
 - Dependency versions are all pinned; no version ranges.
-- `dependenciesInfo` is switched off — that blob is signed with a Google key and isn't
-  reproducible, so F-Droid rejects APKs carrying it.
-- The build succeeds with no keystore, so F-Droid can sign with its own key.
-- Store listing lives in `fastlane/metadata/android/{en-US,fa,ur}/`. Drop screenshots into each
-  locale's `images/phoneScreenshots/`.
+- `dependenciesInfo` is switched off for APKs — that blob is signed with a Google key and is not
+  reproducible. The bundle keeps it, because Play reads it and F-Droid never sees a bundle.
+- `vcsInfo` is switched off too. AGP otherwise writes the building checkout's git revision into
+  `META-INF/version-control-info.textproto`, which no second checkout can reproduce, and that
+  alone makes a reproducible build impossible.
+- The build succeeds with no keystore present, so it can be built and signed by someone else.
+- Store listing lives in `fastlane/metadata/android/{en-US,fa,ur}/`, screenshots included.
 
-Two things to do before submitting: tag a release (`v0.1.0`), and check that F-Droid's build
-server supports **AGP 9.4.1** — it is new, and that is the most likely thing to hold up a merge.
+Reproducibility is real, not aspirational: a build of the tagged commit with no keystore matches
+the published APK entry for entry — name, size and CRC-32 — with only the signature files
+differing. That is what lets F-Droid publish this project's own signed binary instead of its own.
+
+Two things that were open and are now settled: Gradle **9.6** is in F-Droid's
+[transparency log](https://gitlab.com/fdroid/gradle-transparency-log), so `gradlew-fdroid` can
+fetch it; and the wrapper's `distributionUrl` is found from `subdir: app` by walking up, so the
+AGP-to-Gradle table never has to know about AGP 9.4.
 
 ## Open source this app is built on
 
