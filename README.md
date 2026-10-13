@@ -15,8 +15,8 @@ and Arabic script, online or fully offline.
 
 ### ⬇ Download Khazeena 0.6.0
 
-- [**khazeena-0.6.0-foss.apk**](releases/khazeena-0.6.0-foss.apk) · 31.7 MB · `sha256 693a64ae…35f54132a49` · no Google code; Google Translate with your own Cloud key
-- [**khazeena-0.6.0-play.apk**](releases/khazeena-0.6.0-play.apk) · 95.0 MB · `sha256 04f6bfcc…7070e7b8f3a` · translates on the phone with Google's ML Kit; needs Google Play Services
+- [**khazeena-0.6.0-foss.apk**](releases/khazeena-0.6.0-foss.apk) · 31.9 MB · `sha256 b42e0c5b…c9e9510208c` · no Google code; Google Translate with your own Cloud key
+- [**khazeena-0.6.0-play.apk**](releases/khazeena-0.6.0-play.apk) · 95.2 MB · `sha256 6cf2e736…a3f131e6f12` · translates on the phone with Google's ML Kit; needs Google Play Services
 
 Android 7.0 and up · [release history](releases/)
 
