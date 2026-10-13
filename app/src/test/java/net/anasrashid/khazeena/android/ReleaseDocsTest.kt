@@ -34,7 +34,7 @@ class ReleaseDocsTest {
     /** Every release ships as one APK per flavour; see tools/update_release_docs.py. */
     private val flavours = listOf("foss", "play")
 
-    private fun apk(flavour: String) = File(root, "releases/ganjoor-$declaredVersion-$flavour.apk")
+    private fun apk(flavour: String) = File(root, "releases/khazeena-$declaredVersion-$flavour.apk")
 
     @Test
     fun `the README offers the version the build declares`() {
@@ -78,7 +78,7 @@ class ReleaseDocsTest {
 
     @Test
     fun `every checksum in releases matches the APK beside it`() {
-        val listed = Regex("^([0-9a-f]{64})  (ganjoor-.+\\.apk)$", RegexOption.MULTILINE)
+        val listed = Regex("^([0-9a-f]{64})  (khazeena-.+\\.apk)$", RegexOption.MULTILINE)
             .findAll(read("releases/README.md"))
             .map { it.groupValues[1] to it.groupValues[2] }
             .toList()

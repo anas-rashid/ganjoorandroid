@@ -11,8 +11,8 @@ Every release ships as two APKs, one per flavour:
 Run it after building both and copying them into releases/:
 
     ./gradlew :app:assembleFossRelease :app:assemblePlayRelease
-    cp app/build/outputs/apk/foss/release/ganjoor-<v>-foss-release.apk releases/ganjoor-<v>-foss.apk
-    cp app/build/outputs/apk/play/release/ganjoor-<v>-play-release.apk releases/ganjoor-<v>-play.apk
+    cp app/build/outputs/apk/foss/release/khazeena-<v>-foss-release.apk releases/khazeena-<v>-foss.apk
+    cp app/build/outputs/apk/play/release/khazeena-<v>-play-release.apk releases/khazeena-<v>-play.apk
     python3 tools/update_release_docs.py
 
 Google Play itself takes a bundle instead: ./gradlew :app:bundlePlayRelease.
@@ -49,7 +49,7 @@ def main() -> None:
     lines = []
     checksums = []
     for flavour, note in FLAVOURS:
-        name = f"ganjoor-{v}-{flavour}.apk"
+        name = f"khazeena-{v}-{flavour}.apk"
         apk = ROOT / "releases" / name
         if not apk.exists():
             sys.exit(f"releases/{name} is missing — build and copy it in first")
@@ -83,7 +83,7 @@ def main() -> None:
             listing = listing[: existing.start()] + line + listing[existing.end():]
             continue
         last = None
-        for last in re.finditer(r"^[0-9a-f]{64}  ganjoor-[^\n]+$", listing, re.M):
+        for last in re.finditer(r"^[0-9a-f]{64}  khazeena-[^\n]+$", listing, re.M):
             pass
         if not last:
             sys.exit("could not find the checksum block in releases/README.md")
