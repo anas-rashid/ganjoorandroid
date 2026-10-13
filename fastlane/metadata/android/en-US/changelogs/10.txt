@@ -1,0 +1,3 @@
+The app is now called Khazeena (خزینه, a treasury). Nothing about the reading changed — the name did, because Ganjoor is ganjoor.net's name and this is an independent, unofficial reader for it, not their own app.
+
+It installs as a separate app rather than replacing the old one, so bookmarks and downloaded poets do not carry over. Keep both for a while if you need them.
