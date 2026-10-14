@@ -77,8 +77,18 @@ class ReleaseDocsTest {
     }
 
     @Test
-    fun `every checksum in releases matches the APK beside it`() {
-        val listed = Regex("^([0-9a-f]{64})  (khazeena-.+\\.apk)$", RegexOption.MULTILINE)
+    fun `the Play bundle is archived beside the APKs`() {
+        val aab = File(root, "releases/khazeena-$declaredVersion-play.aab")
+        assertTrue(aab.name + " is missing — Play Console takes the bundle, not the APK", aab.exists())
+        assertTrue(
+            aab.name + " has no checksum in releases/README.md",
+            read("releases/README.md").contains("  " + aab.name),
+        )
+    }
+
+    @Test
+    fun `every checksum in releases matches the file beside it`() {
+        val listed = Regex("^([0-9a-f]{64})  (khazeena-.+\\.(?:apk|aab))$", RegexOption.MULTILINE)
             .findAll(read("releases/README.md"))
             .map { it.groupValues[1] to it.groupValues[2] }
             .toList()

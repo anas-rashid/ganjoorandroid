@@ -13,9 +13,12 @@ Run it after building both and copying them into releases/:
     ./gradlew :app:assembleFossRelease :app:assemblePlayRelease
     cp app/build/outputs/apk/foss/release/khazeena-<v>-foss-release.apk releases/khazeena-<v>-foss.apk
     cp app/build/outputs/apk/play/release/khazeena-<v>-play-release.apk releases/khazeena-<v>-play.apk
+    ./gradlew :app:bundlePlayRelease
+    cp app/build/outputs/bundle/playRelease/khazeena-<v>-play-release.aab releases/khazeena-<v>-play.aab
     python3 tools/update_release_docs.py
 
-Google Play itself takes a bundle instead: ./gradlew :app:bundlePlayRelease.
+The .aab is what Google Play Console takes; it is kept beside the APKs and checksummed with
+them, but not offered as a download, since a phone cannot install it.
 
 It reads the version from the build file rather than taking an argument, so the
 documentation can only ever describe the release the build actually produces.
@@ -59,6 +62,11 @@ def main() -> None:
         lines.append(f"- [**{name}**](releases/{name}) · {megabytes:.1f} MB · `sha256 {short}` · {note}")
         checksums.append(f"{digest}  {name}")
         print(f"{name}  {megabytes:.1f} MB  {digest}")
+
+    bundle = ROOT / "releases" / f"khazeena-{v}-play.aab"
+    if not bundle.exists():
+        sys.exit(f"releases/{bundle.name} is missing — build and copy it in first")
+    checksums.append(f"{hashlib.sha256(bundle.read_bytes()).hexdigest()}  {bundle.name}")
 
     # README.md — the download heading, one line per APK, and the line of facts under them.
     readme = ROOT / "README.md"
