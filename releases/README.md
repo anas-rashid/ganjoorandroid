@@ -19,6 +19,10 @@ From 0.5.0 every release comes as two APKs. **foss** has no Google code at all a
 Translate through your own Cloud key; **play** translates on the phone with Google's ML Kit and
 needs Google Play Services. Either upgrades the other.
 
+Beside them is the **play** build as an app bundle (`.aab`), the file Google Play Console takes.
+A phone cannot install it; it is kept here so the bundle on Play can be checked against its
+checksum.
+
 | Version | Code | Commit | What it added |
 | --- | --- | --- | --- |
 | 0.1.0 | 1 | `9445f44` | The base app: browsing, bookmarks, offline, themes, the bundled dictionary with pronunciation, and Ganjoor's chapter order. |
@@ -37,6 +41,7 @@ needs Google Play Services. Either upgrades the other.
 ```
 b42e0c5b159396f85ce78e83dac0f5edff030e5bb834ee9b4fa8ec9e9510208c  khazeena-0.6.0-foss.apk
 6cf2e73662e8ff2d458c5033497f525a867d28ba11cf3609f5ac1a3f131e6f12  khazeena-0.6.0-play.apk
+0644ccd9d3a1c2f9433f41fb8c58da2723c9d5cd4ea929ce7162d3a32ce487e4  khazeena-0.6.0-play.aab
 ```
 
 Installing: `adb install -r releases/khazeena-<version>-foss.apk`. A phone holding a *debug* build has
