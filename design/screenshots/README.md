@@ -34,6 +34,13 @@ Persian. These are also the `fa` and `en-US` listings' `tenInchScreenshots/`.
 | `07-settings.png` | reading settings in the same panel |
 | `08-sepia-night-nastaliq.png` | the reader in sepia night, set in nastaliq |
 
+## 7-inch tablet, landscape
+
+`tablet-7in/` is the same eight scenes on a Nexus 7 profile (600dp, 1920×1200) in landscape,
+cropped to 1920×1088 to drop the emulator's taskbar. These are also the `fa` and `en-US`
+listings' `sevenInchScreenshots/`. At this width the poem keeps its hemistichs stacked while the
+columns are open, and sets them side by side once the columns are hidden.
+
 `../assets/store/` holds the Play graphics: the 512×512 icon, and the 1024×500 feature
 graphic with the SVG it is rendered from —
 
