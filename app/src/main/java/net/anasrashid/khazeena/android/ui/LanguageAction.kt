@@ -1,6 +1,8 @@
 package net.anasrashid.khazeena.android.ui
 
 import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -40,13 +42,21 @@ fun LanguageAction() {
                 },
                 onClick = {
                     open = false
-                    if (!selected) {
-                        settings.update { it.copy(language = language) }
-                        // Resources are picked in attachBaseContext, so the activity restarts.
-                        (context as? Activity)?.recreate()
-                    }
+                    if (!selected) switchLanguage(settings, context, language)
                 },
             )
         }
     }
+}
+
+/**
+ * Resources are picked in attachBaseContext, so the activity restarts. From inside a bottom sheet
+ * or menu the context is that window's wrapper, not the activity, so unwrap until one turns up;
+ * a plain cast found nothing there and the new language waited for the next launch.
+ */
+fun switchLanguage(settings: Settings, context: Context, language: Language) {
+    settings.update { it.copy(language = language) }
+    generateSequence(context) { (it as? ContextWrapper)?.baseContext }
+        .firstNotNullOfOrNull { it as? Activity }
+        ?.recreate()
 }

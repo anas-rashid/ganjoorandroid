@@ -1,6 +1,5 @@
 package net.anasrashid.khazeena.android.ui
 
-import android.app.Activity
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -164,11 +163,7 @@ private fun ReadingSettingsContent() {
 
             Label(R.string.language)
             Chips(Language.entries, prefs.language, { it.label }) { language ->
-                if (language != prefs.language) {
-                    settings.update { it.copy(language = language) }
-                    // Resources are picked in attachBaseContext, so the activity has to restart.
-                    (context as? Activity)?.recreate()
-                }
+                if (language != prefs.language) switchLanguage(settings, context, language)
             }
 
             Toggle(

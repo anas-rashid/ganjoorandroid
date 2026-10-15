@@ -1,9 +1,11 @@
 package net.anasrashid.khazeena.android.data
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -39,6 +41,7 @@ object Downloads {
     fun start(slug: String) {
         if (jobs[slug]?.isActive == true) return
         running[slug] = Progress(0, 0)
+        val wasSaved = Offline.isSaved(slug)
         jobs[slug] = scope.launch {
             try {
                 turn.withLock {
@@ -46,6 +49,14 @@ object Downloads {
                         running[slug] = Progress(done, total)
                     }
                 }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                // Uncaught, this would take the whole app down. A half-walked poet would also
+                // look saved, since saved means the folder exists, so drop it and let the
+                // reader tap download again.
+                Log.w("Downloads", "download of $slug failed", e)
+                if (!wasSaved) Offline.delete(slug)
             } finally {
                 running.remove(slug)
                 revision++
