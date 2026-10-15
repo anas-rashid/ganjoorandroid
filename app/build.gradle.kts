@@ -17,7 +17,7 @@ val keystoreProperties = Properties().apply {
 
 // A delivered file should say what it is without being opened.
 base {
-    archivesName = "khazeena-0.6.0"
+    archivesName = "khazeena-0.6.1"
 }
 
 android {
@@ -33,8 +33,8 @@ android {
         // Pre-1.0 while the app is still being shaped. versionCode only ever climbs: F-Droid
         // refuses an update that does not, and one changelog file per code lives in
         // fastlane/metadata/android/*/changelogs/.
-        versionCode = 10
-        versionName = "0.6.0"
+        versionCode = 11
+        versionName = "0.6.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

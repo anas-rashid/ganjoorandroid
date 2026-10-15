@@ -13,10 +13,10 @@ An **unofficial** Android reader for [Ganjoor](https://ganjoor.net), the open ar
 240 poets and ~135,000 poems, laid out for comfortable long-form reading in Persian, Urdu
 and Arabic script, online or fully offline.
 
-### ⬇ Download Khazeena 0.6.0
+### ⬇ Download Khazeena 0.6.1
 
-- [**khazeena-0.6.0-foss.apk**](releases/khazeena-0.6.0-foss.apk) · 31.9 MB · `sha256 b42e0c5b…c9e9510208c` · no Google code; Google Translate with your own Cloud key
-- [**khazeena-0.6.0-play.apk**](releases/khazeena-0.6.0-play.apk) · 95.2 MB · `sha256 6cf2e736…a3f131e6f12` · translates on the phone with Google's ML Kit; needs Google Play Services
+- [**khazeena-0.6.1-foss.apk**](releases/khazeena-0.6.1-foss.apk) · 31.9 MB · `sha256 e1b88ed5…db8693a7920` · no Google code; Google Translate with your own Cloud key
+- [**khazeena-0.6.1-play.apk**](releases/khazeena-0.6.1-play.apk) · 95.3 MB · `sha256 f84349b9…09f74d0dbdc` · translates on the phone with Google's ML Kit; needs Google Play Services
 
 Android 7.0 and up · [release history](releases/)
 

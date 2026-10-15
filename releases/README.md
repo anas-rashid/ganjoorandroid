@@ -7,7 +7,7 @@ Every build is signed with the same release key. Up to 0.5.1 they also shared on
 applicationId, so any of those upgrades any other in place without losing bookmarks.
 
 0.6.0 renamed the app and changed its applicationId. If you are on an earlier version,
-uninstall it and install 0.6.0 — Android will not replace it for you, and the old app receives
+uninstall it and install the current build — Android will not replace it for you, and the old app receives
 no further updates. Bookmarks and downloaded poets do not carry across; see "If you have the
 old Ganjoor app" in the main README before you remove it.
 
@@ -35,13 +35,14 @@ checksum.
 | 0.5.0 | 8 | `v0.5.0` | Ganjoor's AI descriptions translated in the page for Urdu and English readers, by Google Translate or your AI assistant, always labelled; presets for hosted AI APIs; two builds, foss and play; icons for a couplet's actions, and the bookmark glyph everywhere. |
 | 0.5.1 | 9 | `v0.5.1` | The privacy policy reads inside the app. Built so F-Droid can compile the identical APK and publish it under this project's own signature: AGP no longer writes the building checkout's git revision into the APK. |
 | 0.6.0 | 10 | `v0.6.0` | Renamed to Khazeena. Ganjoor is ganjoor.net's name and this is an independent, unofficial reader for it; the app now has its own name in each script, and its own applicationId. Installs alongside the old app rather than replacing it. |
+| 0.6.1 | 11 | `v0.6.1` | Downloads continue in the background with a progress notification and a per-poet queue; partial downloads are counted and retried; a failed download no longer crashes the app; poets the CDN stalled on load from GitHub instead; a recitation lights the couplet being read; the language switch in settings applies at once. |
 
 ## Checksums
 
 ```
-b42e0c5b159396f85ce78e83dac0f5edff030e5bb834ee9b4fa8ec9e9510208c  khazeena-0.6.0-foss.apk
-6cf2e73662e8ff2d458c5033497f525a867d28ba11cf3609f5ac1a3f131e6f12  khazeena-0.6.0-play.apk
-0644ccd9d3a1c2f9433f41fb8c58da2723c9d5cd4ea929ce7162d3a32ce487e4  khazeena-0.6.0-play.aab
+e1b88ed5b4ec7cc94de4d46e04d5612b51843a15beae909d97ec3db8693a7920  khazeena-0.6.1-foss.apk
+f84349b9f6fa6f54b0ecf6faaf03d7b4a5bb92c918ab9000377c909f74d0dbdc  khazeena-0.6.1-play.apk
+dff354e929363fc6b7846462b8c4498b6d4b0b4f9d428bf4b8e5a21149ccc1a0  khazeena-0.6.1-play.aab
 ```
 
 Installing: `adb install -r releases/khazeena-<version>-foss.apk`. A phone holding a *debug* build has
