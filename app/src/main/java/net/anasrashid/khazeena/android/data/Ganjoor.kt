@@ -18,6 +18,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.io.File
 import java.io.IOException
+import java.util.concurrent.TimeUnit
 
 /**
  * Ganjoor's poetry content as a static JSON "API": every endpoint below is a file in
@@ -27,6 +28,11 @@ import java.io.IOException
  * /hafez/ghazal/sh1 -> poets/hafez/ghazal/sh1.json
  */
 private const val DATA_BASE = "https://cdn.jsdelivr.net/gh/anas-rashid/ganjoor-data@main/"
+
+// The same files straight from GitHub. The repo is far past jsDelivr's 50 MB limit, so a file
+// its edge has not cached yet can stall for 30 s and then answer 503; GitHub answers in a blink.
+// ponytail: not first choice, since GitHub rate-limits bulk downloads that jsDelivr absorbs.
+private const val DATA_MIRROR = "https://raw.githubusercontent.com/anas-rashid/ganjoor-data/main/"
 
 // The data files use PascalCase keys; this maps them to idiomatic Kotlin names.
 @OptIn(ExperimentalSerializationApi::class)
@@ -154,9 +160,6 @@ data class Recitation(
     val mp3Url: String = "",
 )
 
-@Serializable
-private data class LivePoemRecitations(val recitations: List<Recitation> = emptyList())
-
 private val liveJson = Json { ignoreUnknownKeys = true }
 
 @Serializable
@@ -243,6 +246,7 @@ fun parentUrl(fullUrl: String): String? {
 
 object Ganjoor {
     private val dataBase = DATA_BASE.toHttpUrl()
+    private val dataMirror = DATA_MIRROR.toHttpUrl()
     private val liveBase = "https://api.ganjoor.net/".toHttpUrl()
     private lateinit var http: OkHttpClient
 
@@ -260,16 +264,39 @@ object Ganjoor {
             .build()
     }
 
-    private fun dataUrl(path: String) = dataBase.newBuilder().addPathSegments(path).build()
+    // A cold jsDelivr file is either quick or not coming at all, so it gets 15 s before GitHub.
+    private val cdn by lazy { http.newBuilder().callTimeout(15, TimeUnit.SECONDS).build() }
 
-    private fun fetch(url: HttpUrl): String {
+    /** A data-set file: jsDelivr, then GitHub directly when jsDelivr stalls or errs. */
+    private fun fetchData(path: String): String = try {
+        fetchOnce(dataBase.newBuilder().addPathSegments(path).build(), cdn)
+    } catch (e: IOException) {
+        fetchOnce(dataMirror.newBuilder().addPathSegments(path).build(), http)
+    }
+
+    // api.ganjoor.net, for the few things the data set does not carry. One retry for a blip.
+    private fun fetch(url: HttpUrl): String = try {
+        fetchOnce(url, http)
+    } catch (e: IOException) {
+        Thread.sleep(1500)
+        fetchOnce(url, http)
+    }
+
+    private fun fetchOnce(url: HttpUrl, client: OkHttpClient): String {
         val request = Request.Builder().url(url).build()
         val response = try {
-            http.newCall(request).execute()
+            client.newCall(request).execute()
         } catch (offline: IOException) {
-            // Stale-while-offline: serve the cached copy rather than failing the screen.
-            http.newCall(request.newBuilder().cacheControl(CacheControl.FORCE_CACHE).build())
-                .execute()
+            // Stale-while-offline: serve the cached copy rather than failing the screen. With
+            // nothing cached OkHttp makes up a 504, which would hide why the network failed.
+            val cached = client.newCall(
+                request.newBuilder().cacheControl(CacheControl.FORCE_CACHE).build()
+            ).execute()
+            if (!cached.isSuccessful) {
+                cached.close()
+                throw offline
+            }
+            cached
         }
         return response.use {
             if (!it.isSuccessful) throw IOException("HTTP ${it.code} for $url")
@@ -281,12 +308,12 @@ object Ganjoor {
     private suspend inline fun <reified T> load(path: String): T = withContext(Dispatchers.IO) {
         Offline.read(path)?.let { return@withContext json.decodeFromString<T>(it) }
         if (offline) throw NotDownloaded(path)
-        json.decodeFromString<T>(fetch(dataUrl(path)))
+        json.decodeFromString<T>(fetchData(path))
     }
 
     /** Like [load], but keeps the body on disk. Already-saved paths cost nothing. */
     private suspend fun grab(path: String): String = withContext(Dispatchers.IO) {
-        Offline.read(path) ?: fetch(dataUrl(path)).also { Offline.write(path, it) }
+        Offline.read(path) ?: fetchData(path).also { Offline.write(path, it) }
     }
 
     // Kept on disk from the first fetch: without the poet list, offline mode has no way in.
@@ -378,12 +405,12 @@ object Ganjoor {
     suspend fun recitations(poemId: Int): List<Recitation> = withContext(Dispatchers.IO) {
         if (offline || poemId == 0) return@withContext emptyList()
         val url = liveBase.newBuilder()
-            .addPathSegments("api/ganjoor/poem/$poemId")
-            .addQueryParameter("recitations", "true")
-            .addQueryParameter("verseDetails", "false")
+            // Not poem/{id}?recitations=true: that also returns rhymes, images, songs, comments
+            // and related poems by default, half a megabyte for a ghazal against 15 kB here.
+            .addPathSegments("api/ganjoor/poem/$poemId/recitations")
             .build()
         runCatching {
-            liveJson.decodeFromString<LivePoemRecitations>(fetch(url)).recitations
+            liveJson.decodeFromString<List<Recitation>>(fetch(url))
                 .filter { it.mp3Url.isNotBlank() }
         }.getOrDefault(emptyList())
     }

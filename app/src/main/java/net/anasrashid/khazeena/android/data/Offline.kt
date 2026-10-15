@@ -28,9 +28,9 @@ object Offline {
 
     fun isSaved(slug: String) = poetDir(slug).isDirectory
 
-    /** Poem files only — `_cat.json` is structure, not something you read. */
+    /** Poem files only — `_cat.json` and `poet.json` are structure, not something you read. */
     fun poemCount(slug: String): Int =
-        poetDir(slug).walkTopDown().count { it.isFile && it.name != "_cat.json" }
+        poetDir(slug).walkTopDown().count { it.isFile && it.name != "_cat.json" && it.name != "poet.json" }
 
     fun savedSlugs(): List<String> =
         File(root, "poets").listFiles()?.filter { it.isDirectory }?.map { it.name }?.sorted()
