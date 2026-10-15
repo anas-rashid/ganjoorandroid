@@ -1,5 +1,6 @@
 package net.anasrashid.khazeena.android.data
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
@@ -17,8 +18,10 @@ import kotlinx.coroutines.sync.withLock
 /**
  * Tracks poet downloads so the UI can show progress.
  *
- * ponytail: plain coroutines, no WorkManager — a download stops when the process dies. Starting
- * it again is cheap and safe, because [Ganjoor.downloadPoet] skips anything already on disk.
+ * The work is plain coroutines; [DownloadService] only keeps the process alive, in the foreground
+ * with a notification, while anything is queued, so leaving the app does not stop a download.
+ * ponytail: no WorkManager, so a download the system kills anyway is not resumed on its own.
+ * Starting it again is cheap and safe, because [Ganjoor.downloadPoet] skips anything on disk.
  */
 object Downloads {
     /** [total] is 0 until the poet's tree has been walked, i.e. while still queued. */
@@ -26,6 +29,10 @@ object Downloads {
 
     /** Slug -> progress, for downloads running right now. */
     val running = mutableStateMapOf<String, Progress>()
+
+    /** The poet being fetched right now; everyone else in [running] is waiting their turn. */
+    var active by mutableStateOf<String?>(null)
+        private set
 
     /** Bumped whenever a download finishes or a poet is deleted, so screens re-read the disk. */
     var revision by mutableStateOf(0)
@@ -38,26 +45,27 @@ object Downloads {
     // once would open thousands of connections and finish no sooner.
     private val turn = Mutex()
 
-    fun start(slug: String) {
+    fun start(context: Context, slug: String) {
         if (jobs[slug]?.isActive == true) return
         running[slug] = Progress(0, 0)
-        val wasSaved = Offline.isSaved(slug)
+        DownloadService.start(context)
         jobs[slug] = scope.launch {
             try {
                 turn.withLock {
-                    Ganjoor.downloadPoet(slug) { done, total ->
+                    active = slug
+                    val missing = Ganjoor.downloadPoet(slug) { done, total ->
                         running[slug] = Progress(done, total)
                     }
+                    Offline.markSaved(slug, missing)
                 }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                // Uncaught, this would take the whole app down. A half-walked poet would also
-                // look saved, since saved means the folder exists, so drop it and let the
-                // reader tap download again.
+                // Uncaught, this would take the whole app down. What did arrive stays on disk,
+                // unmarked, so tapping download again picks up where this stopped.
                 Log.w("Downloads", "download of $slug failed", e)
-                if (!wasSaved) Offline.delete(slug)
             } finally {
+                if (active == slug) active = null
                 running.remove(slug)
                 revision++
             }
@@ -68,6 +76,8 @@ object Downloads {
         jobs.remove(slug)?.cancel()
         running.remove(slug)
     }
+
+    fun cancelAll() = running.keys.toList().forEach(::cancel)
 
     fun delete(slug: String) {
         cancel(slug)

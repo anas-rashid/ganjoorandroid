@@ -257,6 +257,7 @@ private fun PinMark(modifier: Modifier = Modifier) {
  */
 @Composable
 private fun DownloadAction(slug: String) {
+    val startDownload = rememberStartDownload()
     val progress = Downloads.running[slug]
     val saved = remember(slug, Downloads.revision) { Offline.isSaved(slug) }
 
@@ -282,7 +283,7 @@ private fun DownloadAction(slug: String) {
             )
         }
 
-        else -> IconButton(onClick = { Downloads.start(slug) }) {
+        else -> IconButton(onClick = { startDownload(listOf(slug)) }) {
             Icon(
                 painter = painterResource(R.drawable.ic_download),
                 contentDescription = stringResource(R.string.download),

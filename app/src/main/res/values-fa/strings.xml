@@ -30,7 +30,13 @@
     <string name="offline_mode_note">فقط از شعرهای ذخیره‌شده بخوان</string>
     <string name="download">دریافت</string>
     <string name="downloading">در حال دریافت… %1$d از %2$d</string>
+    <string name="downloads_now">در حال دریافت</string>
+    <string name="download_preparing">در حال یافتن شعرها…</string>
+    <string name="download_waiting">در صف</string>
+    <string name="downloads_waiting">%d شاعر دیگر در صف</string>
+    <string name="cancel_all">لغو همه</string>
     <string name="downloaded">ذخیره شد (%d شعر)</string>
+    <string name="downloaded_partial">ذخیره شد (%1$d شعر، %2$d جا ماند)</string>
     <string name="delete_download">حذف از حافظه</string>
     <string name="download_all">دریافت همهٔ شاعران</string>
     <string name="download_all_warning">دریافت همهٔ ۱۳۵٬۰۰۰ شعر ساعت‌ها طول می‌کشد و صدها مگابایت جا می‌گیرد.</string>

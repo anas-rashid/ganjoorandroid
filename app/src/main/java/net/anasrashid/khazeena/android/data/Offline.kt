@@ -26,14 +26,27 @@ object Offline {
 
     private fun poetDir(slug: String) = File(root, "poets/$slug")
 
-    fun isSaved(slug: String) = poetDir(slug).isDirectory
+    // Written last, once the download has run to the end, and holding how many poems did not
+    // arrive. Without it a download killed halfway, by a crash or by Android, left a folder that
+    // looked exactly like a finished one.
+    private fun marker(slug: String) = File(poetDir(slug), ".complete")
+
+    fun isSaved(slug: String) = marker(slug).isFile
+
+    /** Poems that failed in the last download of a saved poet; downloading again fetches them. */
+    fun missing(slug: String): Int = runCatching { marker(slug).readText().toInt() }.getOrDefault(0)
+
+    fun markSaved(slug: String, missing: Int) {
+        marker(slug).writeText(missing.toString())
+    }
 
     /** Poem files only — `_cat.json` and `poet.json` are structure, not something you read. */
     fun poemCount(slug: String): Int =
-        poetDir(slug).walkTopDown().count { it.isFile && it.name != "_cat.json" && it.name != "poet.json" }
+        poetDir(slug).walkTopDown()
+            .count { it.isFile && it.extension == "json" && it.name != "_cat.json" && it.name != "poet.json" }
 
     fun savedSlugs(): List<String> =
-        File(root, "poets").listFiles()?.filter { it.isDirectory }?.map { it.name }?.sorted()
+        File(root, "poets").listFiles()?.map { it.name }?.filter(::isSaved)?.sorted()
             ?: emptyList()
 
     fun delete(slug: String) {

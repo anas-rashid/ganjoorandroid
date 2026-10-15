@@ -161,6 +161,7 @@ internal fun poetSlug(fullUrl: String): String? =
 
 @Composable
 internal fun PoetDownloadAction(slug: String) {
+    val startDownload = rememberStartDownload()
     val progress = Downloads.running[slug]
     val saved = remember(slug, Downloads.revision) { Offline.isSaved(slug) }
 
@@ -186,7 +187,7 @@ internal fun PoetDownloadAction(slug: String) {
         }
 
         // Core Material icons ship no download glyph, and the extended set is 4 MB for one icon.
-        else -> IconButton(onClick = { Downloads.start(slug) }) {
+        else -> IconButton(onClick = { startDownload(listOf(slug)) }) {
             Icon(painterResource(R.drawable.ic_download), stringResource(R.string.download))
         }
     }

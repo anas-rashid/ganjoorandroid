@@ -1,9 +1,15 @@
 package net.anasrashid.khazeena.android.ui
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import android.text.format.Formatter
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -14,16 +20,17 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -43,8 +50,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import coil3.compose.AsyncImage
 import net.anasrashid.khazeena.android.R
 import net.anasrashid.khazeena.android.data.Downloads
@@ -57,6 +66,7 @@ import net.anasrashid.khazeena.android.data.PoetRef
 fun DownloadsScreen(onUp: () -> Unit) {
     Load(key = Unit, block = { Ganjoor.manifest() }) { manifest ->
         val context = LocalContext.current
+        val startDownload = rememberStartDownload()
         // Re-read the disk whenever a download finishes or a poet is removed.
         val revision = Downloads.revision
         val saved = remember(revision) { Offline.savedSlugs().toSet() }
@@ -91,7 +101,7 @@ fun DownloadsScreen(onUp: () -> Unit) {
                     Surface(tonalElevation = 3.dp) {
                         Button(
                             onClick = {
-                                selected.forEach { Downloads.start(it) }
+                                startDownload(selected.toList())
                                 selected.clear()
                             },
                             modifier = Modifier
@@ -137,16 +147,45 @@ fun DownloadsScreen(onUp: () -> Unit) {
                     HorizontalDivider()
                 }
 
-                items(poets, key = { it.id }) { poet ->
+                // What is downloading, and what is queued behind it, above the full list, so
+                // progress can be followed without hunting for each poet.
+                val active = Downloads.active
+                val queue = manifest.poets.filter { it.slug in Downloads.running }
+                    .sortedByDescending { it.slug == active }
+                if (queue.isNotEmpty()) {
+                    item {
+                        ListItem(
+                            headlineContent = {
+                                Text(
+                                    stringResource(R.string.downloads_now),
+                                    style = MaterialTheme.typography.titleSmall,
+                                    color = MaterialTheme.colorScheme.primary,
+                                )
+                            },
+                            trailingContent = {
+                                TextButton(onClick = Downloads::cancelAll) {
+                                    Text(stringResource(R.string.cancel_all))
+                                }
+                            },
+                        )
+                    }
+                    items(queue, key = { "queued-${it.id}" }) { poet ->
+                        QueuedRow(poet, Downloads.running[poet.slug], poet.slug == active)
+                    }
+                    item { HorizontalDivider() }
+                }
+
+                // Queued poets are listed above instead, so nobody appears twice.
+                items(poets.filter { it.slug !in Downloads.running }, key = { it.id }) { poet ->
                     PoetRow(
                         poet = poet,
-                        progress = Downloads.running[poet.slug],
                         isSaved = poet.slug in saved,
                         isSelected = poet.slug in selected,
                         revision = revision,
                         onToggleSelected = {
                             if (!selected.remove(poet.slug)) selected.add(poet.slug)
                         },
+                        onRetry = { startDownload(listOf(poet.slug)) },
                     )
                     HorizontalDivider()
                 }
@@ -160,7 +199,11 @@ fun DownloadsScreen(onUp: () -> Unit) {
                     confirmButton = {
                         TextButton(onClick = {
                             confirmAll = false
-                            manifest.poets.forEach { Downloads.start(it.slug) }
+                            // Poets already complete would only be walked again for nothing.
+                            startDownload(
+                                manifest.poets.map { it.slug }
+                                    .filter { it !in saved || Offline.missing(it) > 0 }
+                            )
                         }) { Text(stringResource(R.string.download)) }
                     },
                     dismissButton = {
@@ -174,26 +217,92 @@ fun DownloadsScreen(onUp: () -> Unit) {
     }
 }
 
+/** A poet in the download queue: a progress bar while it is fetched, "waiting" until then. */
+@Composable
+private fun QueuedRow(poet: PoetRef, progress: Downloads.Progress?, isActive: Boolean) {
+    ListItem(
+        headlineContent = { Text(poet.nickname) },
+        supportingContent = {
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(
+                    when {
+                        !isActive -> stringResource(R.string.download_waiting)
+                        progress == null || progress.total == 0 ->
+                            stringResource(R.string.download_preparing)
+                        else -> stringResource(R.string.downloading, progress.done, progress.total)
+                    }
+                )
+                if (isActive) {
+                    if (progress == null || progress.total == 0) {
+                        LinearProgressIndicator(Modifier.fillMaxWidth())
+                    } else {
+                        LinearProgressIndicator(
+                            progress = { progress.done.toFloat() / progress.total },
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
+                }
+            }
+        },
+        leadingContent = {
+            AsyncImage(
+                model = poet.imageUrl,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.size(44.dp).clip(CircleShape),
+            )
+        },
+        trailingContent = {
+            IconButton(onClick = { Downloads.cancel(poet.slug) }) {
+                Icon(Icons.Default.Close, stringResource(R.string.cancel))
+            }
+        },
+    )
+}
+
 /**
- * One poet. The trailing control is whichever of the three states the poet is in: being fetched,
- * already on the device, or available to tick for the next batch.
+ * Starts downloads, first asking (Android 13 and up) to show the notification that follows them
+ * once the app is left. Refusing only hides the notification; the downloads run either way.
+ */
+@Composable
+fun rememberStartDownload(): (List<String>) -> Unit {
+    val context = LocalContext.current
+    val ask = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {}
+    return { slugs ->
+        if (Build.VERSION.SDK_INT >= 33 && ContextCompat.checkSelfPermission(
+                context, Manifest.permission.POST_NOTIFICATIONS,
+            ) != PackageManager.PERMISSION_GRANTED
+        ) ask.launch(Manifest.permission.POST_NOTIFICATIONS)
+        slugs.forEach { Downloads.start(context, it) }
+    }
+}
+
+/**
+ * One poet not in the queue. The trailing control follows its state: on the device (with a retry
+ * beside delete when some poems did not arrive), or available to tick for the next batch.
  */
 @Composable
 private fun PoetRow(
     poet: PoetRef,
-    progress: Downloads.Progress?,
     isSaved: Boolean,
     isSelected: Boolean,
     revision: Int,
     onToggleSelected: () -> Unit,
+    onRetry: () -> Unit,
 ) {
     val poems = remember(poet.slug, revision) { if (isSaved) Offline.poemCount(poet.slug) else 0 }
+    val missing = remember(poet.slug, revision) { if (isSaved) Offline.missing(poet.slug) else 0 }
 
     ListItem(
         headlineContent = { Text(poet.nickname) },
         supportingContent = when {
-            progress != null && progress.total > 0 -> {
-                { Text(stringResource(R.string.downloading, progress.done, progress.total)) }
+            missing > 0 -> {
+                {
+                    Text(
+                        stringResource(R.string.downloaded_partial, poems, missing),
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                }
             }
 
             isSaved -> {
@@ -212,18 +321,19 @@ private fun PoetRow(
         },
         trailingContent = {
             when {
-                progress != null -> IconButton(onClick = { Downloads.cancel(poet.slug) }) {
-                    CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
-                }
-
-                isSaved -> IconButton(onClick = { Downloads.delete(poet.slug) }) {
-                    Icon(Icons.Default.Delete, stringResource(R.string.delete_download))
+                isSaved -> Row {
+                    if (missing > 0) IconButton(onClick = onRetry) {
+                        Icon(painterResource(R.drawable.ic_download), stringResource(R.string.retry))
+                    }
+                    IconButton(onClick = { Downloads.delete(poet.slug) }) {
+                        Icon(Icons.Default.Delete, stringResource(R.string.delete_download))
+                    }
                 }
 
                 else -> Checkbox(checked = isSelected, onCheckedChange = { onToggleSelected() })
             }
         },
-        modifier = if (progress != null || isSaved) Modifier
+        modifier = if (isSaved) Modifier
         else Modifier.clickable(onClick = onToggleSelected),
     )
 }
