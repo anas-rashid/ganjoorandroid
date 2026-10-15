@@ -158,7 +158,22 @@ data class Recitation(
     val audioTitle: String = "",
     val audioArtist: String = "",
     val mp3Url: String = "",
+    /** Ganjoor has timed each verse of this reading, so the text can follow along. */
+    val inSyncWithText: Boolean = false,
 )
+
+/** When a reading reaches a verse; [verseOrder] is the poem's own [Verse.vOrder], 0 the title. */
+@Serializable
+data class VerseTiming(val verseOrder: Int = 0, val audioStartMilliseconds: Int = 0)
+
+/**
+ * The verse being read [millis] into a reading: the last one already started. Where two share a
+ * start, as the title and the first line often do at 0, the later wins. Null before the first.
+ */
+fun List<VerseTiming>.verseAt(millis: Int): Int? =
+    filter { it.audioStartMilliseconds <= millis }
+        .maxWithOrNull(compareBy({ it.audioStartMilliseconds }, { it.verseOrder }))
+        ?.verseOrder
 
 private val liveJson = Json { ignoreUnknownKeys = true }
 
@@ -413,6 +428,16 @@ object Ganjoor {
             liveJson.decodeFromString<List<Recitation>>(fetch(url))
                 .filter { it.mp3Url.isNotBlank() }
         }.getOrDefault(emptyList())
+    }
+
+    /** Each verse's start in a [Recitation]; empty when it has none, or on any failure. */
+    suspend fun verseTimings(recitation: Recitation): List<VerseTiming> = withContext(Dispatchers.IO) {
+        if (offline || !recitation.inSyncWithText) return@withContext emptyList()
+        val url = liveBase.newBuilder()
+            .addPathSegments("api/audio/verses/${recitation.id}")
+            .build()
+        runCatching { liveJson.decodeFromString<List<VerseTiming>>(fetch(url)) }
+            .getOrDefault(emptyList())
     }
 
     /**

@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -126,6 +127,21 @@ fun PoemScreen(
         val style = readingStyle(prefs.font, prefs.fontSize, prefs.fontWeight.weight)
         val couplets = remember(poem) { poem.verses.couplets() }
 
+        // The verse a timed reading has reached. Its couplet is lit, and brought into view when
+        // the reading moves past the screen, so the voice can be followed without scrolling.
+        var spoken by remember(poem) { mutableStateOf<Int?>(null) }
+        val list = rememberLazyListState()
+        LaunchedEffect(spoken) {
+            val couplet = couplets.indexOfFirst { c -> c.any { it.vOrder == spoken } }
+            if (couplet < 0) return@LaunchedEffect
+            val item = couplet + 1 // after the breadcrumbs
+            val layout = list.layoutInfo
+            val shown = layout.visibleItemsInfo.firstOrNull { it.index == item }
+            if (shown == null || shown.offset < layout.viewportStartOffset ||
+                shown.offset + shown.size > layout.viewportEndOffset
+            ) list.animateScrollToItem(item)
+        }
+
         // Siblings come from the parent category, which is a much bigger file than the poem, so
         // it loads after the poem is already on screen.
         var siblings by remember(fullUrl) { mutableStateOf<List<PoemRef>>(emptyList()) }
@@ -183,10 +199,15 @@ fun PoemScreen(
             // Above the text, not in it: as an item of the list the player was disposed the
             // moment it scrolled off, which released the MediaPlayer and cut the reading off
             // mid-line. Here it keeps playing, and stays in reach while you read further down.
-            RecitationPlayer(poem.id, Modifier.padding(start = side, end = side, top = 8.dp))
+            RecitationPlayer(
+                poem.id,
+                Modifier.padding(start = side, end = side, top = 8.dp),
+                onVerse = { spoken = it },
+            )
             SelectionContainer(Modifier.weight(1f)) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
+                state = list,
                 contentPadding = PaddingValues(
                     start = side,
                     end = side,
@@ -216,6 +237,7 @@ fun PoemScreen(
                         source = Bookmark(fullUrl, poem.title, poem.fullTitle),
                         onWord = { tapped = it },
                         tapped = tapped,
+                        spoken = couplet.any { it.vOrder == spoken },
                     )
                 }
 
@@ -401,6 +423,7 @@ private fun Couplet(
     onWord: (WordTap) -> Unit,
     tapped: WordTap?,
     sideBySide: Boolean = false,
+    spoken: Boolean = false,
 ) {
     // Tap, not long-press: long-press belongs to the text selection this sits inside.
     var actionsOpen by remember(couplet) { mutableStateOf(false) }
@@ -417,9 +440,13 @@ private fun Couplet(
     val colors = MaterialTheme.colorScheme
     // A step lighter than the page. On OLED black the usual step is all but black itself, so
     // the card takes the next one up: still dim, but there.
-    val cardColor =
-        if (colors.surface == Color.Black) colors.surfaceContainerHighest else colors.surfaceContainerHigh
-    val card = if (isVerse) {
+    val cardColor = when {
+        // The couplet a recitation is reading, in the theme's accent.
+        spoken -> colors.primaryContainer
+        colors.surface == Color.Black -> colors.surfaceContainerHighest
+        else -> colors.surfaceContainerHigh
+    }
+    val card = if (isVerse || spoken) {
         Modifier
             .padding(vertical = 4.dp)
             .clip(RoundedCornerShape(12.dp))
