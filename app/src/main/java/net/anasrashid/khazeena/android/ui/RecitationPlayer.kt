@@ -43,6 +43,8 @@ import androidx.compose.runtime.CompositionLocalProvider
 import net.anasrashid.khazeena.android.R
 import net.anasrashid.khazeena.android.data.Ganjoor
 import net.anasrashid.khazeena.android.data.Recitation
+import net.anasrashid.khazeena.android.data.VerseTiming
+import net.anasrashid.khazeena.android.data.verseAt
 import kotlinx.coroutines.delay
 
 /** mm:ss, the only shape a reading's length ever needs. */
@@ -62,9 +64,12 @@ private fun clock(millis: Int): String {
  * ponytail: still the platform's MediaPlayer rather than ExoPlayer. One URL, and seeking within
  * it, is not a media library's worth of work. Nothing is cached, so this is the one part of the
  * app that needs a connection; it simply doesn't appear when there is no reading or no network.
+ *
+ * @param onVerse the [net.anasrashid.khazeena.android.data.Verse.vOrder] being read, for readings
+ *   Ganjoor has timed; null when stopped before the start, or when there is nothing to follow.
  */
 @Composable
-fun RecitationPlayer(poemId: Int, modifier: Modifier = Modifier) {
+fun RecitationPlayer(poemId: Int, modifier: Modifier = Modifier, onVerse: (Int?) -> Unit = {}) {
     val recitations by produceState(emptyList<Recitation>(), poemId) {
         value = Ganjoor.recitations(poemId)
     }
@@ -93,6 +98,9 @@ fun RecitationPlayer(poemId: Int, modifier: Modifier = Modifier) {
     DisposableEffect(player) { onDispose { runCatching { player.release() } } }
 
     val recitation = recitations.getOrNull(chosen) ?: return
+    val timings by produceState(emptyList<VerseTiming>(), recitation.id) {
+        value = Ganjoor.verseTimings(recitation)
+    }
     // Changing reader stops whatever was playing, so the two never overlap.
     DisposableEffect(recitation.mp3Url) {
         runCatching { player.reset() }
@@ -110,6 +118,12 @@ fun RecitationPlayer(poemId: Int, modifier: Modifier = Modifier) {
             delay(250)
         }
     }
+
+    // The text follows the voice once there is something playing or paused to follow; a pause
+    // keeps the couplet lit, so you can see where the reading will pick up again.
+    val verse = if (duration > 0) timings.verseAt(scrubbing?.toInt() ?: position) else null
+    LaunchedEffect(verse) { onVerse(verse) }
+    DisposableEffect(Unit) { onDispose { onVerse(null) } }
 
     fun toggle() {
         if (playing) {
