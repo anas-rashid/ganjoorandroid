@@ -419,8 +419,11 @@ object Ganjoor {
      * Saves a poet's whole tree — biography, every category and every poem — for offline reading.
      * Re-running it is cheap: anything already on disk is skipped, which is also how a download
      * interrupted by the process dying gets finished.
+     *
+     * @return how many poems could not be fetched. Their siblings are kept, so one bad file
+     *   costs only itself; running this again tries just those.
      */
-    suspend fun downloadPoet(slug: String, onProgress: (done: Int, total: Int) -> Unit) {
+    suspend fun downloadPoet(slug: String, onProgress: (done: Int, total: Int) -> Unit): Int {
         val wasOffline = offline
         offline = false
         try {
@@ -439,16 +442,18 @@ object Ganjoor {
 
             onProgress(0, poemPaths.size)
             var done = 0
+            var failed = 0
             // Six at a time: enough to keep the CDN busy without opening a connection per poem.
             poemPaths.chunked(6).forEach { chunk ->
-                coroutineScope {
+                failed += coroutineScope {
                     chunk.map { path -> async { runCatching { grab(path) } } }.awaitAll()
-                }
+                }.count { it.isFailure }
                 done += chunk.size
                 onProgress(done, poemPaths.size)
             }
 
             catIds.forEach { runCatching { excerpts(it) } }
+            return failed
         } finally {
             offline = wasOffline
         }

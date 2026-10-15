@@ -30,7 +30,13 @@
     <string name="offline_mode_note">صرف محفوظ شدہ کلام پڑھیں</string>
     <string name="download">ڈاؤن لوڈ</string>
     <string name="downloading">ڈاؤن لوڈ جاری… %2$d میں سے %1$d</string>
+    <string name="downloads_now">ڈاؤن لوڈ جاری</string>
+    <string name="download_preparing">کلام تلاش کیے جا رہے ہیں…</string>
+    <string name="download_waiting">قطار میں</string>
+    <string name="downloads_waiting">مزید %d شعرا قطار میں</string>
+    <string name="cancel_all">سب منسوخ کریں</string>
     <string name="downloaded">محفوظ ہو گیا (%d کلام)</string>
+    <string name="downloaded_partial">محفوظ ہو گیا (%1$d کلام، %2$d رہ گئے)</string>
     <string name="delete_download">آلے سے حذف کریں</string>
     <string name="download_all">تمام شعرا ڈاؤن لوڈ کریں</string>
     <string name="download_all_warning">تمام ۱۳۵٬۰۰۰ کلام ڈاؤن لوڈ کرنے میں کئی گھنٹے اور سینکڑوں میگابائٹ لگیں گے۔</string>

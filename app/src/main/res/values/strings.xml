@@ -32,7 +32,13 @@
     <string name="offline_mode_note">Read only what\'s been downloaded</string>
     <string name="download">Download</string>
     <string name="downloading">Downloading… %1$d of %2$d</string>
+    <string name="downloads_now">Downloading now</string>
+    <string name="download_preparing">Finding the poems…</string>
+    <string name="download_waiting">Waiting</string>
+    <string name="downloads_waiting">%d more waiting</string>
+    <string name="cancel_all">Cancel all</string>
     <string name="downloaded">Saved (%d poems)</string>
+    <string name="downloaded_partial">Saved (%1$d poems, %2$d missing)</string>
     <string name="delete_download">Delete from device</string>
     <string name="download_all">Download every poet</string>
     <string name="download_all_warning">Downloading all 135,000 poems takes hours and hundreds of megabytes.</string>
